@@ -56,21 +56,32 @@ class Application
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $method = $_SERVER['REQUEST_METHOD'];
         
-        // Normalize slashes for Windows compatibility
-        $scriptName = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
-        
-        // Remove script path from URI if it exists (for subfolder installation)
-        if ($scriptName !== '/' && strpos($uri, $scriptName) === 0) {
-            $uri = substr($uri, strlen($scriptName));
+        $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']); 
+        $scriptDir = str_replace('\\', '/', dirname($scriptName));
+
+        // Ensure scriptDir ends with / for consistent matching
+        if (substr($scriptDir, -1) !== '/') {
+            $scriptDir .= '/';
+        }
+
+        // Case 1: Request includes the full path (e.g. /sunuframework2/public/login)
+        if (strpos($uri, $scriptDir) === 0) {
+            $uri = substr($uri, strlen($scriptDir));
+        }
+        else {
+            // Case 2: Request is rewritten (e.g. /sunuframework2/login -> /sunuframework2/public/index.php)
+            // We need to check if the scriptDir ends with 'public/' and try removing it.
+            $publicSegment = '/public/';
+            if (substr($scriptDir, -strlen($publicSegment)) === $publicSegment) {
+                $baseDir = substr($scriptDir, 0, -strlen($publicSegment) + 1); // Keep trailing slash
+                if (strpos($uri, $baseDir) === 0) {
+                    $uri = substr($uri, strlen($baseDir));
+                }
+            }
         }
         
-        // Ensure URI starts with /
-        if ($uri === '' || $uri === false) {
-            $uri = '/';
-        }
-        if (strpos($uri, '/') !== 0) {
-            $uri = '/' . $uri;
-        }
+        // Cleanup
+        $uri = '/' . ltrim($uri, '/');
 
         $this->router->dispatch($method, $uri);
     }
