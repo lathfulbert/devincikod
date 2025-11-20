@@ -91,6 +91,15 @@ class Column
         return $this;
     }
 
+    public function unique(): self
+    {
+        // Unique constraint logic would go here (e.g. adding UNIQUE index)
+        // For MVP, we might just mark it or append UNIQUE to definition if supported inline
+        // SQLite supports inline UNIQUE. MySQL supports it too.
+        $this->unique = true;
+        return $this;
+    }
+
     public function toSql(): string
     {
         $sql = "{$this->name} {$this->type}";
@@ -101,6 +110,10 @@ class Column
 
         if ($this->default !== null) {
             $sql .= " DEFAULT '{$this->default}'";
+        }
+
+        if (isset($this->unique) && $this->unique) {
+            $sql .= " UNIQUE";
         }
 
         return $sql;

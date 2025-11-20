@@ -22,10 +22,12 @@ This is a modular PHP framework built from scratch. It features a central Core a
 ## Database & Migrations
 1.  Configure your database in `.env` (copy from `.env.example` if needed).
 2.  Run migrations: `php sunu migrate`.
-3.  This will create the `users` table defined in `Modules/Auth`.
+3.  Run seeders: `php sunu seed` (Initializes Roles & Permissions).
+4.  This will create the `users` table and RBAC tables.
 
 ## CLI
-- Use `php sunu migrate` to run pending migrations.
+- `php sunu migrate`: Run pending migrations.
+- `php sunu seed`: Run database seeders.
 
 ## Adding a New Module
 1.  Create a new directory in `Modules/` (e.g., `Modules/Blog`).

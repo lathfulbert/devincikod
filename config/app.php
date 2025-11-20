@@ -6,7 +6,8 @@ return [
     'modules' => [
         'Demo' => true,
         'Blog' => true,
-        'Auth' => true
+        'Auth' => true,
+        'RBAC' => true
     ],
     'database' => [
         'driver' => getenv('DB_CONNECTION') ?: 'mysql',

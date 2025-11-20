@@ -17,8 +17,19 @@ class Kernel
 
         if ($command === 'migrate') {
             $this->migrate();
+        } elseif ($command === 'seed') {
+            $this->seed();
         } else {
-            echo "Usage: php sunu migrate\n";
+            echo "Usage: php sunu [migrate|seed]\n";
+        }
+    }
+
+    protected function seed(): void
+    {
+        echo "Running seeders...\n";
+        // Hardcoded for now, ideally discovered
+        if (class_exists(\Modules\RBAC\Database\Seeders\RBACSeeder::class)) {
+            (new \Modules\RBAC\Database\Seeders\RBACSeeder())->run();
         }
     }
 
