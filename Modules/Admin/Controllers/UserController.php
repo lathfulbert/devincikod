@@ -42,10 +42,7 @@ class UserController
 
         // Assign roles
         if (!empty($roleIds)) {
-            $db = Database::getInstance();
-            foreach ($roleIds as $roleId) {
-                $db->query("INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)", [$user->id, $roleId]);
-            }
+            $user->roles()->attach($roleIds);
         }
 
         redirect('/admin/users');
@@ -59,16 +56,17 @@ class UserController
             redirect('/admin/users');
             return;
         }
-        
+
         $app = Application::getInstance();
         $user = User::find($id);
         $roles = Role::all();
-        $userRoles = $user->roles();
+        // Use getResults() to get the array of Role objects
+        $userRoles = $user->roles()->getResults();
         $userRoleIds = array_map(fn($r) => $r->id, $userRoles);
 
         echo $app->view->render('admin/users/edit', [
-            'title' => 'Edit User', 
-            'user' => $user, 
+            'title' => 'Edit User',
+            'user' => $user,
             'roles' => $roles,
             'userRoleIds' => $userRoleIds
         ]);
@@ -81,7 +79,7 @@ class UserController
             redirect('/admin/users');
             return;
         }
-        
+
         $user = User::find($id);
         if (!$user) {
             redirect('/admin/users');
@@ -98,15 +96,8 @@ class UserController
         }
         $user->save();
 
-        // Update roles (simple delete and re-insert for now)
-        $db = Database::getInstance();
-        $db->query("DELETE FROM user_roles WHERE user_id = ?", [$user->id]);
-        
-        if (!empty($roleIds)) {
-            foreach ($roleIds as $roleId) {
-                $db->query("INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)", [$user->id, $roleId]);
-            }
-        }
+        // Update roles
+        $user->roles()->sync($roleIds);
 
         redirect('/admin/users');
         exit;
@@ -119,11 +110,11 @@ class UserController
             redirect('/admin/users');
             return;
         }
-        
+
         $user = User::find($id);
         if ($user) {
-            $db = Database::getInstance();
-            $db->query("DELETE FROM user_roles WHERE user_id = ?", [$user->id]);
+            // Detach all roles before deleting
+            $user->roles()->detach();
             $user->delete();
         }
         redirect('/admin/users');

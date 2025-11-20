@@ -40,10 +40,7 @@ class RoleController
         $role->save();
 
         if (!empty($permissionIds)) {
-            $db = Database::getInstance();
-            foreach ($permissionIds as $permId) {
-                $db->query("INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)", [$role->id, $permId]);
-            }
+            $role->permissions()->attach($permissionIds);
         }
 
         redirect('/admin/roles');
@@ -57,16 +54,16 @@ class RoleController
             redirect('/admin/roles');
             return;
         }
-        
+
         $app = Application::getInstance();
         $role = Role::find($id);
         $permissions = Permission::all();
-        $rolePermissions = $role->permissions();
+        $rolePermissions = $role->permissions()->getResults();
         $rolePermissionIds = array_map(fn($p) => $p->id, $rolePermissions);
 
         echo $app->view->render('admin/roles/edit', [
-            'title' => 'Edit Role', 
-            'role' => $role, 
+            'title' => 'Edit Role',
+            'role' => $role,
             'permissions' => $permissions,
             'rolePermissionIds' => $rolePermissionIds
         ]);
@@ -79,7 +76,7 @@ class RoleController
             redirect('/admin/roles');
             return;
         }
-        
+
         $role = Role::find($id);
         if (!$role) {
             redirect('/admin/roles');
@@ -94,14 +91,7 @@ class RoleController
         $role->slug = $slug;
         $role->save();
 
-        $db = Database::getInstance();
-        $db->query("DELETE FROM role_permissions WHERE role_id = ?", [$role->id]);
-
-        if (!empty($permissionIds)) {
-            foreach ($permissionIds as $permId) {
-                $db->query("INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)", [$role->id, $permId]);
-            }
-        }
+        $role->permissions()->sync($permissionIds);
 
         redirect('/admin/roles');
         exit;
@@ -114,12 +104,11 @@ class RoleController
             redirect('/admin/roles');
             return;
         }
-        
+
         $role = Role::find($id);
         if ($role) {
-            $db = Database::getInstance();
-            $db->query("DELETE FROM role_permissions WHERE role_id = ?", [$role->id]);
-            $db->query("DELETE FROM user_roles WHERE role_id = ?", [$role->id]);
+            $role->permissions()->detach();
+            $role->users()->detach();
             $role->delete();
         }
         redirect('/admin/roles');

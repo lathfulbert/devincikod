@@ -9,15 +9,13 @@ class Role extends Model
 {
     protected static string $table = 'roles';
 
-    public function permissions(): array
+    public function permissions(): \App\Core\Database\ORM\Relations\BelongsToMany
     {
-        $db = Database::getInstance();
-        $stmt = $db->query(
-            "SELECT p.* FROM permissions p 
-            JOIN role_permissions rp ON p.id = rp.permission_id 
-            WHERE rp.role_id = ?", 
-            [$this->id]
-        );
-        return $stmt->fetchAll(\PDO::FETCH_CLASS, Permission::class);
+        return $this->belongsToMany(Permission::class, 'role_permissions', 'role_id', 'permission_id');
+    }
+
+    public function users(): \App\Core\Database\ORM\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(\Modules\Auth\Models\User::class, 'user_roles', 'role_id', 'user_id');
     }
 }

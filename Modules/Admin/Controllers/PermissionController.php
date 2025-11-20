@@ -46,7 +46,7 @@ class PermissionController
             redirect('/admin/permissions');
             return;
         }
-        
+
         $app = Application::getInstance();
         $permission = Permission::find($id);
         echo $app->view->render('admin/permissions/edit', ['title' => 'Edit Permission', 'permission' => $permission]);
@@ -59,7 +59,7 @@ class PermissionController
             redirect('/admin/permissions');
             return;
         }
-        
+
         $permission = Permission::find($id);
         if (!$permission) {
             redirect('/admin/permissions');
@@ -84,11 +84,10 @@ class PermissionController
             redirect('/admin/permissions');
             return;
         }
-        
+
         $permission = Permission::find($id);
         if ($permission) {
-            $db = \App\Core\Database\Database::getInstance();
-            $db->query("DELETE FROM role_permissions WHERE permission_id = ?", [$permission->id]);
+            $permission->roles()->detach();
             $permission->delete();
         }
         redirect('/admin/permissions');
