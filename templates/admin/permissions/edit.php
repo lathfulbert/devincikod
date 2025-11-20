@@ -1,5 +1,6 @@
-<?php ob_start(); ?>
+@extends('admin.layout')
 
+@section('content')
 <div class="header">
     <h1>Edit Permission: <?= htmlspecialchars($permission->name) ?></h1>
     <a href="<?= url('/admin/permissions') ?>" class="btn btn-primary">Back</a>
@@ -18,6 +19,4 @@
         <button type="submit" class="btn btn-success">Update Permission</button>
     </form>
 </div>
-
-<?php $content = ob_get_clean(); ?>
-<?php include __DIR__ . '/../layout.php'; ?>
+@endsection

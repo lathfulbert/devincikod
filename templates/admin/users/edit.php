@@ -1,5 +1,6 @@
-<?php ob_start(); ?>
+@extends('admin.layout')
 
+@section('content')
 <div class="header">
     <h1>Edit User: <?= htmlspecialchars($user->username) ?></h1>
     <a href="<?= url('/admin/users') ?>" class="btn btn-primary">Back</a>
@@ -19,16 +20,14 @@
             <label>Roles</label>
             <div class="checkbox-group">
                 <?php foreach ($roles as $role): ?>
-                <label>
-                    <input type="checkbox" name="roles[]" value="<?= $role->id ?>" <?= in_array($role->id, $userRoleIds) ? 'checked' : '' ?>>
-                    <?= htmlspecialchars($role->name) ?>
-                </label>
+                    <label>
+                        <input type="checkbox" name="roles[]" value="<?= $role->id ?>" <?= in_array($role->id, $userRoleIds) ? 'checked' : '' ?>>
+                        <?= htmlspecialchars($role->name) ?>
+                    </label>
                 <?php endforeach; ?>
             </div>
         </div>
         <button type="submit" class="btn btn-success">Update User</button>
     </form>
 </div>
-
-<?php $content = ob_get_clean(); ?>
-<?php include __DIR__ . '/../layout.php'; ?>
+@endsection
