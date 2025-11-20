@@ -32,6 +32,11 @@ class DemoModule implements ModuleContract
                     $app = Application::getInstance();
                     echo $app->view->render('demo/index', ['title' => 'Demo Module']);
                 }
+            ],
+            [
+                'method' => 'GET',
+                'path' => '/template-demo',
+                'handler' => [new \Modules\Demo\Controllers\DemoController(), 'templateDemo']
             ]
         ];
     }
