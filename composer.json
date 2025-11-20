@@ -1,0 +1,12 @@
+{
+    "name": "sunu/framework2",
+    "description": "A modular PHP framework",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "App\\Core\\": "Core/",
+            "Modules\\": "Modules/"
+        }
+    },
+    "require": {}
+}

@@ -1,0 +1,42 @@
+# Vendor
+/vendor/
+composer.lock
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+
+# Logs
+/storage/logs/*.log
+*.log
+
+# Cache
+/storage/cache/*
+!storage/cache/.gitkeep
+!storage/logs/.gitkeep
+
+# Base de données
+*.sqlite
+*.sqlite-journal
+# Note: database/*.sqlite est ignoré mais pas database/database.sqlite qui sera créé
+
+# Configuration locale (après le premier déploiement, créez .env.local)
+# .env
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Temporaire
+*.tmp
+*.swp
+*.swo
+*~
+
+# Tests
+/phpunit.xml
+/coverage/
+/.phpunit.cache/
