@@ -12,7 +12,7 @@ class TemplateEngine
     public function __construct(string $cachePath)
     {
         $this->cachePath = $cachePath;
-        
+
         // Ensure cache directory exists
         if (!is_dir($this->cachePath)) {
             mkdir($this->cachePath, 0755, true);
@@ -41,30 +41,59 @@ class TemplateEngine
      */
     public function compileString(string $template): string
     {
+        $result = $template;
+
         // Compile in order of precedence
-        $compiled = $template;
-        
-        // Comments
-        $compiled = $this->compileComments($compiled);
-        
-        // Echoing
-        $compiled = $this->compileEchos($compiled);
-        
+        $result = $this->compileComments($result);
+        $result = $this->compileEchos($result);
+        $result = $this->compilePhp($result);
+
+        // Directives
+        $result = $this->compileExtends($result);
+        $result = $this->compileSection($result);
+        $result = $this->compileYield($result);
+        $result = $this->compileInclude($result);
+
         // Control structures
-        $compiled = $this->compileIf($compiled);
-        $compiled = $this->compileElse($compiled);
-        $compiled = $this->compileEndif($compiled);
-        $compiled = $this->compileForeach($compiled);
-        $compiled = $this->compileEndforeach($compiled);
-        $compiled = $this->compileFor($compiled);
-        $compiled = $this->compileEndfor($compiled);
-        $compiled = $this->compileWhile($compiled);
-        $compiled = $this->compileEndwhile($compiled);
-        
-        // PHP blocks
-        $compiled = $this->compilePhp($compiled);
-        
-        return $compiled;
+        $result = $this->compileIf($result);
+        $result = $this->compileElse($result);
+        $result = $this->compileEndif($result);
+        $result = $this->compileForeach($result);
+        $result = $this->compileEndforeach($result);
+        $result = $this->compileFor($result);
+        $result = $this->compileEndfor($result);
+        $result = $this->compileWhile($result);
+        $result = $this->compileEndwhile($result);
+
+        return $result;
+    }
+
+    protected function compileExtends(string $value): string
+    {
+        // Match @extends('layout')
+        // We replace it with PHP code that sets the extends property on the engine
+        return preg_replace('/@extends\s*\([\'"](.+?)[\'"]\)/', '<?php $this->engine->setExtends(\'$1\'); ?>', $value);
+    }
+
+    protected function compileSection(string $value): string
+    {
+        // @section('name')
+        $value = preg_replace('/@section\s*\([\'"](.+?)[\'"]\)/', '<?php $this->startSection(\'$1\'); ?>', $value);
+        // @endsection
+        $value = preg_replace('/@endsection/', '<?php $this->endSection(); ?>', $value);
+        return $value;
+    }
+
+    protected function compileYield(string $value): string
+    {
+        // @yield('name')
+        return preg_replace('/@yield\s*\([\'"](.+?)[\'"]\)/', '<?= $this->yieldSection(\'$1\') ?>', $value);
+    }
+
+    protected function compileInclude(string $value): string
+    {
+        // @include('view')
+        return preg_replace('/@include\s*\([\'"](.+?)[\'"]\)/', '<?php echo $this->make(\'$1\', get_defined_vars()); ?>', $value);
     }
 
     /**
@@ -82,10 +111,10 @@ class TemplateEngine
     {
         // Raw echo {!! !!}
         $value = preg_replace('/\{!!\s*(.+?)\s*!!\}/s', '<?= $1 ?>', $value);
-        
+
         // Escaped echo {{ }}
         $value = preg_replace('/\{\{\s*(.+?)\s*\}\}/s', '<?= e($1) ?>', $value);
-        
+
         return $value;
     }
 
@@ -227,5 +256,31 @@ class TemplateEngine
     public function yieldSection(string $name, string $default = ''): string
     {
         return $this->sections[$name] ?? $default;
+    }
+
+    /**
+     * Set the layout to extend.
+     */
+    public function setExtends(string $layout): void
+    {
+        $this->extends = $layout;
+    }
+
+    /**
+     * Get the layout to extend.
+     */
+    public function getExtends(): string
+    {
+        return $this->extends;
+    }
+
+    /**
+     * Reset the engine state.
+     */
+    public function reset(): void
+    {
+        $this->extends = '';
+        $this->sections = [];
+        $this->sectionStack = [];
     }
 }
