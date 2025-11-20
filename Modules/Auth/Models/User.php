@@ -10,21 +10,14 @@ class User extends Model
 {
     protected static string $table = 'users';
 
-    public function roles(): array
+    public function roles(): \App\Core\Database\ORM\Relations\BelongsToMany
     {
-        $db = Database::getInstance();
-        $stmt = $db->query(
-            "SELECT r.* FROM roles r 
-            JOIN user_roles ur ON r.id = ur.role_id 
-            WHERE ur.user_id = ?", 
-            [$this->id]
-        );
-        return $stmt->fetchAll(\PDO::FETCH_CLASS, Role::class);
+        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
     }
 
     public function hasRole(string $slug): bool
     {
-        foreach ($this->roles() as $role) {
+        foreach ($this->roles()->getResults() as $role) {
             if ($role->slug === $slug) {
                 return true;
             }
@@ -34,8 +27,8 @@ class User extends Model
 
     public function hasPermission(string $slug): bool
     {
-        foreach ($this->roles() as $role) {
-            foreach ($role->permissions() as $permission) {
+        foreach ($this->roles()->getResults() as $role) {
+            foreach ($role->permissions()->getResults() as $permission) {
                 if ($permission->slug === $slug) {
                     return true;
                 }

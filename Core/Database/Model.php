@@ -44,7 +44,7 @@ abstract class Model
     {
         $db = Database::getInstance();
         $table = static::getTable();
-        
+
         if (isset($this->attributes['id']) && $this->attributes['id'] !== null) {
             // Update
             $set = [];
@@ -61,10 +61,10 @@ abstract class Model
             // Insert - exclude 'id' field for auto-increment
             $insertData = $this->attributes;
             unset($insertData['id']); // Remove id if it exists
-            
+
             $keys = array_keys($insertData);
             $placeholders = array_fill(0, count($keys), '?');
-            
+
             $columnNames = array_map(fn($k) => "`{$k}`", $keys);
             $sql = "INSERT INTO `{$table}` (" . implode(', ', $columnNames) . ") VALUES (" . implode(', ', $placeholders) . ")";
             $db->query($sql, array_values($insertData));
@@ -72,13 +72,39 @@ abstract class Model
         }
     }
 
-    public function __get($key)
+    public function delete(): void
     {
-        return $this->attributes[$key] ?? null;
+        if (isset($this->attributes['id'])) {
+            $db = Database::getInstance();
+            $table = static::getTable();
+            $db->query("DELETE FROM {$table} WHERE id = ?", [$this->attributes['id']]);
+        }
     }
 
     public function __set($key, $value)
     {
         $this->attributes[$key] = $value;
+    }
+
+    public function belongsToMany(string $related, string $table = null, string $foreignPivotKey = null, string $relatedPivotKey = null): ORM\Relations\BelongsToMany
+    {
+        $instance = new $related();
+
+        if ($table === null) {
+            // Alphabetical order of table names
+            $tables = [static::getTable(), $instance->getTable()];
+            sort($tables);
+            $table = implode('_', $tables);
+        }
+
+        if ($foreignPivotKey === null) {
+            $foreignPivotKey = strtolower(basename(str_replace('\\', '/', static::class))) . '_id';
+        }
+
+        if ($relatedPivotKey === null) {
+            $relatedPivotKey = strtolower(basename(str_replace('\\', '/', $related))) . '_id';
+        }
+
+        return new ORM\Relations\BelongsToMany($this, $instance, $table, $foreignPivotKey, $relatedPivotKey);
     }
 }
