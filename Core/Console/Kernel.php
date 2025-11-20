@@ -7,9 +7,7 @@ use App\Core\Database\Database;
 
 class Kernel
 {
-    public function __construct(protected Application $app)
-    {
-    }
+    public function __construct(protected Application $app) {}
 
     public function handle(array $argv): void
     {
@@ -22,91 +20,136 @@ class Kernel
             } else {
                 $this->migrate();
             }
+        } elseif ($command === 'migrate:reset') {
+            $this->reset();
+        } elseif ($command === 'migrate:fresh') {
+            $this->fresh();
         } elseif ($command === 'seed') {
-            $this->seed();
+            $truncate = ($flag === '--truncate');
+            $this->seed($truncate);
         } else {
-            echo "Usage: php sunu [migrate|seed]\n";
-            echo "       php sunu migrate --down (Rollback last migration)\n";
+            echo "Usage: php sunu [command]\n";
+            echo "Commands:\n";
+            echo "  migrate          Run pending migrations\n";
+            echo "  migrate --down   Rollback the last batch of migrations\n";
+            echo "  migrate:reset    Rollback all migrations\n";
+            echo "  migrate:fresh    Drop all tables and re-run all migrations\n";
+            echo "  seed             Run seeders\n";
+            echo "  seed --truncate  Truncate tables before seeding\n";
         }
     }
 
-    protected function seed(): void
+    protected function seed(bool $truncate = false): void
     {
-        echo "Running seeders...\n";
-        // Hardcoded for now, ideally discovered
-        if (class_exists(\Modules\RBAC\Database\Seeders\RBACSeeder::class)) {
-            (new \Modules\RBAC\Database\Seeders\RBACSeeder())->run();
+        if ($truncate) {
+            echo "Truncating tables...\n";
+            $db = Database::getInstance();
+            $driver = $db->getDriver();
+
+            $db->query("SET FOREIGN_KEY_CHECKS = 0");
+
+            $tables = $db->query("SHOW TABLES")->fetchAll(\PDO::FETCH_COLUMN);
+
+            foreach ($tables as $table) {
+                if ($table === 'migrations') continue;
+
+                $db->query("DELETE FROM $table");
+
+                // Reset Auto Increment
+                if ($driver === 'sqlite') {
+                    $db->query("DELETE FROM sqlite_sequence WHERE name = ?", [$table]);
+                } else {
+                    $db->query("ALTER TABLE $table AUTO_INCREMENT = 1");
+                }
+
+                echo "  Truncated: $table\n";
+            }
+
+            $db->query("SET FOREIGN_KEY_CHECKS = 1");
+            echo "Tables truncated.\n";
         }
-        if (class_exists(\Modules\Admin\Database\Seeders\AdminUserSeeder::class)) {
-            (new \Modules\Admin\Database\Seeders\AdminUserSeeder())->run();
+
+        echo "Running seeders...\n";
+
+        $modules = $this->app->moduleManager->getModules();
+
+        foreach ($modules as $module) {
+            $moduleName = $module->getName();
+            $seederPath = $this->app->getBasePath() . "/Modules/{$moduleName}/Database/Seeders";
+
+            if (is_dir($seederPath)) {
+                $files = glob($seederPath . '/*.php');
+                sort($files); // Ensure consistent order
+
+                foreach ($files as $file) {
+                    $className = basename($file, '.php');
+                    $fullClassName = "\\Modules\\{$moduleName}\\Database\\Seeders\\{$className}";
+
+                    if (class_exists($fullClassName)) {
+                        $seeder = new $fullClassName();
+                        if (method_exists($seeder, 'run')) {
+                            echo "  Seeding: {$className}\n";
+                            $seeder->run();
+                        }
+                    }
+                }
+            }
         }
     }
 
     protected function migrate(): void
     {
         echo "Running migrations (UP)...\n";
-        
+
         try {
             $db = Database::getInstance();
-            echo "Database instance retrieved\n";
-            
+
             $this->ensureMigrationsTable($db);
-            echo "Migrations table ensured\n";
-            
+
             // Get executed migrations
             $executedMigrations = $db->query("SELECT migration FROM migrations")->fetchAll(\PDO::FETCH_COLUMN);
-            echo "Executed migrations count: " . count($executedMigrations) . "\n";
 
             $modules = $this->app->moduleManager->getModules();
-            echo "Found " . count($modules) . " modules\n";
-            
+
             foreach ($modules as $module) {
                 $moduleName = $module->getName();
                 $migrationPath = $this->app->getBasePath() . "/Modules/{$moduleName}/Database/Migrations";
-                echo "Checking module: {$moduleName}\n";
-                
+
                 if (is_dir($migrationPath)) {
                     $files = glob($migrationPath . '/*.php');
-                    
+
                     // Sort files to ensure order (001_, 002_, etc.)
                     sort($files);
-                    
-                    echo "  Found " . count($files) . " migration files\n";
-                    
+
                     foreach ($files as $file) {
                         $className = basename($file, '.php');
-                        
+
                         if (in_array($className, $executedMigrations)) {
-                            echo "  Skipping (already executed): {$className}\n";
                             continue;
                         }
 
                         try {
                             // Include the migration file and get the returned object
                             $migration = require $file;
-                            
+
                             // Check if it's a valid migration object
                             if (is_object($migration) && method_exists($migration, 'up')) {
                                 echo "  Migrating: {$className}\n";
                                 $migration->up();
-                                
+
                                 // Log migration
                                 $db->query("INSERT INTO migrations (migration) VALUES (?)", [$className]);
-                                
+
                                 echo "  ✓ Migrated: {$className}\n";
-                            } else {
-                                echo "  Warning: {$className} did not return a valid migration object\n";
                             }
                         } catch (\Exception $e) {
                             echo "  ✗ Error migrating {$className}: " . $e->getMessage() . "\n";
                             echo "  Stack trace:\n" . $e->getTraceAsString() . "\n";
                         }
                     }
-                } else {
-                    echo "  Migration path does not exist: {$migrationPath}\n";
                 }
             }
-            
+
             echo "\nMigrations completed!\n";
         } catch (\Exception $e) {
             echo "Fatal error during migration: " . $e->getMessage() . "\n";
@@ -117,7 +160,7 @@ class Kernel
     protected function rollback(): void
     {
         echo "Rolling back migrations (DOWN)...\n";
-        
+
         $db = Database::getInstance();
         $this->ensureMigrationsTable($db);
 
@@ -129,8 +172,42 @@ class Kernel
             return;
         }
 
-        $className = $lastMigration['migration'];
-        echo "Rolling back: {$className}\n";
+        $this->runDown($lastMigration);
+    }
+
+    protected function reset(): void
+    {
+        echo "Resetting all migrations...\n";
+
+        $db = Database::getInstance();
+        $this->ensureMigrationsTable($db);
+
+        // Get all migrations ordered by ID desc
+        $migrations = $db->query("SELECT * FROM migrations ORDER BY id DESC")->fetchAll();
+
+        if (empty($migrations)) {
+            echo "Nothing to reset.\n";
+            return;
+        }
+
+        foreach ($migrations as $migration) {
+            $this->runDown($migration);
+        }
+
+        echo "Reset completed.\n";
+    }
+
+    protected function fresh(): void
+    {
+        echo "Dropping all tables and re-running migrations...\n";
+        $this->reset();
+        $this->migrate();
+    }
+
+    protected function runDown(array $migrationRecord): void
+    {
+        $className = $migrationRecord['migration'];
+        $db = Database::getInstance();
 
         // Find the file for this migration
         $modules = $this->app->moduleManager->getModules();
@@ -143,25 +220,21 @@ class Kernel
 
             if (file_exists($file)) {
                 try {
-                    // Include the migration file and get the returned object
                     $migration = require $file;
-                    
-                    // Check if it's a valid migration object
+
                     if (is_object($migration) && method_exists($migration, 'down')) {
+                        echo "  Rolling back: {$className}\n";
                         $migration->down();
-                        
+
                         // Remove from DB
-                        $db->query("DELETE FROM migrations WHERE id = ?", [$lastMigration['id']]);
-                        
-                        echo "Rolled back: {$className}\n";
+                        $db->query("DELETE FROM migrations WHERE id = ?", [$migrationRecord['id']]);
+
+                        echo "  ✓ Rolled back: {$className}\n";
                         $found = true;
                         break;
-                    } else {
-                        echo "Migration file exists but did not return a valid migration object.\n";
                     }
                 } catch (\Exception $e) {
                     echo "Error rolling back {$className}: " . $e->getMessage() . "\n";
-                    echo "Stack trace:\n" . $e->getTraceAsString() . "\n";
                 }
             }
         }
@@ -174,8 +247,8 @@ class Kernel
     protected function ensureMigrationsTable(Database $db): void
     {
         $driver = $db->getDriver();
-        $idColumn = $driver === 'sqlite' 
-            ? 'INTEGER PRIMARY KEY AUTOINCREMENT' 
+        $idColumn = $driver === 'sqlite'
+            ? 'INTEGER PRIMARY KEY AUTOINCREMENT'
             : 'INT AUTO_INCREMENT PRIMARY KEY';
 
         $db->query("CREATE TABLE IF NOT EXISTS migrations (

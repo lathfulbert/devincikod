@@ -1,5 +1,6 @@
-<?php ob_start(); ?>
+@extends('admin.layout')
 
+@section('content')
 <div class="header">
     <h1>Dashboard</h1>
 </div>
@@ -26,6 +27,4 @@
         <a href="<?= url('/admin/permissions') ?>" class="btn btn-primary">Go to Permissions</a>
     </div>
 </div>
-
-<?php $content = ob_get_clean(); ?>
-<?php include __DIR__ . '/layout.php'; ?>
+@endsection
