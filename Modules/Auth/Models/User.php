@@ -3,6 +3,7 @@
 namespace Modules\Auth\Models;
 
 use App\Core\Database\Database;
+use App\Core\Database\Model;
 use Modules\RBAC\Models\Role;
 
 class User extends Model

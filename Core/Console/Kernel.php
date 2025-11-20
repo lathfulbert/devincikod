@@ -37,6 +37,9 @@ class Kernel
         if (class_exists(\Modules\RBAC\Database\Seeders\RBACSeeder::class)) {
             (new \Modules\RBAC\Database\Seeders\RBACSeeder())->run();
         }
+        if (class_exists(\Modules\Admin\Database\Seeders\AdminUserSeeder::class)) {
+            (new \Modules\Admin\Database\Seeders\AdminUserSeeder())->run();
+        }
     }
 
     protected function migrate(): void

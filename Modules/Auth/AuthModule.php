@@ -26,7 +26,7 @@ class AuthModule implements ModuleContract
         $authMiddleware = function() {
             $auth = new Auth();
             if (!$auth->check()) {
-                header('Location: /login');
+                redirect('/login');
                 return false;
             }
             return true;

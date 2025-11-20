@@ -19,6 +19,9 @@ class Application
     {
         self::$instance = $this;
         
+        // Load Helpers
+        require_once __DIR__ . '/Support/helpers.php';
+
         // Load .env
         (new \App\Core\Support\DotEnv($basePath . '/.env'))->load();
 
@@ -42,6 +45,9 @@ class Application
     {
         // Load Config
         $this->config->load($this->basePath . '/config/app.php');
+
+        // Initialize Database
+        \App\Core\Database\Database::getInstance()->connect($this->config->get('database', []));
 
         // Discover and Register Modules
         $this->moduleManager->discover();
