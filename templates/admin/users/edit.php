@@ -8,6 +8,7 @@
 
 <div class="card">
     <form action="<?= url('/admin/users/' . $user->id) ?>" method="POST">
+        <?= csrf_field() ?>
         <div class="form-group">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" value="<?= htmlspecialchars($user->username) ?>" required>

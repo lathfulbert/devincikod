@@ -18,7 +18,7 @@ class Application
     public function __construct(protected string $basePath)
     {
         self::$instance = $this;
-        
+
         // Load Helpers
         require_once __DIR__ . '/Support/helpers.php';
 
@@ -43,6 +43,14 @@ class Application
 
     public function boot(): void
     {
+        // Start Session
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Initialize CSRF Protection
+        \App\Core\Security\CSRF::getInstance();
+
         // Load Config
         $this->config->load($this->basePath . '/config/app.php');
 
@@ -52,7 +60,7 @@ class Application
         // Discover and Register Modules
         $this->moduleManager->discover();
         $this->moduleManager->registerModules();
-        
+
         // Load Module Routes
         foreach ($this->moduleManager->getModules() as $module) {
             $this->router->loadModuleRoutes($module->getRoutes());
@@ -64,10 +72,14 @@ class Application
 
     public function run(): void
     {
+        // Handle CSRF Protection
+        $csrfMiddleware = new \App\Core\Middleware\CSRFMiddleware();
+        $csrfMiddleware->handle();
+
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $method = $_SERVER['REQUEST_METHOD'];
-        
-        $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']); 
+
+        $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']);
         $scriptDir = str_replace('\\', '/', dirname($scriptName));
 
         // Ensure scriptDir ends with / for consistent matching
@@ -78,8 +90,7 @@ class Application
         // Case 1: Request includes the full path (e.g. /sunuframework2/public/login)
         if (strpos($uri, $scriptDir) === 0) {
             $uri = substr($uri, strlen($scriptDir));
-        }
-        else {
+        } else {
             // Case 2: Request is rewritten (e.g. /sunuframework2/login -> /sunuframework2/public/index.php)
             // We need to check if the scriptDir ends with 'public/' and try removing it.
             $publicSegment = '/public/';
@@ -90,7 +101,7 @@ class Application
                 }
             }
         }
-        
+
         // Cleanup
         $uri = '/' . ltrim($uri, '/');
 
