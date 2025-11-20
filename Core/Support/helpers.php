@@ -76,7 +76,7 @@ if (!function_exists('env')) {
         if ($value === false) {
             return $default;
         }
-        
+
         switch (strtolower($value)) {
             case 'true':
             case '(true)':
@@ -91,7 +91,7 @@ if (!function_exists('env')) {
             case '(null)':
                 return null;
         }
-        
+
         return $value;
     }
 }
@@ -110,11 +110,11 @@ if (!function_exists('url')) {
     {
         $baseUrl = config('app.url', '/sunuframework2');
         $baseUrl = rtrim($baseUrl, '/');
-        
+
         if (!empty($path) && $path[0] !== '/') {
             $path = '/' . $path;
         }
-        
+
         return $baseUrl . $path;
     }
 }
@@ -231,7 +231,8 @@ if (!function_exists('str_starts_with')) {
 }
 
 if (!function_exists('str_starts_with_impl')) {
-    function str_starts_with_impl($haystack, $needle) {
+    function str_starts_with_impl($haystack, $needle)
+    {
         return strncmp($haystack, $needle, strlen($needle)) === 0;
     }
 }
@@ -259,11 +260,11 @@ if (!function_exists('str_slug')) {
     {
         // Convert all dashes/underscores into separator
         $flip = $separator === '-' ? '_' : '-';
-        $title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
+        $title = preg_replace('![' . preg_quote($flip) . ']+!u', $separator, $title);
         // Remove all characters that are not the separator, letters, numbers, or whitespace
-        $title = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', mb_strtolower($title));
+        $title = preg_replace('![^' . preg_quote($separator) . '\pL\pN\s]+!u', '', mb_strtolower($title));
         // Replace all separator characters and whitespace by a single separator
-        $title = preg_replace('!['.preg_quote($separator).'\s]+!u', $separator, $title);
+        $title = preg_replace('![' . preg_quote($separator) . '\s]+!u', $separator, $title);
         return trim($title, $separator);
     }
 }
@@ -388,16 +389,19 @@ if (!function_exists('with')) {
     }
 }
 
+/*
+|--------------------------------------------------------------------------
+| Security Helpers
+|--------------------------------------------------------------------------
+*/
+
 if (!function_exists('csrf_token')) {
     /**
      * Get the CSRF token value.
      */
     function csrf_token(): string
     {
-        if (!isset($_SESSION['csrf_token'])) {
-            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-        }
-        return $_SESSION['csrf_token'];
+        return \App\Core\Security\CSRF::getInstance()->getToken();
     }
 }
 
@@ -407,7 +411,7 @@ if (!function_exists('csrf_field')) {
      */
     function csrf_field(): string
     {
-        return '<input type="hidden" name="_token" value="' . csrf_token() . '">';
+        return \App\Core\Security\CSRF::getInstance()->getTokenField();
     }
 }
 
@@ -418,5 +422,60 @@ if (!function_exists('method_field')) {
     function method_field(string $method): string
     {
         return '<input type="hidden" name="_method" value="' . $method . '">';
+    }
+}
+
+if (!function_exists('sanitize')) {
+    /**
+     * Sanitize input data
+     */
+    function sanitize($input, string $type = 'string')
+    {
+        return \App\Core\Security\Sanitizer::clean($input, $type);
+    }
+}
+
+if (!function_exists('escape')) {
+    /**
+     * Escape output for HTML display (XSS protection)
+     */
+    function escape(?string $string): string
+    {
+        return \App\Core\Security\Sanitizer::escapeOutput($string);
+    }
+}
+
+if (!function_exists('old')) {
+    /**
+     * Retrieve old input from session
+     */
+    function old(string $key, $default = null)
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $oldInput = $_SESSION['_old_input'] ?? [];
+        return $oldInput[$key] ?? $default;
+    }
+}
+
+if (!function_exists('flash')) {
+    /**
+     * Flash data to session
+     */
+    function flash(string $key, $value = null)
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if ($value === null) {
+            $flash = $_SESSION['_flash'] ?? [];
+            unset($_SESSION['_flash']);
+            return $flash[$key] ?? null;
+        }
+
+        $_SESSION['_flash'][$key] = $value;
     }
 }

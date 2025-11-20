@@ -13,6 +13,7 @@
     @endif
 
     <form method="POST" action="<?= url('/login') ?>">
+        <?= csrf_field() ?>
         <div style="margin-bottom: 1rem;">
             <label style="display: block; margin-bottom: 5px;">Username (admin)</label>
             <input type="text" name="username" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">

@@ -8,6 +8,7 @@
 
 <div class="card">
     <form action="<?= url('/admin/permissions/' . $permission->id) ?>" method="POST">
+        <?= csrf_field() ?>
         <div class="form-group">
             <label for="name">Name</label>
             <input type="text" id="name" name="name" value="<?= htmlspecialchars($permission->name) ?>" required>
