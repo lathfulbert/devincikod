@@ -33,6 +33,11 @@ class Application
         return self::$instance;
     }
 
+    public function getBasePath(): string
+    {
+        return $this->basePath;
+    }
+
     public function boot(): void
     {
         // Load Config
