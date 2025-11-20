@@ -9,7 +9,9 @@ abstract class Model
 
     public function __construct(array $attributes = [])
     {
-        $this->attributes = $attributes;
+        if (!empty($attributes)) {
+            $this->attributes = $attributes;
+        }
     }
 
     public static function getTable(): string
