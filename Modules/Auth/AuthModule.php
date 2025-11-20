@@ -35,6 +35,13 @@ class AuthModule implements ModuleContract
         return [
             [
                 'method' => 'GET',
+                'path' => '/',
+                'handler' => function() {
+                    redirect('/login');
+                }
+            ],
+            [
+                'method' => 'GET',
                 'path' => '/login',
                 'handler' => [new AuthController(), 'login']
             ],
@@ -47,12 +54,6 @@ class AuthModule implements ModuleContract
                 'method' => 'GET',
                 'path' => '/logout',
                 'handler' => [new AuthController(), 'logout']
-            ],
-            [
-                'method' => 'GET',
-                'path' => '/dashboard',
-                'handler' => [new AuthController(), 'dashboard'],
-                'middleware' => [$authMiddleware]
             ]
         ];
     }
