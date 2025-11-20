@@ -30,30 +30,79 @@ class Blueprint
         $this->table = $table;
     }
 
-    public function id(): void
+    public function id(): Column
     {
-        $this->columns[] = "id INT AUTO_INCREMENT PRIMARY KEY";
+        return $this->addColumn('id', 'INT AUTO_INCREMENT PRIMARY KEY');
     }
 
-    public function string(string $column, int $length = 255): void
+    public function string(string $column, int $length = 255): Column
     {
-        $this->columns[] = "{$column} VARCHAR({$length})";
+        return $this->addColumn($column, "VARCHAR({$length})");
     }
 
-    public function text(string $column): void
+    public function text(string $column): Column
     {
-        $this->columns[] = "{$column} TEXT";
+        return $this->addColumn($column, 'TEXT');
     }
 
     public function timestamps(): void
     {
-        $this->columns[] = "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
-        $this->columns[] = "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP";
+        $this->addColumn('created_at', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+        $this->addColumn('updated_at', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP');
+    }
+
+    protected function addColumn(string $name, string $type): Column
+    {
+        $column = new Column($name, $type);
+        $this->columns[] = $column;
+        return $column;
     }
 
     public function toSql(): string
     {
-        $cols = implode(', ', $this->columns);
-        return "CREATE TABLE {$this->table} ({$cols})";
+        $cols = array_map(fn($col) => $col->toSql(), $this->columns);
+        $colsSql = implode(', ', $cols);
+        return "CREATE TABLE {$this->table} ({$colsSql})";
+    }
+}
+
+class Column
+{
+    protected string $name;
+    protected string $type;
+    protected ?string $default = null;
+    protected bool $nullable = false;
+
+    public function __construct(string $name, string $type)
+    {
+        $this->name = $name;
+        $this->type = $type;
+    }
+
+    public function default(string|int $value): self
+    {
+        $this->default = (string)$value;
+        return $this;
+    }
+
+    public function nullable(): self
+    {
+        $this->nullable = true;
+        return $this;
+    }
+
+    public function toSql(): string
+    {
+        $sql = "{$this->name} {$this->type}";
+        
+        if (!$this->nullable && strpos($this->type, 'PRIMARY KEY') === false) {
+            $sql .= " NOT NULL";
+        }
+
+        if ($this->default !== null) {
+            $sql .= " DEFAULT '{$this->default}'";
+        }
+
+        return $sql;
     }
 }

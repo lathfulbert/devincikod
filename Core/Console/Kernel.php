@@ -33,7 +33,7 @@ class Kernel
         $modules = $this->app->moduleManager->getModules();
         foreach ($modules as $module) {
             $moduleName = $module->getName();
-            $migrationPath = $this->app->basePath . "/Modules/{$moduleName}/Database/Migrations";
+            $migrationPath = $this->app->getBasePath() . "/Modules/{$moduleName}/Database/Migrations";
             
             if (is_dir($migrationPath)) {
                 $files = glob($migrationPath . '/*.php');
