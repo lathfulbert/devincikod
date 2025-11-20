@@ -45,24 +45,29 @@ abstract class Model
         $db = Database::getInstance();
         $table = static::getTable();
         
-        if (isset($this->attributes['id'])) {
+        if (isset($this->attributes['id']) && $this->attributes['id'] !== null) {
             // Update
             $set = [];
             $params = [];
             foreach ($this->attributes as $key => $value) {
                 if ($key === 'id') continue;
-                $set[] = "{$key} = ?";
+                $set[] = "`{$key}` = ?";
                 $params[] = $value;
             }
             $params[] = $this->attributes['id'];
-            $sql = "UPDATE {$table} SET " . implode(', ', $set) . " WHERE id = ?";
+            $sql = "UPDATE `{$table}` SET " . implode(', ', $set) . " WHERE id = ?";
             $db->query($sql, $params);
         } else {
-            // Insert
-            $keys = array_keys($this->attributes);
+            // Insert - exclude 'id' field for auto-increment
+            $insertData = $this->attributes;
+            unset($insertData['id']); // Remove id if it exists
+            
+            $keys = array_keys($insertData);
             $placeholders = array_fill(0, count($keys), '?');
-            $sql = "INSERT INTO {$table} (" . implode(', ', $keys) . ") VALUES (" . implode(', ', $placeholders) . ")";
-            $db->query($sql, array_values($this->attributes));
+            
+            $columnNames = array_map(fn($k) => "`{$k}`", $keys);
+            $sql = "INSERT INTO `{$table}` (" . implode(', ', $columnNames) . ") VALUES (" . implode(', ', $placeholders) . ")";
+            $db->query($sql, array_values($insertData));
             $this->attributes['id'] = $db->getPdo()->lastInsertId();
         }
     }

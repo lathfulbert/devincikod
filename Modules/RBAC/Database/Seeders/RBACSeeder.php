@@ -14,11 +14,11 @@ class RBACSeeder
 
         // Roles
         $roles = [
-            ['name' => 'Administrateur', 'slug' => 'admin', 'level' => 100],
-            ['name' => 'Manager', 'slug' => 'manager', 'level' => 80],
-            ['name' => 'Éditeur', 'slug' => 'editor', 'level' => 60],
-            ['name' => 'Rédacteur', 'slug' => 'writer', 'level' => 40],
-            ['name' => 'Utilisateur', 'slug' => 'user', 'level' => 20],
+            ['name' => 'Administrateur', 'slug' => 'admin', 'description' => 'Full system access'],
+            ['name' => 'Manager', 'slug' => 'manager', 'description' => 'Can manage users and content'],
+            ['name' => 'Éditeur', 'slug' => 'editor', 'description' => 'Can edit and publish content'],
+            ['name' => 'Rédacteur', 'slug' => 'writer', 'description' => 'Can create content'],
+            ['name' => 'Utilisateur', 'slug' => 'user', 'description' => 'Basic user access'],
         ];
 
         foreach ($roles as $roleData) {
@@ -37,13 +37,13 @@ class RBACSeeder
         // Permissions
         $permissions = [
             // Users
-            ['name' => 'View Users', 'slug' => 'view.users', 'group_name' => 'users'],
-            ['name' => 'Create Users', 'slug' => 'create.users', 'group_name' => 'users'],
+            ['name' => 'View Users', 'slug' => 'view.users', 'description' => 'Can view users'],
+            ['name' => 'Create Users', 'slug' => 'create.users', 'description' => 'Can create users'],
             // Content
-            ['name' => 'View Posts', 'slug' => 'view.posts', 'group_name' => 'content'],
-            ['name' => 'Create Posts', 'slug' => 'create.posts', 'group_name' => 'content'],
+            ['name' => 'View Posts', 'slug' => 'view.posts', 'description' => 'Can view posts'],
+            ['name' => 'Create Posts', 'slug' => 'create.posts', 'description' => 'Can create posts'],
             // System
-            ['name' => 'Access Admin', 'slug' => 'access.admin', 'group_name' => 'system'],
+            ['name' => 'Access Admin', 'slug' => 'access.admin', 'description' => 'Can access admin panel'],
         ];
 
         foreach ($permissions as $permData) {
