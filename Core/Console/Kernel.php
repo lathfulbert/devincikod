@@ -14,13 +14,19 @@ class Kernel
     public function handle(array $argv): void
     {
         $command = $argv[1] ?? null;
+        $flag = $argv[2] ?? null;
 
         if ($command === 'migrate') {
-            $this->migrate();
+            if ($flag === '--down') {
+                $this->rollback();
+            } else {
+                $this->migrate();
+            }
         } elseif ($command === 'seed') {
             $this->seed();
         } else {
             echo "Usage: php sunu [migrate|seed]\n";
+            echo "       php sunu migrate --down (Rollback last migration)\n";
         }
     }
 
@@ -35,21 +41,10 @@ class Kernel
 
     protected function migrate(): void
     {
-        echo "Running migrations...\n";
+        echo "Running migrations (UP)...\n";
         
         $db = Database::getInstance();
-        $driver = $db->getDriver();
-        
-        $idColumn = $driver === 'sqlite' 
-            ? 'INTEGER PRIMARY KEY AUTOINCREMENT' 
-            : 'INT AUTO_INCREMENT PRIMARY KEY';
-
-        // Create migrations table if not exists
-        $db->query("CREATE TABLE IF NOT EXISTS migrations (
-            id $idColumn,
-            migration VARCHAR(255),
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )");
+        $this->ensureMigrationsTable($db);
         
         // Get executed migrations
         $executedMigrations = $db->query("SELECT migration FROM migrations")->fetchAll(\PDO::FETCH_COLUMN);
@@ -70,7 +65,6 @@ class Kernel
 
                     require_once $file;
                     
-                    // Namespace convention needs to be handled. 
                     $fullClassName = "Modules\\{$moduleName}\\Database\\Migrations\\{$className}";
                     
                     if (class_exists($fullClassName)) {
@@ -86,5 +80,69 @@ class Kernel
                 }
             }
         }
+    }
+
+    protected function rollback(): void
+    {
+        echo "Rolling back migrations (DOWN)...\n";
+        
+        $db = Database::getInstance();
+        $this->ensureMigrationsTable($db);
+
+        // Get last migration
+        $lastMigration = $db->query("SELECT * FROM migrations ORDER BY id DESC LIMIT 1")->fetch();
+
+        if (!$lastMigration) {
+            echo "Nothing to rollback.\n";
+            return;
+        }
+
+        $className = $lastMigration['migration'];
+        echo "Rolling back: {$className}\n";
+
+        // Find the file for this migration
+        $modules = $this->app->moduleManager->getModules();
+        $found = false;
+
+        foreach ($modules as $module) {
+            $moduleName = $module->getName();
+            $migrationPath = $this->app->getBasePath() . "/Modules/{$moduleName}/Database/Migrations";
+            $file = $migrationPath . '/' . $className . '.php';
+
+            if (file_exists($file)) {
+                require_once $file;
+                $fullClassName = "Modules\\{$moduleName}\\Database\\Migrations\\{$className}";
+                
+                if (class_exists($fullClassName)) {
+                    $migration = new $fullClassName();
+                    $migration->down();
+                    
+                    // Remove from DB
+                    $db->query("DELETE FROM migrations WHERE id = ?", [$lastMigration['id']]);
+                    
+                    echo "Rolled back: {$className}\n";
+                    $found = true;
+                    break;
+                }
+            }
+        }
+
+        if (!$found) {
+            echo "Migration file not found for: {$className}\n";
+        }
+    }
+
+    protected function ensureMigrationsTable(Database $db): void
+    {
+        $driver = $db->getDriver();
+        $idColumn = $driver === 'sqlite' 
+            ? 'INTEGER PRIMARY KEY AUTOINCREMENT' 
+            : 'INT AUTO_INCREMENT PRIMARY KEY';
+
+        $db->query("CREATE TABLE IF NOT EXISTS migrations (
+            id $idColumn,
+            migration VARCHAR(255),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )");
     }
 }
