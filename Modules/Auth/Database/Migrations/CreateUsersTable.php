@@ -1,26 +1,50 @@
 <?php
 
-namespace Modules\Auth\Database\Migrations;
-
 use App\Core\Database\Migration;
-use App\Core\Database\Schema;
-use App\Core\Database\Blueprint;
 
-class CreateUsersTable extends Migration
+/**
+ * Migration: Create users table
+ * 
+ * This migration creates the users table with all necessary fields
+ * for authentication and user management using Laravel-style syntax.
+ * 
+ * Usage: php sunu migrate
+ */
+return new class extends Migration
 {
+    /**
+     * Run the migration
+     */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        $this->create('users', function($table) {
+            // Primary Key
             $table->id();
-            $table->string('username');
-            $table->string('password');
-            $table->string('role')->default('user');
+            
+            // User Information
+            $table->string('username', 100)->unique();
+            $table->email('email')->unique();
+            $table->password('password');
+            
+            // Profile
+            $table->string('first_name', 100)->nullable();
+            $table->string('last_name', 100)->nullable();
+            $table->string('avatar', 255)->nullable();
+            
+            // Status
+            $table->boolean('is_active')->default(true);
+            $table->boolean('is_verified')->default(false);
+            
+            // Timestamps
             $table->timestamps();
         });
     }
 
+    /**
+     * Reverse the migration
+     */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        $this->dropIfExists('users');
     }
-}
+};
