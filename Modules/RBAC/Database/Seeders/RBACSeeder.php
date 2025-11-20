@@ -22,6 +22,13 @@ class RBACSeeder
         ];
 
         foreach ($roles as $roleData) {
+            // Check if role exists
+            $stmt = $db->query("SELECT id FROM roles WHERE slug = ?", [$roleData['slug']]);
+            if ($stmt->fetch()) {
+                echo "Role already exists: {$roleData['name']}\n";
+                continue;
+            }
+
             $role = new Role($roleData);
             $role->save();
             echo "Role created: {$roleData['name']}\n";
@@ -40,17 +47,31 @@ class RBACSeeder
         ];
 
         foreach ($permissions as $permData) {
+            // Check if permission exists
+            $stmt = $db->query("SELECT id FROM permissions WHERE slug = ?", [$permData['slug']]);
+            if ($stmt->fetch()) {
+                echo "Permission already exists: {$permData['name']}\n";
+                continue;
+            }
+
             $perm = new Permission($permData);
             $perm->save();
             echo "Permission created: {$permData['name']}\n";
         }
 
         // Assign Permissions to Admin (All)
-        $adminRole = Role::find(1); // Assuming ID 1 is Admin
+        // Find Admin Role by slug
+        $stmt = $db->query("SELECT * FROM roles WHERE slug = 'admin'");
+        $adminRole = $stmt->fetchObject(Role::class);
+
         if ($adminRole) {
             $allPerms = Permission::all();
             foreach ($allPerms as $perm) {
-                $db->query("INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)", [$adminRole->id, $perm->id]);
+                // Check if already assigned
+                $check = $db->query("SELECT id FROM role_permissions WHERE role_id = ? AND permission_id = ?", [$adminRole->id, $perm->id]);
+                if (!$check->fetch()) {
+                    $db->query("INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)", [$adminRole->id, $perm->id]);
+                }
             }
             echo "All permissions assigned to Admin\n";
         }

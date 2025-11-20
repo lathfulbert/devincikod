@@ -37,10 +37,23 @@ class Kernel
     {
         echo "Running migrations...\n";
         
-        // Scan modules for migrations
-        // For MVP, let's assume a 'migrations' folder in root or modules
-        // We'll just scan Modules/{Module}/Database/Migrations
+        $db = Database::getInstance();
+        $driver = $db->getDriver();
         
+        $idColumn = $driver === 'sqlite' 
+            ? 'INTEGER PRIMARY KEY AUTOINCREMENT' 
+            : 'INT AUTO_INCREMENT PRIMARY KEY';
+
+        // Create migrations table if not exists
+        $db->query("CREATE TABLE IF NOT EXISTS migrations (
+            id $idColumn,
+            migration VARCHAR(255),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )");
+        
+        // Get executed migrations
+        $executedMigrations = $db->query("SELECT migration FROM migrations")->fetchAll(\PDO::FETCH_COLUMN);
+
         $modules = $this->app->moduleManager->getModules();
         foreach ($modules as $module) {
             $moduleName = $module->getName();
@@ -49,16 +62,25 @@ class Kernel
             if (is_dir($migrationPath)) {
                 $files = glob($migrationPath . '/*.php');
                 foreach ($files as $file) {
-                    require_once $file;
                     $className = basename($file, '.php');
+                    
+                    if (in_array($className, $executedMigrations)) {
+                        continue;
+                    }
+
+                    require_once $file;
+                    
                     // Namespace convention needs to be handled. 
-                    // Let's assume Modules\{Module}\Database\Migrations\{ClassName}
                     $fullClassName = "Modules\\{$moduleName}\\Database\\Migrations\\{$className}";
                     
                     if (class_exists($fullClassName)) {
                         $migration = new $fullClassName();
                         echo "Migrating: {$className}\n";
                         $migration->up();
+                        
+                        // Log migration
+                        $db->query("INSERT INTO migrations (migration) VALUES (?)", [$className]);
+                        
                         echo "Migrated: {$className}\n";
                     }
                 }

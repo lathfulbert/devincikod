@@ -32,6 +32,10 @@ class Blueprint
 
     public function id(): Column
     {
+        $driver = Database::getInstance()->getDriver();
+        if ($driver === 'sqlite') {
+            return $this->addColumn('id', 'INTEGER PRIMARY KEY AUTOINCREMENT');
+        }
         return $this->addColumn('id', 'INT AUTO_INCREMENT PRIMARY KEY');
     }
 
@@ -47,8 +51,17 @@ class Blueprint
 
     public function timestamps(): void
     {
-        $this->addColumn('created_at', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
-        $this->addColumn('updated_at', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP');
+        $driver = Database::getInstance()->getDriver();
+        $currentTimestamp = 'CURRENT_TIMESTAMP';
+        
+        $this->addColumn('created_at', "TIMESTAMP DEFAULT {$currentTimestamp}");
+        
+        if ($driver === 'sqlite') {
+            // SQLite doesn't support ON UPDATE in column definition easily without triggers
+            $this->addColumn('updated_at', "TIMESTAMP DEFAULT {$currentTimestamp}");
+        } else {
+            $this->addColumn('updated_at', "TIMESTAMP DEFAULT {$currentTimestamp} ON UPDATE {$currentTimestamp}");
+        }
     }
 
     protected function addColumn(string $name, string $type): Column
@@ -72,6 +85,7 @@ class Column
     protected string $type;
     protected ?string $default = null;
     protected bool $nullable = false;
+    protected bool $unique = false;
 
     public function __construct(string $name, string $type)
     {
