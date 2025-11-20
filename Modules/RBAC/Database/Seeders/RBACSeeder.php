@@ -68,7 +68,7 @@ class RBACSeeder
             $allPerms = Permission::all();
             foreach ($allPerms as $perm) {
                 // Check if already assigned
-                $check = $db->query("SELECT id FROM role_permissions WHERE role_id = ? AND permission_id = ?", [$adminRole->id, $perm->id]);
+                $check = $db->query("SELECT role_id FROM role_permissions WHERE role_id = ? AND permission_id = ?", [$adminRole->id, $perm->id]);
                 if (!$check->fetch()) {
                     $db->query("INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)", [$adminRole->id, $perm->id]);
                 }

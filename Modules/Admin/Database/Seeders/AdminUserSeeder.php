@@ -40,6 +40,7 @@ class AdminUserSeeder
         if (!$user) {
             $user = new User();
             $user->username = $username;
+            $user->email = 'admin@example.com';
             $user->password = password_hash($password, PASSWORD_BCRYPT);
             $user->save();
             echo "User created: $username (password: $password)\n";
