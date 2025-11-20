@@ -3,7 +3,7 @@
     <?php if (isset($error)): ?>
         <p style="color: red;"><?= $error ?></p>
     <?php endif; ?>
-    <form method="POST" action="/login">
+    <form method="POST" action="<?= url('/login') ?>">
         <div style="margin-bottom: 1rem;">
             <label>Username (admin):</label><br>
             <input type="text" name="username" style="width: 100%; padding: 0.5rem;">
