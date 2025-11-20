@@ -4,6 +4,7 @@ namespace Modules\Admin\Controllers;
 
 use App\Core\Application;
 use Modules\RBAC\Models\Permission;
+use Modules\RBAC\Models\Module;
 
 class PermissionController
 {
@@ -17,15 +18,22 @@ class PermissionController
     public function create()
     {
         $app = Application::getInstance();
-        echo $app->view->render('admin/permissions/create', ['title' => 'Create Permission']);
+        $modules = Module::all();
+        echo $app->view->render('admin/permissions/create', [
+            'title' => 'Créer une Permission',
+            'modules' => $modules
+        ]);
     }
 
     public function store()
     {
-        $name = $_POST['name'] ?? '';
-        $slug = $_POST['slug'] ?? '';
+        $name = sanitize($_POST['name'] ?? '', 'string');
+        $slug = sanitize($_POST['slug'] ?? '', 'alphanumeric');
+        $module_id = !empty($_POST['module_id']) ? (int)$_POST['module_id'] : null;
+        $description = sanitize($_POST['description'] ?? '', 'string');
 
         if (empty($name) || empty($slug)) {
+            flash('error', 'Le nom et le slug sont requis.');
             redirect('/admin/permissions/create');
             exit;
         }
@@ -33,8 +41,11 @@ class PermissionController
         $permission = new Permission();
         $permission->name = $name;
         $permission->slug = $slug;
+        $permission->module_id = $module_id;
+        $permission->description = $description;
         $permission->save();
 
+        flash('success', 'Permission créée avec succès.');
         redirect('/admin/permissions');
         exit;
     }
@@ -49,7 +60,13 @@ class PermissionController
 
         $app = Application::getInstance();
         $permission = Permission::find($id);
-        echo $app->view->render('admin/permissions/edit', ['title' => 'Edit Permission', 'permission' => $permission]);
+        $modules = Module::all();
+
+        echo $app->view->render('admin/permissions/edit', [
+            'title' => 'Modifier la Permission',
+            'permission' => $permission,
+            'modules' => $modules
+        ]);
     }
 
     public function update(array $params = [])
@@ -66,13 +83,18 @@ class PermissionController
             exit;
         }
 
-        $name = $_POST['name'] ?? '';
-        $slug = $_POST['slug'] ?? '';
+        $name = sanitize($_POST['name'] ?? '', 'string');
+        $slug = sanitize($_POST['slug'] ?? '', 'alphanumeric');
+        $module_id = !empty($_POST['module_id']) ? (int)$_POST['module_id'] : null;
+        $description = sanitize($_POST['description'] ?? '', 'string');
 
         $permission->name = $name;
         $permission->slug = $slug;
+        $permission->module_id = $module_id;
+        $permission->description = $description;
         $permission->save();
 
+        flash('success', 'Permission mise à jour avec succès.');
         redirect('/admin/permissions');
         exit;
     }

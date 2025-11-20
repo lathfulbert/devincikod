@@ -7,6 +7,7 @@ use Modules\Admin\Controllers\AdminController;
 use Modules\Admin\Controllers\UserController;
 use Modules\Admin\Controllers\RoleController;
 use Modules\Admin\Controllers\PermissionController;
+use Modules\Admin\Controllers\ModuleController;
 use App\Core\Auth\Auth;
 
 class AdminModule implements ModuleContract
@@ -16,17 +17,13 @@ class AdminModule implements ModuleContract
         return 'Admin';
     }
 
-    public function register(): void
-    {
-    }
+    public function register(): void {}
 
-    public function boot(): void
-    {
-    }
+    public function boot(): void {}
 
     public function getRoutes(): array
     {
-        $adminMiddleware = function() {
+        $adminMiddleware = function () {
             $auth = new Auth();
             if (!$auth->check()) {
                 redirect('/login');
@@ -44,7 +41,7 @@ class AdminModule implements ModuleContract
                 'handler' => [new AdminController(), 'index'],
                 'middleware' => [$adminMiddleware]
             ],
-            
+
             // Users
             [
                 'method' => 'GET',
@@ -156,6 +153,44 @@ class AdminModule implements ModuleContract
                 'method' => 'POST',
                 'path' => '/admin/permissions/{id}/delete',
                 'handler' => [new PermissionController(), 'delete'],
+                'middleware' => [$adminMiddleware]
+            ],
+
+            // Modules
+            [
+                'method' => 'GET',
+                'path' => '/admin/modules',
+                'handler' => [new ModuleController(), 'index'],
+                'middleware' => [$adminMiddleware]
+            ],
+            [
+                'method' => 'GET',
+                'path' => '/admin/modules/create',
+                'handler' => [new ModuleController(), 'create'],
+                'middleware' => [$adminMiddleware]
+            ],
+            [
+                'method' => 'POST',
+                'path' => '/admin/modules',
+                'handler' => [new ModuleController(), 'store'],
+                'middleware' => [$adminMiddleware]
+            ],
+            [
+                'method' => 'GET',
+                'path' => '/admin/modules/{id}/edit',
+                'handler' => [new ModuleController(), 'edit'],
+                'middleware' => [$adminMiddleware]
+            ],
+            [
+                'method' => 'POST',
+                'path' => '/admin/modules/{id}',
+                'handler' => [new ModuleController(), 'update'],
+                'middleware' => [$adminMiddleware]
+            ],
+            [
+                'method' => 'POST',
+                'path' => '/admin/modules/{id}/delete',
+                'handler' => [new ModuleController(), 'delete'],
                 'middleware' => [$adminMiddleware]
             ],
         ];
