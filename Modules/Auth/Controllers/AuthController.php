@@ -35,7 +35,7 @@ class AuthController
 
             if ($user && password_verify($password, $user['password'])) {
                 $this->auth->login(['id' => $user['id'], 'username' => $user['username'], 'role' => $user['role']]);
-                redirect('/dashboard');
+                redirect('/admin/dashboard');
                 exit;
             } else {
                 $error = "Invalid credentials";

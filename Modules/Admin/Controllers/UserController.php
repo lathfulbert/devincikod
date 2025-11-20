@@ -52,8 +52,14 @@ class UserController
         exit;
     }
 
-    public function edit($id)
+    public function edit(array $params = [])
     {
+        $id = $params['id'] ?? null;
+        if (!$id) {
+            redirect('/admin/users');
+            return;
+        }
+        
         $app = Application::getInstance();
         $user = User::find($id);
         $roles = Role::all();
@@ -68,8 +74,14 @@ class UserController
         ]);
     }
 
-    public function update($id)
+    public function update(array $params = [])
     {
+        $id = $params['id'] ?? null;
+        if (!$id) {
+            redirect('/admin/users');
+            return;
+        }
+        
         $user = User::find($id);
         if (!$user) {
             redirect('/admin/users');
@@ -100,8 +112,14 @@ class UserController
         exit;
     }
 
-    public function delete($id)
+    public function delete(array $params = [])
     {
+        $id = $params['id'] ?? null;
+        if (!$id) {
+            redirect('/admin/users');
+            return;
+        }
+        
         $user = User::find($id);
         if ($user) {
             $db = Database::getInstance();

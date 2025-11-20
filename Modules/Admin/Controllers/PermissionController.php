@@ -39,15 +39,27 @@ class PermissionController
         exit;
     }
 
-    public function edit($id)
+    public function edit(array $params = [])
     {
+        $id = $params['id'] ?? null;
+        if (!$id) {
+            redirect('/admin/permissions');
+            return;
+        }
+        
         $app = Application::getInstance();
         $permission = Permission::find($id);
         echo $app->view->render('admin/permissions/edit', ['title' => 'Edit Permission', 'permission' => $permission]);
     }
 
-    public function update($id)
+    public function update(array $params = [])
     {
+        $id = $params['id'] ?? null;
+        if (!$id) {
+            redirect('/admin/permissions');
+            return;
+        }
+        
         $permission = Permission::find($id);
         if (!$permission) {
             redirect('/admin/permissions');
@@ -65,12 +77,16 @@ class PermissionController
         exit;
     }
 
-    public function delete($id)
+    public function delete(array $params = [])
     {
+        $id = $params['id'] ?? null;
+        if (!$id) {
+            redirect('/admin/permissions');
+            return;
+        }
+        
         $permission = Permission::find($id);
         if ($permission) {
-            // TODO: Remove from role_permissions first? Or rely on FK cascade if exists?
-            // For now, manual cleanup might be safer if no FK cascade
             $db = \App\Core\Database\Database::getInstance();
             $db->query("DELETE FROM role_permissions WHERE permission_id = ?", [$permission->id]);
             $permission->delete();

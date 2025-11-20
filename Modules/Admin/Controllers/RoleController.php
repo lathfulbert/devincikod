@@ -50,8 +50,14 @@ class RoleController
         exit;
     }
 
-    public function edit($id)
+    public function edit(array $params = [])
     {
+        $id = $params['id'] ?? null;
+        if (!$id) {
+            redirect('/admin/roles');
+            return;
+        }
+        
         $app = Application::getInstance();
         $role = Role::find($id);
         $permissions = Permission::all();
@@ -66,8 +72,14 @@ class RoleController
         ]);
     }
 
-    public function update($id)
+    public function update(array $params = [])
     {
+        $id = $params['id'] ?? null;
+        if (!$id) {
+            redirect('/admin/roles');
+            return;
+        }
+        
         $role = Role::find($id);
         if (!$role) {
             redirect('/admin/roles');
@@ -95,8 +107,14 @@ class RoleController
         exit;
     }
 
-    public function delete($id)
+    public function delete(array $params = [])
     {
+        $id = $params['id'] ?? null;
+        if (!$id) {
+            redirect('/admin/roles');
+            return;
+        }
+        
         $role = Role::find($id);
         if ($role) {
             $db = Database::getInstance();
