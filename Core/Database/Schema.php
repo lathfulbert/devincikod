@@ -2,134 +2,139 @@
 
 namespace App\Core\Database;
 
+/**
+ * Schema - Facade for database schema operations
+ * Provides Laravel-like schema building methods
+ */
 class Schema
 {
+    /**
+     * Create a new table
+     */
     public static function create(string $table, callable $callback): void
     {
         $blueprint = new Blueprint($table);
         $callback($blueprint);
         
         $sql = $blueprint->toSql();
+       Database::getInstance()->query($sql);
+        
+        // Handle foreign keys separately (after table creation)
+        self::addForeignKeys($blueprint);
+        
+        // Handle indexes that need separate statements
+        self::addIndexes($blueprint);
+    }
+
+    /**
+     * Modify an existing table
+     */
+    public static function table(string $table, callable $callback): void
+    {
+        // For now, throw exception - ALTER TABLE support can be added later
+        throw new \Exception("Schema::table() not yet implemented. Use raw SQL for alterations.");
+    }
+
+    /**
+     * Drop a table
+     */
+    public static function drop(string $table): void
+    {
+        $sql = "DROP TABLE `{$table}`";
         Database::getInstance()->query($sql);
     }
 
+    /**
+     * Drop a table if it exists
+     */
     public static function dropIfExists(string $table): void
     {
-        $sql = "DROP TABLE IF EXISTS {$table}";
+        $sql = "DROP TABLE IF EXISTS `{$table}`";
         Database::getInstance()->query($sql);
     }
-}
 
-class Blueprint
-{
-    protected string $table;
-    protected array $columns = [];
-
-    public function __construct(string $table)
+    /**
+     * Check if a table exists
+     */
+    public static function hasTable(string $table): bool
     {
-        $this->table = $table;
-    }
-
-    public function id(): Column
-    {
-        $driver = Database::getInstance()->getDriver();
-        if ($driver === 'sqlite') {
-            return $this->addColumn('id', 'INTEGER PRIMARY KEY AUTOINCREMENT');
-        }
-        return $this->addColumn('id', 'INT AUTO_INCREMENT PRIMARY KEY');
-    }
-
-    public function string(string $column, int $length = 255): Column
-    {
-        return $this->addColumn($column, "VARCHAR({$length})");
-    }
-
-    public function text(string $column): Column
-    {
-        return $this->addColumn($column, 'TEXT');
-    }
-
-    public function timestamps(): void
-    {
-        $driver = Database::getInstance()->getDriver();
-        $currentTimestamp = 'CURRENT_TIMESTAMP';
-        
-        $this->addColumn('created_at', "TIMESTAMP DEFAULT {$currentTimestamp}");
+        $db = Database::getInstance();
+        $driver = $db->getDriver();
         
         if ($driver === 'sqlite') {
-            // SQLite doesn't support ON UPDATE in column definition easily without triggers
-            $this->addColumn('updated_at', "TIMESTAMP DEFAULT {$currentTimestamp}");
+            $sql = "SELECT name FROM sqlite_master WHERE type='table' AND name=?";
         } else {
-            $this->addColumn('updated_at', "TIMESTAMP DEFAULT {$currentTimestamp} ON UPDATE {$currentTimestamp}");
+            $sql = "SHOW TABLES LIKE ?";
         }
-    }
-
-    protected function addColumn(string $name, string $type): Column
-    {
-        $column = new Column($name, $type);
-        $this->columns[] = $column;
-        return $column;
-    }
-
-    public function toSql(): string
-    {
-        $cols = array_map(fn($col) => $col->toSql(), $this->columns);
-        $colsSql = implode(', ', $cols);
-        return "CREATE TABLE {$this->table} ({$colsSql})";
-    }
-}
-
-class Column
-{
-    protected string $name;
-    protected string $type;
-    protected ?string $default = null;
-    protected bool $nullable = false;
-    protected bool $unique = false;
-
-    public function __construct(string $name, string $type)
-    {
-        $this->name = $name;
-        $this->type = $type;
-    }
-
-    public function default(string|int $value): self
-    {
-        $this->default = (string)$value;
-        return $this;
-    }
-
-    public function nullable(): self
-    {
-        $this->nullable = true;
-        return $this;
-    }
-
-    public function unique(): self
-    {
-        // Unique constraint logic would go here (e.g. adding UNIQUE index)
-        // For MVP, we might just mark it or append UNIQUE to definition if supported inline
-        // SQLite supports inline UNIQUE. MySQL supports it too.
-        $this->unique = true;
-        return $this;
-    }
-
-    public function toSql(): string
-    {
-        $sql = "{$this->name} {$this->type}";
         
-        if (!$this->nullable && strpos($this->type, 'PRIMARY KEY') === false) {
-            $sql .= " NOT NULL";
-        }
+        $stmt = $db->query($sql, [$table]);
+        return $stmt->rowCount() > 0;
+    }
 
-        if ($this->default !== null) {
-            $sql .= " DEFAULT '{$this->default}'";
+    /**
+     * Check if a column exists in a table
+     */
+    public static function hasColumn(string $table, string $column): bool
+    {
+        $db = Database::getInstance();
+        $driver = $db->getDriver();
+        
+        if ($driver === 'sqlite') {
+            $sql = "PRAGMA table_info(`{$table}`)";
+            $stmt = $db->query($sql);
+            $columns = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            foreach ($columns as $col) {
+                if ($col['name'] === $column) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            $sql = "SHOW COLUMNS FROM `{$table}` LIKE ?";
+            $stmt = $db->query($sql, [$column]);
+            return $stmt->rowCount() > 0;
         }
+    }
 
-        if (isset($this->unique) && $this->unique) {
-            $sql .= " UNIQUE";
+    /**
+     * Add foreign key constraints to a table
+     */
+    protected static function addForeignKeys(Blueprint $blueprint): void
+    {
+        $db = Database::getInstance();
+        $driver = $db->getDriver();
+        
+        // SQLite doesn't support ALTER TABLE ADD CONSTRAINT for foreign keys
+        // They must be defined inline during CREATE TABLE
+        if ($driver === 'sqlite') {
+            return;
         }
+        
+        foreach ($blueprint->getColumns() as $column) {
+            $foreign = $column->getForeignKey();
+            if ($foreign) {
+                $sql = "ALTER TABLE `{$blueprint->getTable()}` ADD {$foreign->toSql()}";
+                $db->query($sql);
+            }
+        }
+    }
 
-        return $sql;
+    /**
+     * Add indexes that need separate statements
+     */
+    protected static function addIndexes(Blueprint $blueprint): void
+    {
+        $db = Database::getInstance();
+        
+        foreach ($blueprint->getColumns() as $column) {
+            if ($column->needsIndex()) {
+                $table = $blueprint->getTable();
+                $name = $column->getName();
+                $indexName = "{$table}_{$name}_index";
+                
+                $sql = "CREATE INDEX `{$indexName}` ON `{$table}` (`{$name}`)";
+                $db->query($sql);
+            }
+        }
     }
 }
