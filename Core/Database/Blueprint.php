@@ -31,7 +31,7 @@ class Blueprint
         if ($driver === 'sqlite') {
             return $this->addColumn($column, 'INTEGER', true);
         }
-        return $this->addColumn($column, 'BIGINT UNSIGNED', true);
+        return $this->addColumn($column, 'BIGINT UNSIGNED', true)->autoIncrement();
     }
 
     public function increments(string $column): Column

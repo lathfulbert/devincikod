@@ -19,7 +19,7 @@ class Column
     protected bool $autoIncrement = false;
     protected bool $useCurrent = false;
     protected bool $onUpdate = false;
-    protected ?array $foreignKey = null;
+    protected ?ForeignKeyDefinition $foreignKey = null;
 
     public function __construct(string $name, string $type, string $driver = 'mysql')
     {

@@ -46,42 +46,71 @@ class Kernel
     {
         echo "Running migrations (UP)...\n";
         
-        $db = Database::getInstance();
-        $this->ensureMigrationsTable($db);
-        
-        // Get executed migrations
-        $executedMigrations = $db->query("SELECT migration FROM migrations")->fetchAll(\PDO::FETCH_COLUMN);
-
-        $modules = $this->app->moduleManager->getModules();
-        foreach ($modules as $module) {
-            $moduleName = $module->getName();
-            $migrationPath = $this->app->getBasePath() . "/Modules/{$moduleName}/Database/Migrations";
+        try {
+            $db = Database::getInstance();
+            echo "Database instance retrieved\n";
             
-            if (is_dir($migrationPath)) {
-                $files = glob($migrationPath . '/*.php');
-                foreach ($files as $file) {
-                    $className = basename($file, '.php');
-                    
-                    if (in_array($className, $executedMigrations)) {
-                        continue;
-                    }
+            $this->ensureMigrationsTable($db);
+            echo "Migrations table ensured\n";
+            
+            // Get executed migrations
+            $executedMigrations = $db->query("SELECT migration FROM migrations")->fetchAll(\PDO::FETCH_COLUMN);
+            echo "Executed migrations count: " . count($executedMigrations) . "\n";
 
-                    require_once $file;
+            $modules = $this->app->moduleManager->getModules();
+            echo "Found " . count($modules) . " modules\n";
+            
+            foreach ($modules as $module) {
+                $moduleName = $module->getName();
+                $migrationPath = $this->app->getBasePath() . "/Modules/{$moduleName}/Database/Migrations";
+                echo "Checking module: {$moduleName}\n";
+                
+                if (is_dir($migrationPath)) {
+                    $files = glob($migrationPath . '/*.php');
                     
-                    $fullClassName = "Modules\\{$moduleName}\\Database\\Migrations\\{$className}";
+                    // Sort files to ensure order (001_, 002_, etc.)
+                    sort($files);
                     
-                    if (class_exists($fullClassName)) {
-                        $migration = new $fullClassName();
-                        echo "Migrating: {$className}\n";
-                        $migration->up();
+                    echo "  Found " . count($files) . " migration files\n";
+                    
+                    foreach ($files as $file) {
+                        $className = basename($file, '.php');
                         
-                        // Log migration
-                        $db->query("INSERT INTO migrations (migration) VALUES (?)", [$className]);
-                        
-                        echo "Migrated: {$className}\n";
+                        if (in_array($className, $executedMigrations)) {
+                            echo "  Skipping (already executed): {$className}\n";
+                            continue;
+                        }
+
+                        try {
+                            // Include the migration file and get the returned object
+                            $migration = require $file;
+                            
+                            // Check if it's a valid migration object
+                            if (is_object($migration) && method_exists($migration, 'up')) {
+                                echo "  Migrating: {$className}\n";
+                                $migration->up();
+                                
+                                // Log migration
+                                $db->query("INSERT INTO migrations (migration) VALUES (?)", [$className]);
+                                
+                                echo "  ✓ Migrated: {$className}\n";
+                            } else {
+                                echo "  Warning: {$className} did not return a valid migration object\n";
+                            }
+                        } catch (\Exception $e) {
+                            echo "  ✗ Error migrating {$className}: " . $e->getMessage() . "\n";
+                            echo "  Stack trace:\n" . $e->getTraceAsString() . "\n";
+                        }
                     }
+                } else {
+                    echo "  Migration path does not exist: {$migrationPath}\n";
                 }
             }
+            
+            echo "\nMigrations completed!\n";
+        } catch (\Exception $e) {
+            echo "Fatal error during migration: " . $e->getMessage() . "\n";
+            echo "Stack trace:\n" . $e->getTraceAsString() . "\n";
         }
     }
 
@@ -113,19 +142,26 @@ class Kernel
             $file = $migrationPath . '/' . $className . '.php';
 
             if (file_exists($file)) {
-                require_once $file;
-                $fullClassName = "Modules\\{$moduleName}\\Database\\Migrations\\{$className}";
-                
-                if (class_exists($fullClassName)) {
-                    $migration = new $fullClassName();
-                    $migration->down();
+                try {
+                    // Include the migration file and get the returned object
+                    $migration = require $file;
                     
-                    // Remove from DB
-                    $db->query("DELETE FROM migrations WHERE id = ?", [$lastMigration['id']]);
-                    
-                    echo "Rolled back: {$className}\n";
-                    $found = true;
-                    break;
+                    // Check if it's a valid migration object
+                    if (is_object($migration) && method_exists($migration, 'down')) {
+                        $migration->down();
+                        
+                        // Remove from DB
+                        $db->query("DELETE FROM migrations WHERE id = ?", [$lastMigration['id']]);
+                        
+                        echo "Rolled back: {$className}\n";
+                        $found = true;
+                        break;
+                    } else {
+                        echo "Migration file exists but did not return a valid migration object.\n";
+                    }
+                } catch (\Exception $e) {
+                    echo "Error rolling back {$className}: " . $e->getMessage() . "\n";
+                    echo "Stack trace:\n" . $e->getTraceAsString() . "\n";
                 }
             }
         }
