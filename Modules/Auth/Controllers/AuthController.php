@@ -35,7 +35,7 @@ class AuthController
 
             if ($user && password_verify($password, $user['password'])) {
                 $this->auth->login(['id' => $user['id'], 'username' => $user['username'], 'role' => $user['role']]);
-                header('Location: /dashboard');
+                redirect('/dashboard');
                 exit;
             } else {
                 $error = "Invalid credentials";
@@ -49,7 +49,7 @@ class AuthController
     public function logout()
     {
         $this->auth->logout();
-        header('Location: /login');
+        redirect('/login');
         exit;
     }
     

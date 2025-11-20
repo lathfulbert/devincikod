@@ -2,12 +2,14 @@
 
 return [
     'name' => getenv('APP_NAME') ?: 'SunuFramework',
+    'url' => getenv('APP_URL') ?: '/sunuframework2',
     'debug' => getenv('APP_DEBUG') === 'true',
     'modules' => [
         'Demo' => true,
         'Blog' => true,
         'Auth' => true,
-        'RBAC' => true
+        'RBAC' => true,
+        'Admin' => true
     ],
     'database' => [
         'driver' => getenv('DB_CONNECTION') ?: 'mysql',
