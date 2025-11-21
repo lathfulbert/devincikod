@@ -73,8 +73,12 @@ class Application
         // Initialize I18n (Internationalization)
         \App\Core\I18n\Middleware\SetLocaleMiddleware::run();
 
-        // Discover and Register Modules
         $this->moduleManager->discover();
+        try {
+            $this->moduleManager->syncToRegistry(); // Ensure new modules are in DB
+        } catch (\PDOException $e) {
+            // Ignore DB errors during boot (e.g. during migration)
+        }
         $this->moduleManager->loadEnabledModules();
         $this->moduleManager->registerModules();
 

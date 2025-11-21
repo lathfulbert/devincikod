@@ -30,7 +30,7 @@ class Router
     {
         foreach ($this->routes as $route) {
             $match = $this->matchRoute($route['path'], $uri);
-            
+
             if ($route['method'] === $method && $match !== false) {
                 // Handle Middleware
                 if (isset($route['middleware']) && !empty($route['middleware'])) {
@@ -42,7 +42,7 @@ class Router
                         }
                     }
                 }
-                
+
                 // Call handler with parameters
                 return $this->callHandler($route['handler'], $match);
             }
@@ -58,15 +58,20 @@ class Router
     {
         if (is_array($handler)) {
             [$controller, $method] = $handler;
-            
+
+            // If controller is a class name string, instantiate it
+            if (is_string($controller) && class_exists($controller)) {
+                $controller = new $controller();
+            }
+
             // Use reflection to get method parameters and pass them in order
             $reflection = new \ReflectionMethod($controller, $method);
             $methodParams = $reflection->getParameters();
-            
+
             $args = [];
             foreach ($methodParams as $param) {
                 $paramName = $param->getName();
-                
+
                 // If it's the first parameter and it's an array type (for $params = [])
                 if ($param->getType() && $param->getType()->getName() === 'array' && $param->isDefaultValueAvailable()) {
                     $args[] = $params;
@@ -81,7 +86,7 @@ class Router
                     $args[] = null;
                 }
             }
-            
+
             return call_user_func_array([$controller, $method], $args);
         } else {
             // For closures, pass params as single array argument
@@ -132,12 +137,23 @@ class Router
     public function loadModuleRoutes(array $routes): void
     {
         foreach ($routes as $route) {
-            $this->addRoute(
-                $route['method'], 
-                $route['path'], 
-                $route['handler'], 
-                $route['middleware'] ?? []
-            );
+            if (isset($route['method'])) {
+                // Associative array format
+                $this->addRoute(
+                    $route['method'],
+                    $route['path'],
+                    $route['handler'],
+                    $route['middleware'] ?? []
+                );
+            } else {
+                // Indexed array format: [method, path, handler, middleware]
+                $this->addRoute(
+                    $route[0],
+                    $route[1],
+                    $route[2],
+                    $route[3] ?? []
+                );
+            }
         }
     }
 
@@ -147,7 +163,7 @@ class Router
     protected function handleNotFound(): void
     {
         http_response_code(404);
-        
+
         // Try to render a 404 view if it exists
         $viewPath = dirname(dirname(dirname(__DIR__))) . '/templates/errors/404.php';
         if (file_exists($viewPath)) {
@@ -164,18 +180,18 @@ class Router
     {
         $prefix = $attributes['prefix'] ?? '';
         $middleware = $attributes['middleware'] ?? [];
-        
+
         // Store current context
         $previousPrefix = $this->currentPrefix ?? '';
         $previousMiddleware = $this->currentMiddleware ?? [];
-        
+
         // Set new context
         $this->currentPrefix = $previousPrefix . $prefix;
         $this->currentMiddleware = array_merge($previousMiddleware, $middleware);
-        
+
         // Execute callback
         $callback($this);
-        
+
         // Restore previous context
         $this->currentPrefix = $previousPrefix;
         $this->currentMiddleware = $previousMiddleware;
@@ -201,16 +217,23 @@ class Router
         foreach ($this->routes as $route) {
             if (isset($route['name']) && $route['name'] === $name) {
                 $path = $route['path'];
-                
+
                 // Replace parameters in the path
                 foreach ($params as $key => $value) {
                     $path = str_replace('{' . $key . '}', $value, $path);
                 }
-                
+
                 return url($path);
             }
         }
-        
+
         return '#';
+    }
+    /**
+     * Get all registered routes.
+     */
+    public function getRoutes(): array
+    {
+        return $this->routes;
     }
 }

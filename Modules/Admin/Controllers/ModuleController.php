@@ -3,120 +3,135 @@
 namespace Modules\Admin\Controllers;
 
 use App\Core\Application;
-use Modules\RBAC\Models\Module;
+use App\Core\Module\ModuleManager;
 
 class ModuleController
 {
+    protected ModuleManager $moduleManager;
+
+    public function __construct()
+    {
+        $this->moduleManager = Application::getInstance()->moduleManager;
+    }
+
+    /**
+     * List all modules.
+     */
     public function index()
     {
         $app = Application::getInstance();
-        $modules = Module::all();
-        echo $app->view->render('admin/modules/index', ['title' => 'Modules', 'modules' => $modules]);
-    }
 
-    public function create()
-    {
-        $app = Application::getInstance();
-        echo $app->view->render('admin/modules/create', ['title' => 'Créer un Module']);
-    }
+        // Ensure we have the latest state
+        $this->moduleManager->discover();
+        $this->moduleManager->syncToRegistry();
 
-    public function store()
-    {
-        $name = sanitize($_POST['name'] ?? '', 'string');
-        $slug = sanitize($_POST['slug'] ?? '', 'alphanumeric');
-        $icon = sanitize($_POST['icon'] ?? '', 'string');
-        $description = sanitize($_POST['description'] ?? '', 'string');
-        $is_active = isset($_POST['is_active']) ? 1 : 0;
+        $modules = $this->moduleManager->getAllModules();
+        $registry = $this->moduleManager->getRegistry();
 
-        if (empty($name) || empty($slug)) {
-            flash('error', 'Le nom et le slug sont requis.');
-            redirect('/admin/modules/create');
-            exit;
+        // Prepare view data
+        $viewData = [];
+        foreach ($modules as $name => $module) {
+            $viewData[] = [
+                'name' => $module->getName(),
+                'version' => $module->getVersion(),
+                'description' => $module->getDescription(),
+                'author' => $module->getAuthor(),
+                'is_enabled' => $registry->isEnabled($name),
+                'is_installed' => $registry->isInstalled($name),
+            ];
         }
 
-        $module = new Module();
-        $module->name = $name;
-        $module->slug = $slug;
-        $module->icon = $icon;
-        $module->description = $description;
-        $module->is_active = $is_active;
-        $module->save();
-
-        flash('success', 'Module créé avec succès.');
-        redirect('/admin/modules');
-        exit;
-    }
-
-    public function edit(array $params = [])
-    {
-        $id = $params['id'] ?? null;
-        if (!$id) {
-            redirect('/admin/modules');
-            return;
-        }
-
-        $app = Application::getInstance();
-        $module = Module::find($id);
-
-        if (!$module) {
-            redirect('/admin/modules');
-            return;
-        }
-
-        echo $app->view->render('admin/modules/edit', [
-            'title' => 'Modifier le Module',
-            'module' => $module
+        echo $app->view->render('admin/modules/index', [
+            'title' => 'Gestion des Modules',
+            'modules' => $viewData
         ]);
     }
 
-    public function update(array $params = [])
+    /**
+     * Enable a module.
+     */
+    public function enable(array $params = [])
     {
-        $id = $params['id'] ?? null;
-        if (!$id) {
+        $name = $params['name'] ?? $_POST['name'] ?? null;
+
+        if (!$name) {
+            flash('error', 'Nom du module manquant.');
             redirect('/admin/modules');
             return;
         }
 
-        $module = Module::find($id);
-        if (!$module) {
-            redirect('/admin/modules');
-            exit;
+        if ($this->moduleManager->activateModule($name)) {
+            flash('success', "Module {$name} activé avec succès.");
+        } else {
+            flash('error', "Impossible d'activer le module {$name}.");
         }
 
-        $name = sanitize($_POST['name'] ?? '', 'string');
-        $slug = sanitize($_POST['slug'] ?? '', 'alphanumeric');
-        $icon = sanitize($_POST['icon'] ?? '', 'string');
-        $description = sanitize($_POST['description'] ?? '', 'string');
-        $is_active = isset($_POST['is_active']) ? 1 : 0;
-
-        $module->name = $name;
-        $module->slug = $slug;
-        $module->icon = $icon;
-        $module->description = $description;
-        $module->is_active = $is_active;
-        $module->save();
-
-        flash('success', 'Module mis à jour avec succès.');
         redirect('/admin/modules');
-        exit;
     }
 
-    public function delete(array $params = [])
+    /**
+     * Disable a module.
+     */
+    public function disable(array $params = [])
     {
-        $id = $params['id'] ?? null;
-        if (!$id) {
+        $name = $params['name'] ?? $_POST['name'] ?? null;
+
+        if (!$name) {
+            flash('error', 'Nom du module manquant.');
             redirect('/admin/modules');
             return;
         }
 
-        $module = Module::find($id);
-        if ($module) {
-            // Note: Permissions with this module_id will have it set to NULL (ON DELETE SET NULL)
-            $module->delete();
-            flash('success', 'Module supprimé avec succès.');
+        if ($this->moduleManager->deactivateModule($name)) {
+            flash('success', "Module {$name} désactivé avec succès.");
+        } else {
+            flash('error', "Impossible de désactiver le module {$name}.");
         }
 
         redirect('/admin/modules');
-        exit;
+    }
+
+    /**
+     * Install a module.
+     */
+    public function install(array $params = [])
+    {
+        $name = $params['name'] ?? $_POST['name'] ?? null;
+
+        if (!$name) {
+            flash('error', 'Nom du module manquant.');
+            redirect('/admin/modules');
+            return;
+        }
+
+        if ($this->moduleManager->installModule($name)) {
+            flash('success', "Module {$name} installé avec succès.");
+        } else {
+            flash('error', "Impossible d'installer le module {$name}.");
+        }
+
+        redirect('/admin/modules');
+    }
+
+    /**
+     * Uninstall a module.
+     */
+    public function uninstall(array $params = [])
+    {
+        $name = $params['name'] ?? $_POST['name'] ?? null;
+
+        if (!$name) {
+            flash('error', 'Nom du module manquant.');
+            redirect('/admin/modules');
+            return;
+        }
+
+        if ($this->moduleManager->uninstallModule($name)) {
+            flash('success', "Module {$name} désinstallé avec succès.");
+        } else {
+            flash('error', "Impossible de désinstaller le module {$name}.");
+        }
+
+        redirect('/admin/modules');
     }
 }
