@@ -1,4 +1,0 @@
-﻿Routes charg├®es : 37
-
-Test de matching pour [GET] /admin/users/edit/1:
-Route trouv├®e: /admin/users/edit/{id}

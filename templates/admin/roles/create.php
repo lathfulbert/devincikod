@@ -7,7 +7,7 @@
 </div>
 
 <div class="card">
-    <form action="<?= url('/admin/roles') ?>" method="POST">
+    <form action="<?= url('/admin/roles/store') ?>" method="POST">
         <?= csrf_field() ?>
         <div class="form-group">
             <label for="name">Name</label>

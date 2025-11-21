@@ -7,7 +7,7 @@
 </div>
 
 <div class="card">
-    <form action="<?= url('/admin/roles/' . $role->id) ?>" method="POST">
+    <form action="<?= url('/admin/roles/' . $role->id . '/update') ?>" method="POST">
         <?= csrf_field() ?>
         <div class="form-group">
             <label for="name">Name</label>

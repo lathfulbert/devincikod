@@ -22,7 +22,7 @@ component('breadcrumb');
         component('card-start');
         ?>
 
-        <form action="<?= url('/admin/users') ?>" method="POST">
+        <form action="<?= url('/admin/users/store') ?>" method="POST">
             <?= csrf_field() ?>
 
             <div class="mb-3">
