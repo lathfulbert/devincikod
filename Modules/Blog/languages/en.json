@@ -1,0 +1,17 @@
+{
+  "blog": {
+    "title": "Blog",
+    "posts": "Posts",
+    "categories": "Categories",
+    "tags": "Tags",
+    "create_post": "New Post",
+    "edit_post": "Edit Post",
+    "post_title": "Title",
+    "post_content": "Content",
+    "post_excerpt": "Excerpt",
+    "published": "Published",
+    "draft": "Draft",
+    "author": "Author",
+    "published_at": "Published on"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "app": {
+    "name": "SunuFramework",
+    "tagline": "إطار PHP حديث ونموذجي"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "register": "تسجيل",
+    "welcome": "مرحبا، :name",
+    "login_success": "تم تسجيل الدخول بنجاح! مرحبا :name.",
+    "logout_success": "تم تسجيل الخروج بنجاح. نراك قريبا!",
+    "login_failed": "اسم المستخدم أو كلمة المرور غير صحيحة.",
+    "password_reset": "إعادة تعيين كلمة المرور",
+    "forgot_password": "نسيت كلمة المرور؟",
+    "remember_me": "تذكرني"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "welcome": "مرحبا بك في لوحة التحكم",
+    "overview": "نظرة عامة",
+    "statistics": "إحصائيات",
+    "recent_activity": "النشاط الأخير"
+  },
+  "navigation": {
+    "home": "الرئيسية",
+    "dashboard": "لوحة التحكم",
+    "users": "المستخدمين",
+    "roles": "الأدوار",
+    "permissions": "الصلاحيات",
+    "modules": "الوحدات",
+    "settings": "الإعدادات",
+    "profile": "الملف الشخصي"
+  },
+  "messages": {
+    "success": "تمت العملية بنجاح!",
+    "error": "حدث خطأ.",
+    "saved": "تم الحفظ بنجاح.",
+    "updated": "تم التحديث بنجاح.",
+    "deleted": "تم الحذف بنجاح.",
+    "created": "تم الإنشاء بنجاح.",
+    "confirm_delete": "هل أنت متأكد من حذف هذا العنصر؟",
+    "no_data": "لا توجد بيانات متاحة.",
+    "loading": "جاري التحميل..."
+  },
+  "actions": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "create": "إنشاء",
+    "view": "عرض",
+    "search": "بحث",
+    "filter": "تصفية",
+    "export": "تصدير",
+    "import": "استيراد",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "submit": "إرسال",
+    "reset": "إعادة تعيين"
+  },
+  "common": {
+    "yes": "نعم",
+    "no": "لا",
+    "all": "الكل",
+    "none": "لا شيء"
+  }
+}

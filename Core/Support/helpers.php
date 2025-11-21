@@ -733,3 +733,106 @@ if (!function_exists('vite')) {
         return $html;
     }
 }
+
+/*
+|--------------------------------------------------------------------------
+| I18n Translation Helpers
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('__t')) {
+    /**
+     * Translate the given message.
+     * Shorthand alias for trans().
+     *
+     * @param string $key Translation key (dot notation)
+     * @param array $replace Replacement parameters
+     * @param string|null $locale Specific locale
+     * @return string Translated string
+     */
+    function __t(string $key, array $replace = [], ?string $locale = null): string
+    {
+        return App\Core\I18n\LanguageManager::getInstance()->trans($key, $replace, $locale);
+    }
+}
+
+if (!function_exists('trans')) {
+    /**
+     * Translate the given message.
+     *
+     * @param string $key Translation key (dot notation) 
+     * @param array $replace Replacement parameters
+     * @param string|null $locale Specific locale
+     * @return string Translated string
+     */
+    function trans(string $key, array $replace = [], ?string $locale = null): string
+    {
+        return App\Core\I18n\LanguageManager::getInstance()->trans($key, $replace, $locale);
+    }
+}
+
+if (!function_exists('trans_choice')) {
+    /**
+     * Translate the given message with pluralization.
+     *
+     * @param string $key Translation key
+     * @param int $count Count for pluralization
+     * @param array $replace Replacement parameters
+     * @param string|null $locale Specific locale
+     * @return string Translated string
+     */
+    function trans_choice(string $key, int $count, array $replace = [], ?string $locale = null): string
+    {
+        return App\Core\I18n\LanguageManager::getInstance()->transChoice($key, $count, $replace, $locale);
+    }
+}
+
+if (!function_exists('app_locale')) {
+    /**
+     * Get the current application locale.
+     *
+     * @return string Current locale code
+     */
+    function app_locale(): string
+    {
+        return App\Core\I18n\LanguageManager::getInstance()->getLocale();
+    }
+}
+
+if (!function_exists('set_locale')) {
+    /**
+     * Set the application locale.
+     *
+     * @param string $locale Locale code
+     * @return void
+     */
+    function set_locale(string $locale): void
+    {
+        App\Core\I18n\LanguageManager::getInstance()->setLocale($locale);
+    }
+}
+
+if (!function_exists('supported_locales')) {
+    /**
+     * Get all supported locales.
+     *
+     * @return array List of supported locale codes
+     */
+    function supported_locales(): array
+    {
+        return App\Core\I18n\LanguageManager::getInstance()->getSupportedLocales();
+    }
+}
+
+if (!function_exists('is_locale_supported')) {
+    /**
+     * Check if a locale is supported.
+     *
+     * @param string $locale Locale code
+     * @return bool True if supported
+     */
+    function is_locale_supported(string $locale): bool
+    {
+        return App\Core\I18n\LanguageManager::getInstance()->isLocaleSupported($locale);
+    }
+}
