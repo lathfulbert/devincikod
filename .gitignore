@@ -41,3 +41,6 @@ Thumbs.db
 /phpunit.xml
 /coverage/
 /.phpunit.cache/
+
+/node_modules
+/public/build
