@@ -11,7 +11,7 @@
 <?php endif; ?>
 
 <div class="card">
-    <form action="<?= url('/admin/permissions/' . $permission->id) ?>" method="POST">
+    <form action="<?= url('/admin/permissions/' . $permission->id . '/update') ?>" method="POST">
         <?= csrf_field() ?>
         <div class="form-group">
             <label for="name">Nom *</label>
