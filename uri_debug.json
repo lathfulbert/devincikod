@@ -1,0 +1,120 @@
+{
+    "REQUEST_URI": "\/sunuframework2\/admin\/roles\/1\/edit",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/admin\/roles\/1\/edit"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/admin\/roles\/1\/edit",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/admin\/roles\/1\/edit"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/admin\/roles\/1\/edit",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/admin\/roles\/1\/edit"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/admin\/roles\/1\/edit",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/admin\/roles\/1\/edit"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/admin\/roles\/1\/edit",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/admin\/roles\/1\/edit"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/public\/admin",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/admin"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/assets\/images\/dashboard\/profile.jpg",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/assets\/images\/dashboard\/profile.jpg"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/logout",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/logout"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/login",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/login"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/assets\/css\/vendors\/bootstrap\/bootstrap.min.css",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/assets\/css\/vendors\/bootstrap\/bootstrap.min.css"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/assets\/css\/vendors\/feather-icon\/feather-icon.css",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/assets\/css\/vendors\/feather-icon\/feather-icon.css"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/assets\/js\/vendors\/jquery-3.6.0.min.js",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/assets\/js\/vendors\/jquery-3.6.0.min.js"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/assets\/js\/vendors\/bootstrap\/bootstrap.bundle.min.js",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/assets\/js\/vendors\/bootstrap\/bootstrap.bundle.min.js"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/assets\/js\/vendors\/feather-icon\/feather.min.js",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/assets\/js\/vendors\/feather-icon\/feather.min.js"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/dashboard",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/dashboard"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/admin\/dashboard",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/admin\/dashboard"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/assets\/images\/dashboard\/profile.jpg",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/assets\/images\/dashboard\/profile.jpg"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/admin\/users",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/admin\/users"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/assets\/images\/dashboard\/profile.jpg",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/assets\/images\/dashboard\/profile.jpg"
+}
+{
+    "REQUEST_URI": "\/sunuframework2\/admin\/users\/1\/edit",
+    "SCRIPT_NAME": "\/sunuframework2\/public\/index.php",
+    "METHOD": "GET",
+    "FINAL_URI": "\/admin\/users\/1\/edit"
+}

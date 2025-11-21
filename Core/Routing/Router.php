@@ -234,6 +234,7 @@ class Router
 
         return '#';
     }
+
     /**
      * Get all registered routes.
      */

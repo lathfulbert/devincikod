@@ -11,6 +11,16 @@ Ajouter un exemple d’ORM complet (Model + QueryBuilder)
 ✅ Ajouter un exemple complet d’authentification (Login/Register)
 ➡️ Dites-moi simplement ce que vous voulez ajouter ensuite.
 
+Verification de mon ORM
+🔧 Sauvegarde (save), update(), delete(), create()
+🔧 Relations ORM (hasOne, hasMany, belongsTo)
+🔧 Scopes
+🔧 Pagination
+🔧 Eager loading
+🔧 Casting (int, bool, datetime)
+🔧 Soft Deletes
+🔧 Events (creating, created, updating...)
+
 Framework PHP modulaire — Core + Modules autonomes + Templates + Permissions + Multilingue (i18n)
 
 ---
