@@ -21,6 +21,7 @@ if (isset($_SESSION['flash'])) {
 <div class="card">
     <h2>Configuration Générale</h2>
     <form method="POST" action="<?= url('/admin/cache/update') ?>" id="cacheConfigForm">
+        <input type="hidden" name="_csrf_token" value="<?= csrf_token() ?>">
 
         <!-- Configuration générale -->
         <div class="form-group">
@@ -135,10 +136,7 @@ if (isset($_SESSION['flash'])) {
 
 <script>
     function showDriverConfig(driver) {
-        // Cacher toutes les configs
         document.querySelectorAll('.driver-config').forEach(el => el.style.display = 'none');
-
-        // Afficher la config sélectionnée
         const configDiv = document.getElementById('config_' + driver);
         if (configDiv) {
             configDiv.style.display = 'block';
@@ -150,16 +148,27 @@ if (isset($_SESSION['flash'])) {
         testSpan.textContent = ' Test en cours...';
         testSpan.style.color = 'orange';
 
-        // Préparer les données du formulaire
         const formData = new FormData(document.getElementById('cacheConfigForm'));
-        formData.append('driver', driver);
+        formData.set('driver', driver);
 
         fetch('<?= url('/admin/cache/test-driver') ?>', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Status:', response.status, 'OK:', response.ok);
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    return response.json();
+                } else {
+                    return response.text().then(text => {
+                        console.error('Not JSON:', text.substring(0, 200));
+                        throw new Error('Réponse invalide (pas JSON). Voir console.');
+                    });
+                }
+            })
             .then(data => {
+                console.log('Result:', data);
                 if (data.success) {
                     testSpan.textContent = ' ✓ ' + data.message;
                     testSpan.style.color = 'green';
@@ -169,7 +178,8 @@ if (isset($_SESSION['flash'])) {
                 }
             })
             .catch(error => {
-                testSpan.textContent = ' ✗ Erreur réseau';
+                console.error('Error:', error);
+                testSpan.textContent = ' ✗ ' + error.message;
                 testSpan.style.color = 'red';
             });
     }
