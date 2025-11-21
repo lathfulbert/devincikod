@@ -282,3 +282,99 @@ body {
 .no-transition {
   transition: none !important;
 }
+
+/* ==========================================
+   CORRECTIFS STRUCTURELS (SIDEBAR & HEADER)
+   ========================================== */
+
+/* Header Fix */
+.page-header {
+  max-height: 80px;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 9;
+  background-color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.page-wrapper .page-header .header-wrapper {
+  padding: 15px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Sidebar Fix */
+.sidebar-wrapper {
+  position: fixed;
+  top: 80px; /* Hauteur du header */
+  height: calc(100vh - 80px);
+  width: 280px;
+  z-index: 8;
+  background: #ffffff;
+  box-shadow: 0 0 20px rgba(89, 102, 122, 0.1);
+  overflow-y: auto;
+  transition: 0.3s;
+}
+
+.page-wrapper.compact-wrapper
+  .page-body-wrapper
+  .sidebar-wrapper
+  .sidebar-main
+  .sidebar-links {
+  margin-top: 20px;
+  padding-bottom: 40px;
+}
+
+.sidebar-main .sidebar-links > li {
+  padding: 0 20px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  border-radius: 5px;
+  color: var(--text-color);
+  transition: all 0.3s ease;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+  background-color: rgba(115, 102, 255, 0.1);
+  color: var(--primary-color);
+}
+
+.sidebar-link i {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+/* Page Body Fix */
+.page-body-wrapper {
+  padding-top: 80px; /* Hauteur du header */
+}
+
+.page-body {
+  margin-left: 280px; /* Largeur de la sidebar */
+  padding: 30px;
+  min-height: calc(100vh - 80px);
+  background-color: #f8f9fa;
+  transition: 0.3s;
+}
+
+/* Responsive Fixes */
+@media (max-width: 991px) {
+  .sidebar-wrapper {
+    left: -280px;
+  }
+
+  .page-body {
+    margin-left: 0;
+  }
+
+  .sidebar-wrapper.open {
+    left: 0;
+  }
+}

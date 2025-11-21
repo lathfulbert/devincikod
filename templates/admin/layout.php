@@ -149,76 +149,81 @@
 
         <!-- Page Body Start -->
         <div class="page-body-wrapper">
-
             <!-- Sidebar Start -->
-            <div class="sidebar-wrapper">
-                <div class="logo-wrapper">
-                    <a href="<?= url('/admin/dashboard') ?>">
-                        <h4 class="mb-0" style="color: #7366ff; font-weight: 700;">Sunu</h4>
-                    </a>
-                    <div class="back-btn">
-                        <i class="fa fa-angle-left"></i>
+            <div class="sidebar-wrapper" sidebar-layout="stroke-svg">
+                <div>
+                    <div class="logo-wrapper">
+                        <a href="<?= url('/admin/dashboard') ?>">
+                            <h4 class="mb-0" style="color: #7366ff; font-weight: 700;">Sunu</h4>
+                        </a>
+                        <div class="back-btn">
+                            <i class="fa fa-angle-left"></i>
+                        </div>
+                        <div class="toggle-sidebar">
+                            <i class="status_toggle middle sidebar-toggle" data-feather="grid"></i>
+                        </div>
                     </div>
-                    <div class="toggle-sidebar">
-                        <i class="status_toggle middle sidebar-toggle" data-feather="grid"></i>
+                    <div class="logo-icon-wrapper">
+                        <a href="<?= url('/admin/dashboard') ?>">
+                            <img class="img-fluid" src="<?= url('/assets/images/logo/logo-icon.png') ?>" alt="">
+                        </a>
                     </div>
+                    <nav class="sidebar-main">
+                        <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
+                        <div id="sidebar-menu">
+                            <ul class="sidebar-links" id="simple-bar">
+                                <li class="back-btn">
+                                    <a href="<?= url('/admin/dashboard') ?>">
+                                        <img class="img-fluid" src="<?= url('/assets/images/logo/logo-icon.png') ?>" alt="">
+                                    </a>
+                                    <div class="mobile-back text-end">
+                                        <span>Retour</span><i class="fa fa-angle-right ps-2" aria-hidden="true"></i>
+                                    </div>
+                                </li>
+
+                                <!-- Dashboard -->
+                                <li class="sidebar-list">
+                                    <a class="sidebar-link sidebar-title link-nav" href="<?= url('/admin/dashboard') ?>">
+                                        <i data-feather="home"></i><span>Dashboard</span>
+                                    </a>
+                                </li>
+
+                                <!-- Gestion -->
+                                <li class="sidebar-list">
+                                    <label class="badge badge-light-primary">Gestion</label>
+                                    <a class="sidebar-link sidebar-title" href="javascript:void(0)">
+                                        <i data-feather="users"></i><span>Utilisateurs</span>
+                                    </a>
+                                    <ul class="sidebar-submenu">
+                                        <li><a href="<?= url('/admin/users') ?>">Liste des utilisateurs</a></li>
+                                        <li><a href="<?= url('/admin/roles') ?>">Rôles</a></li>
+                                        <li><a href="<?= url('/admin/permissions') ?>">Permissions</a></li>
+                                    </ul>
+                                </li>
+
+                                <!-- Système -->
+                                <li class="sidebar-list">
+                                    <label class="badge badge-light-secondary">Système</label>
+                                    <a class="sidebar-link sidebar-title" href="javascript:void(0)">
+                                        <i data-feather="settings"></i><span>Configuration</span>
+                                    </a>
+                                    <ul class="sidebar-submenu">
+                                        <li><a href="<?= url('/admin/modules') ?>">Modules</a></li>
+                                        <li><a href="<?= url('/admin/cache') ?>">Cache</a></li>
+                                    </ul>
+                                </li>
+
+                                <!-- Retour au site -->
+                                <li class="sidebar-list">
+                                    <a class="sidebar-link sidebar-title link-nav" href="<?= url('/') ?>">
+                                        <i data-feather="external-link"></i><span>Retour au site</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
+                    </nav>
                 </div>
-
-                <nav class="sidebar-main">
-                    <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
-                    <div id="sidebar-menu">
-                        <ul class="sidebar-links" id="simple-bar">
-                            <li class="back-btn">
-                                <a href="<?= url('/admin/dashboard') ?>">
-                                    <img class="img-fluid" src="<?= url('/assets/images/logo/logo-icon.png') ?>" alt="">
-                                </a>
-                                <div class="mobile-back text-end">
-                                    <span>Retour</span><i class="fa fa-angle-right ps-2" aria-hidden="true"></i>
-                                </div>
-                            </li>
-
-                            <!-- Dashboard -->
-                            <li class="sidebar-list">
-                                <a class="sidebar-link sidebar-title" href="<?= url('/admin/dashboard') ?>">
-                                    <i data-feather="home"></i><span>Dashboard</span>
-                                </a>
-                            </li>
-
-                            <!-- Gestion -->
-                            <li class="sidebar-list">
-                                <label class="badge badge-light-primary">Gestion</label>
-                                <a class="sidebar-link sidebar-title" href="javascript:void(0)">
-                                    <i data-feather="users"></i><span>Utilisateurs</span>
-                                </a>
-                                <ul class="sidebar-submenu">
-                                    <li><a href="<?= url('/admin/users') ?>">Liste des utilisateurs</a></li>
-                                    <li><a href="<?= url('/admin/roles') ?>">Rôles</a></li>
-                                    <li><a href="<?= url('/admin/permissions') ?>">Permissions</a></li>
-                                </ul>
-                            </li>
-
-                            <!-- Système -->
-                            <li class="sidebar-list">
-                                <label class="badge badge-light-secondary">Système</label>
-                                <a class="sidebar-link sidebar-title" href="javascript:void(0)">
-                                    <i data-feather="settings"></i><span>Configuration</span>
-                                </a>
-                                <ul class="sidebar-submenu">
-                                    <li><a href="<?= url('/admin/modules') ?>">Modules</a></li>
-                                    <li><a href="<?= url('/admin/cache') ?>">Cache</a></li>
-                                </ul>
-                            </li>
-
-                            <!-- Retour au site -->
-                            <li class="sidebar-list">
-                                <a class="sidebar-link sidebar-title" href="<?= url('/') ?>">
-                                    <i data-feather="external-link"></i><span>Retour au site</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
-                </nav>
             </div>
             <!-- Sidebar End -->
 
