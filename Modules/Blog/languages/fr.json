@@ -1,0 +1,17 @@
+{
+  "blog": {
+    "title": "Blog",
+    "posts": "Articles",
+    "categories": "Catégories",
+    "tags": "Tags",
+    "create_post": "Nouvel article",
+    "edit_post": "Modifier l'article",
+    "post_title": "Titre",
+    "post_content": "Contenu",
+    "post_excerpt": "Extrait",
+    "published": "Publié",
+    "draft": "Brouillon",
+    "author": "Auteur",
+    "published_at": "Publié le"
+  }
+}

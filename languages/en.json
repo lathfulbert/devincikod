@@ -1,0 +1,118 @@
+{
+  "app": {
+    "name": "SunuFramework",
+    "tagline": "Modern modular PHP framework"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "welcome": "Welcome, :name",
+    "login_success": "Login successful! Welcome :name.",
+    "logout_success": "Logged out successfully. See you soon!",
+    "login_failed": "Invalid username or password.",
+    "password_reset": "Password Reset",
+    "forgot_password": "Forgot password?",
+    "remember_me": "Remember me"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to your dashboard",
+    "overview": "Overview",
+    "statistics": "Statistics",
+    "recent_activity": "Recent Activity"
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "roles": "Roles",
+    "permissions": "Permissions",
+    "modules": "Modules",
+    "settings": "Settings",
+    "profile": "Profile"
+  },
+  "validation": {
+    "required": "The :field field is required.",
+    "email": "The :field field must be a valid email address.",
+    "min": "The :field field must be at least :min characters.",
+    "max": "The :field field cannot exceed :max characters.",
+    "unique": "This :field value is already in use.",
+    "confirmed": "The :field confirmation does not match.",
+    "alpha": "The :field field can only contain letters.",
+    "alpha_dash": "The :field field can only contain letters, numbers, dashes and underscores.",
+    "numeric": "The :field field must be a number."
+  },
+  "messages": {
+    "success": "Operation successful!",
+    "error": "An error occurred.",
+    "saved": "Saved successfully.",
+    "updated": "Updated successfully.",
+    "deleted": "Deleted successfully.",
+    "created": "Created successfully.",
+    "confirm_delete": "Are you sure you want to delete this item?",
+    "no_data": "No data available.",
+    "loading": "Loading..."
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "view": "View",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "reset": "Reset"
+  },
+  "users": {
+    "title": "Users",
+    "create": "New User",
+    "edit": "Edit User",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "role": "Role",
+    "active": "Active",
+    "count": ":count user|:count users"
+  },
+  "roles": {
+    "title": "Roles",
+    "create": "New Role",
+    "edit": "Edit Role",
+    "name": "Name",
+    "description": "Description",
+    "permissions": "Permissions",
+    "count": ":count role|:count roles"
+  },
+  "permissions": {
+    "title": "Permissions",
+    "name": "Name",
+    "description": "Description",
+    "module": "Module",
+    "count": ":count permission|:count permissions"
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No",
+    "all": "All",
+    "none": "None",
+    "or": "or",
+    "and": "and",
+    "of": "of",
+    "to": "to",
+    "in": "in",
+    "at": "at",
+    "by": "by",
+    "for": "for",
+    "with": "with"
+  }
+}

@@ -57,6 +57,9 @@ class Application
         // Initialize Database
         \App\Core\Database\Database::getInstance()->connect($this->config->get('database', []));
 
+        // Initialize I18n (Internationalization)
+        \App\Core\I18n\Middleware\SetLocaleMiddleware::run();
+
         // Discover and Register Modules
         $this->moduleManager->discover();
         $this->moduleManager->registerModules();
