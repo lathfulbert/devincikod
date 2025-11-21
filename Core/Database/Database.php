@@ -12,9 +12,7 @@ class Database
     protected PDO $pdo;
     protected string $driver = 'mysql';
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function getInstance(): Database
     {
@@ -68,5 +66,10 @@ class Database
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt;
+    }
+
+    public function lastInsertId(): string
+    {
+        return $this->pdo->lastInsertId();
     }
 }
