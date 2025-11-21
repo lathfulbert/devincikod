@@ -113,7 +113,8 @@
         }
 
         .form-group input,
-        .form-group select {
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             padding: 8px;
             border: 1px solid #ddd;
@@ -148,6 +149,7 @@
         <a href="<?= url('/admin/roles') ?>">Roles</a>
         <a href="<?= url('/admin/permissions') ?>">Permissions</a>
         <a href="<?= url('/admin/modules') ?>">Modules</a>
+        <a href="<?= url('/admin/cache') ?>">Cache</a>
         <div style="margin-top: auto;">
             <a href="<?= url('/') ?>">Back to Site</a>
             <a href="<?= url('/logout') ?>">Logout</a>
