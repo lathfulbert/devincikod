@@ -56,4 +56,58 @@ class AdminModule extends AbstractModule
     {
         return __DIR__;
     }
+
+    public function getMenuItems(): array
+    {
+        return [
+            [
+                'type' => 'link',
+                'title' => 'Dashboard',
+                'icon' => 'home',
+                'url' => '/admin/dashboard',
+                'class' => 'link-nav'
+            ],
+            [
+                'type' => 'separator',
+                'label' => 'Gestion',
+                'class' => 'badge-light-primary'
+            ],
+            [
+                'type' => 'dropdown',
+                'title' => 'Utilisateurs',
+                'icon' => 'users',
+                'children' => [
+                    ['title' => 'Liste des utilisateurs', 'url' => '/admin/users'],
+                    ['title' => 'Rôles', 'url' => '/admin/roles'],
+                    ['title' => 'Permissions', 'url' => '/admin/permissions'],
+                ]
+            ],
+            [
+                'type' => 'separator',
+                'label' => 'Système',
+                'class' => 'badge-light-secondary'
+            ],
+            [
+                'type' => 'dropdown',
+                'title' => 'Configuration',
+                'icon' => 'settings',
+                'children' => [
+                    ['title' => 'Modules', 'url' => '/admin/modules'],
+                    ['title' => 'Cache', 'url' => '/admin/cache'],
+                ]
+            ],
+            [
+                'type' => 'link',
+                'title' => 'Retour au site',
+                'icon' => 'external-link',
+                'url' => '/',
+                'class' => 'link-nav'
+            ]
+        ];
+    }
+
+    public function getApiRoutes(): array
+    {
+        return [];
+    }
 }

@@ -182,4 +182,20 @@ abstract class AbstractModule implements ModuleContract
     {
         return $this->manifest;
     }
+
+    /**
+     * Get module API routes.
+     */
+    public function getApiRoutes(): array
+    {
+        return [];
+    }
+
+    /**
+     * Get module menu items for the sidebar.
+     */
+    public function getMenuItems(): array
+    {
+        return [];
+    }
 }

@@ -122,8 +122,26 @@ if (!function_exists('url')) {
      */
     function url(string $path = ''): string
     {
-        $baseUrl = config('app.url', '/sunuframework2');
-        $baseUrl = rtrim($baseUrl, '/');
+        static $baseUrl = null;
+
+        if ($baseUrl === null) {
+            $configUrl = config('app.url');
+
+            if ($configUrl !== null) {
+                $baseUrl = rtrim($configUrl, '/');
+            } else {
+                // Auto-detect base path
+                $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+                $detectedPath = str_replace('\\', '/', dirname($scriptName));
+
+                // Remove '/public' if present (for subfolder installations redirecting to public)
+                if (substr($detectedPath, -7) === '/public') {
+                    $detectedPath = substr($detectedPath, 0, -7);
+                }
+
+                $baseUrl = rtrim($detectedPath, '/');
+            }
+        }
 
         if (!empty($path) && $path[0] !== '/') {
             $path = '/' . $path;

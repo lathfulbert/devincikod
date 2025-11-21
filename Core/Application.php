@@ -85,6 +85,14 @@ class Application
         // Load Module Routes
         foreach ($this->moduleManager->getModules() as $module) {
             $this->router->loadModuleRoutes($module->getRoutes());
+
+            // Load API Routes with /api prefix
+            $apiRoutes = $module->getApiRoutes();
+            if (!empty($apiRoutes)) {
+                $this->router->group(['prefix' => '/api'], function ($router) use ($apiRoutes) {
+                    $router->loadModuleRoutes($apiRoutes);
+                });
+            }
         }
 
         // Boot Modules

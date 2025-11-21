@@ -2,7 +2,7 @@
 
 return [
     'name' => getenv('APP_NAME') ?: 'SunuFramework',
-    'url' => getenv('APP_URL') ?: '/sunuframework2',
+    'url' => getenv('APP_URL') ?: null,
     'debug' => getenv('APP_DEBUG') === 'true',
     'modules' => [
         'Demo' => true,
