@@ -26,5 +26,11 @@
         <p>Manage access permissions.</p>
         <a href="<?= url('/admin/permissions') ?>" class="btn btn-primary">Go to Permissions</a>
     </div>
+
+    <div class="card" style="flex: 1;">
+        <h3>Modules</h3>
+        <p>Manage Modules</p>
+        <a href="<?= url('/admin/modules') ?>" class="btn btn-primary">Go to Permissions</a>
+    </div>
 </div>
 @endsection
