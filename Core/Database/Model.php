@@ -112,4 +112,26 @@ abstract class Model
 
         return new ORM\Relations\BelongsToMany($this, $instance, $table, $foreignPivotKey, $relatedPivotKey);
     }
+
+    /**
+     * Begin a new query on the model.
+     *
+     * @return QueryBuilder
+     */
+    public static function query()
+    {
+        return new QueryBuilder(static::class);
+    }
+
+    /**
+     * Handle dynamic static method calls into the method.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public static function __callStatic($method, $parameters)
+    {
+        return (new QueryBuilder(static::class))->$method(...$parameters);
+    }
 }

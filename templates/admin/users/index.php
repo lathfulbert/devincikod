@@ -1,42 +1,122 @@
 @extends('admin.layout')
 
 @section('content')
-<div class="header">
-    <h1>Users</h1>
-    <a href="<?= url('/admin/users/create') ?>" class="btn btn-success">Create User</a>
+
+<?php
+// Breadcrumb
+$breadcrumb = [
+    ['label' => 'Dashboard', 'url' => '/admin/dashboard'],
+    ['label' => 'Utilisateurs']
+];
+component('breadcrumb');
+?>
+
+<!-- Messages Flash -->
+<?php component('alerts'); ?>
+
+<!-- Section: Actions rapides -->
+<div class="row mb-3">
+    <div class="col-12 text-end">
+        <a href="<?= url('/admin/users/create') ?>" class="btn btn-primary">
+            <i data-feather="plus"></i> Nouvel utilisateur
+        </a>
+    </div>
 </div>
 
-<div class="card">
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Roles</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($users as $user): ?>
+<div class="row">
+    <div class="col-12">
+        <?php
+        $card_title = "Liste des Utilisateurs";
+        component('card-start');
+        ?>
+
+        <table id="usersTable" class="table table-striped table-hover">
+            <thead>
                 <tr>
-                    <td><?= $user->id ?></td>
-                    <td><?= htmlspecialchars($user->username ?? '') ?></td>
-                    <td>
-                        <?php
-                        $roles = $user->roles()->getResults();
-                        $roleNames = array_map(fn($r) => $r->name, $roles);
-                        echo implode(', ', $roleNames);
-                        ?>
-                    </td>
-                    <td>
-                        <a href="<?= url('/admin/users/' . $user->id . '/edit') ?>" class="btn btn-primary btn-sm">Edit</a>
-                        <form action="<?= url('/admin/users/' . $user->id . '/delete') ?>" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure?');">
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
-                    </td>
+                    <th>ID</th>
+                    <th>Nom d'utilisateur</th>
+                    <th>Rôles</th>
+                    <th>Date de création</th>
+                    <th class="text-end">Actions</th>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php if (!empty($users)): ?>
+                    <?php foreach ($users as $user): ?>
+                        <tr>
+                            <td><?= $user->id ?></td>
+                            <td>
+                                <strong><?= htmlspecialchars($user->username ?? '') ?></strong>
+                            </td>
+                            <td>
+                                <?php
+                                $roles = $user->roles()->getResults();
+                                $roleNames = array_map(fn($r) => $r->name, $roles);
+                                if (!empty($roleNames)) {
+                                    foreach ($roleNames as $roleName) {
+                                        echo '<span class="badge bg-primary me-1">' . htmlspecialchars($roleName) . '</span>';
+                                    }
+                                } else {
+                                    echo '<span class="text-muted">Aucun rôle</span>';
+                                }
+                                ?>
+                            </td>
+                            <td>
+                                <?php if (isset($user->created_at)): ?>
+                                    <?= date('d/m/Y H:i', strtotime($user->created_at)) ?>
+                                <?php else: ?>
+                                    <span class="text-muted">-</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-end">
+                                <a href="<?= url('/admin/users/' . $user->id . '/edit') ?>"
+                                    class="btn btn-sm btn-warning"
+                                    title="Éditer">
+                                    <i data-feather="edit" style="width: 14px; height: 14px;"></i>
+                                </a>
+                                <form action="<?= url('/admin/users/' . $user->id . '/delete') ?>"
+                                    method="POST"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">
+                                    <input type="hidden" name="_csrf_token" value="<?= csrf_token() ?>">
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
+                                        <i data-feather="trash-2" style="width: 14px; height: 14px;"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">
+                            <i data-feather="inbox"></i> Aucun utilisateur trouvé
+                        </td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+
+        <?php
+        $card_footer = "Total : " . count($users ?? []) . " utilisateur(s)";
+        component('card-end');
+        ?>
+    </div>
 </div>
+
+@endsection
+
+@section('scripts')
+<?php
+$datatable_id = 'usersTable';
+$datatable_config = [
+    'order' => [[0, 'asc']],
+    'pageLength' => 10,
+    'responsive' => true
+];
+component('datatable-init');
+?>
+<script>
+    // Réinitialiser les icônes Feather après le rendu DataTable
+    feather.replace();
+</script>
 @endsection
