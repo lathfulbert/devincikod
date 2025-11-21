@@ -17,6 +17,7 @@ class Application
 
     public function __construct(protected string $basePath)
     {
+        $this->basePath = $basePath;
         self::$instance = $this;
 
         // Load Helpers
@@ -28,7 +29,19 @@ class Application
         $this->config = new Config();
         $this->router = new Router();
         $this->view = new View($basePath . '/templates');
-        $this->moduleManager = new ModuleManager($basePath . '/Modules');
+
+        // Initialize Module System with dependencies (SOLID: Dependency Injection)
+        $modulesPath = $basePath . '/Modules';
+        $loader = new \App\Core\Module\ModuleLoader($modulesPath);
+        $registry = new \App\Core\Module\ModuleRegistry();
+        $activator = new \App\Core\Module\ModuleActivator($registry);
+
+        $this->moduleManager = new ModuleManager(
+            $modulesPath,
+            $loader,
+            $registry,
+            $activator
+        );
     }
 
     public static function getInstance(): Application
@@ -62,6 +75,7 @@ class Application
 
         // Discover and Register Modules
         $this->moduleManager->discover();
+        $this->moduleManager->loadEnabledModules();
         $this->moduleManager->registerModules();
 
         // Load Module Routes
