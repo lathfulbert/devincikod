@@ -1,0 +1,30 @@
+{
+  "name": "Admin",
+  "version": "1.0.0",
+  "description": "Administration Dashboard Module",
+  "author": "SunuFramework Team",
+  "license": "MIT",
+  "dependencies": {
+    "php": ">=8.0"
+  },
+  "autoload": {
+    "routes": true,
+    "migrations": true,
+    "services": false,
+    "permissions": true,
+    "views": true,
+    "assets": true,
+    "config": false
+  },
+  "permissions": [
+    "access_admin_panel",
+    "manage_settings"
+  ],
+  "settings": {
+    "dashboard_widgets_enabled": true
+  },
+  "assets": {
+    "js": [],
+    "css": []
+  }
+}

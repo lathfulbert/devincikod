@@ -2,23 +2,13 @@
 
 namespace Modules\I18n;
 
-use App\Core\Module\ModuleContract;
-use Modules\I18n\Controllers\I18nController;
+use App\Core\Module\AbstractModule;
 
-class I18nModule implements ModuleContract
+class I18nModule extends AbstractModule
 {
-    public function getName(): string
-    {
-        return 'I18n';
-    }
-
-    public function register(): void {}
-
-    public function boot(): void {}
-
     public function getRoutes(): array
     {
-        $controller = new I18nController();
+        $controller = new \Modules\I18n\Controllers\I18nController();
 
         return [
             [
@@ -67,5 +57,10 @@ class I18nModule implements ModuleContract
                 'handler' => [$controller, 'import']
             ]
         ];
+    }
+
+    protected function getModulePath(): string
+    {
+        return __DIR__;
     }
 }

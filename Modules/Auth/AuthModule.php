@@ -2,25 +2,14 @@
 
 namespace Modules\Auth;
 
-use App\Core\Module\ModuleContract;
-use Modules\Auth\Controllers\AuthController;
-use App\Core\Auth\Auth;
+use App\Core\Module\AbstractModule;
 
-class AuthModule implements ModuleContract
+class AuthModule extends AbstractModule
 {
-    public function getName(): string
-    {
-        return 'Auth';
-    }
-
-    public function register(): void {}
-
-    public function boot(): void {}
-
     public function getRoutes(): array
     {
         $authMiddleware = function () {
-            $auth = new Auth();
+            $auth = new \App\Core\Auth\Auth();
             if (!$auth->check()) {
                 redirect('/login');
                 return false;
@@ -39,28 +28,33 @@ class AuthModule implements ModuleContract
             [
                 'method' => 'GET',
                 'path' => '/login',
-                'handler' => [new AuthController(), 'login']
+                'handler' => [new \Modules\Auth\Controllers\AuthController(), 'login']
             ],
             [
                 'method' => 'POST',
                 'path' => '/login',
-                'handler' => [new AuthController(), 'login']
+                'handler' => [new \Modules\Auth\Controllers\AuthController(), 'login']
             ],
             [
                 'method' => 'GET',
                 'path' => '/register',
-                'handler' => [new AuthController(), 'register']
+                'handler' => [new \Modules\Auth\Controllers\AuthController(), 'register']
             ],
             [
                 'method' => 'POST',
                 'path' => '/register',
-                'handler' => [new AuthController(), 'register']
+                'handler' => [new \Modules\Auth\Controllers\AuthController(), 'register']
             ],
             [
                 'method' => 'GET',
                 'path' => '/logout',
-                'handler' => [new AuthController(), 'logout']
+                'handler' => [new \Modules\Auth\Controllers\AuthController(), 'logout']
             ]
         ];
+    }
+
+    protected function getModulePath(): string
+    {
+        return __DIR__;
     }
 }

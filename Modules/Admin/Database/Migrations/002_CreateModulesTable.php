@@ -1,7 +1,7 @@
 <?php
 
-use App\Core\Database\Schema\Blueprint;
-use App\Core\Database\Schema\Schema;
+use App\Core\Database\Schema;
+use App\Core\Database\Blueprint;
 
 return new class
 {
@@ -13,16 +13,13 @@ return new class
         Schema::create('modules', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->string('version', 20);
+            $table->string('version', 50); // Support for semantic versioning with metadata
             $table->text('description')->nullable();
             $table->string('author')->nullable();
             $table->boolean('is_enabled')->default(false);
             $table->boolean('is_installed')->default(false);
-            $table->json('manifest')->nullable();
-            $table->json('settings')->nullable();
-            $table->timestamp('installed_at')->nullable();
-            $table->timestamp('activated_at')->nullable();
-            $table->timestamps();
+            $table->json('config')->nullable(); // Module configuration
+            $table->timestamps(); // created_at = installation date, updated_at = last modification
         });
     }
 
