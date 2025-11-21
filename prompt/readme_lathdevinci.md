@@ -1,4 +1,16 @@
 # LathDevinci Framework  
+
+Ajouter un système de Cron / Scheduler
+
+Ajoutery securite (Can(), authorization)
+Ajouter un exemple d’ORM complet (Model + QueryBuilder)
+✅ Ajouter un système de Cron / Scheduler
+✅ Ajouter un exemple de Middlewares avancés
+✅ Générer un tutoriel pas-à-pas pour créer un module professionnel
+✅ Générer la version PDF ou ZIP téléchargeable de la documentation
+✅ Ajouter un exemple complet d’authentification (Login/Register)
+➡️ Dites-moi simplement ce que vous voulez ajouter ensuite.
+
 Framework PHP modulaire — Core + Modules autonomes + Templates + Permissions + Multilingue (i18n)
 
 ---

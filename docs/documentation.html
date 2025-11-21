@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SunuFramework2 — Documentation</title>
+  <style>
+    body{font-family:Inter,system-ui,Arial,Helvetica,sans-serif;line-height:1.6;color:#111;background:#fff;padding:24px}
+    header{border-bottom:1px solid #eee;margin-bottom:24px}
+    h1{font-size:28px;margin:0}
+    h2{font-size:20px;margin-top:28px}
+    pre{background:#f8f8f8;padding:12px;border-radius:6px;overflow:auto}
+    code{font-family:monospace;background:#f0f0f0;padding:2px 6px;border-radius:4px}
+    nav{position:fixed;right:12px;top:80px;width:260px;border-left:1px solid #eee;padding-left:12px}
+    .section{max-width:900px}
+    ul{margin-top:0}
+    .badge{display:inline-block;background:#eef;padding:2px 8px;border-radius:999px;font-size:12px}
+  </style>
+</head>
+<body>
+<header>
+  <h1>SunuFramework2 — Documentation utilisateur</h1>
+  <p>Version: projet local — documentation générée automatiquement. But: adaptez les chemins et valeurs <code>.env</code> à votre environnement.</p>
+</header>
+<main class="section">
+  <h2>Sommaire</h2>
+  <ol>
+    <li>Installation & démarrage</li>
+    <li>Structure du projet</li>
+    <li>Configuration</li>
+    <li>Routing</li>
+    <li>Contrôleurs et Gestionnaires</li>
+    <li>Vues et Template Engine</li>
+    <li>Modules</li>
+    <li>Base de données & ORM</li>
+    <li>Sécurité (CSRF, Auth)</li>
+    <li>Internationalisation (I18n)</li>
+    <li>Cache, Middleware & Services</li>
+    <li>Utilitaires & scripts</li>
+    <li>Exemples rapides</li>
+    <li>FAQ & conseils de déploiement</li>
+  </ol>
+
+  <h2 id="install">1) Installation & démarrage</h2>
+  <p>Prérequis: PHP 8+, Composer, un serveur web (Apache/Nginx) ou PHP built-in server.</p>
+  <p>Étapes rapides :</p>
+  <pre><code># dézippez le projet
+unzip "sunuframework2 - Copie.zip"
+cd "sunuframework2 - Copie"
+# installer les dépendances php (si composer.json ajouté)
+composer install
+# copier .env et adapter
+cp .env.example .env
+# lancer le serveur pour développement
+php -S localhost:8000 -t public
+</code></pre>
+
+  <h2 id="structure">2) Structure du projet</h2>
+  <p>Points clés trouvés dans l'arborescence :</p>
+  <ul>
+    <li><code>/Core</code> — noyau: Application.php, Router, View, ModuleLoader/Manager, Database, ORM, Security (CSRF), I18n, Cache, Middleware.</li>
+    <li><code>/config</code> — fichiers de configuration (app.php, database.php, etc.).</li>
+    <li><code>/Modules</code> — modules plug-and-play (architecture modulaire).</li>
+    <li><code>/templates</code> — vues/templates pour le moteur de templates.</li>
+    <li><code>/public</code> — point d'entrée web (index.php, assets).</li>
+    <li><code>composer.json</code> — autoload PSR-4 (namespaces: App\Core, Modules\).</li>
+  </ul>
+
+  <h2 id="config">3) Configuration</h2>
+  <p>Le framework charge <code>config/app.php</code> et utilise un <code>.env</code>. Ajustez les valeurs DB et APP à l'intérieur du fichier <code>.env</code>.</p>
+  <pre><code>// esempio: config/app.php chargé par Application
+$this->config->load($this->basePath . '/config/app.php');
+</code></pre>
+
+  <h2 id="routing">4) Routing</h2>
+  <p>Le routeur expose des méthodes pour les verb HTTP : <code>get</code>, <code>post</code>, etc. Il supporte les callbacks et les paires <code>[ControllerClass::class, 'method']</code>.</p>
+  <pre><code>use App\Core\Routing\Router;
+
+$router = new Router();
+$router->get('/', [App\Controllers\HomeController::class, 'index']);
+$router->post('/login', [App\Controllers\AuthController::class, 'login']);
+
+// route avec middleware
+$router->get('/admin', [AdminController::class,'index'], ['auth','admin']);
+</code></pre>
+  <p>Le routeur tente de matcher l'URI et appelle <code>callHandler</code> en injectant les paramètres.</p>
+
+  <h2 id="controllers">5) Contrôleurs et gestionnaires</h2>
+  <p>Les contrôleurs sont des classes PHP simples placées dans <code>Modules/.../Controllers</code> ou <code>App\Controllers</code>. Exemple minimal :</p>
+  <pre><code>namespace App\Controllers;
+
+class HomeController {
+    public function index() {
+        return view('home', ['title' => 'Bienvenue']);
+    }
+}
+</code></pre>
+
+  <h2 id="views">6) Vues et Template Engine</h2>
+  <p>La classe <code>App\Core\View\View</code> initialise un moteur de templates. Les templates sont sous <code>/templates</code>. Utilisez <code>view('path.to.view', $data)</code> pour rendre une page.</p>
+  <pre><code>// render dans un contrôleur
+return $this->view->render('pages.home', ['user' => $user]);
+</code></pre>
+
+  <h2 id="modules">7) Modules</h2>
+  <p>Modules sont chargés depuis <code>/Modules</code> par un <code>ModuleLoader/ModuleManager</code>. Pour créer un module :</p>
+  <ol>
+    <li>Créer dossier <code>Modules/MyModule</code></li>
+    <li>Ajouter <code>Controllers</code>, <code>Models</code>, <code>Views</code>, et un fichier d'enregistrement (ex: <code>module.json</code> ou une classe <code>Module.php</code>).</li>
+    <li>Le ModuleLoader scanne le dossier et instancie/registre les routes et services.</li>
+  </ol>
+
+  <h2 id="database">8) Base de données & ORM</h2>
+  <p>Le framework contient un composant Database et un ORM basique (QueryBuilder, Relations, Schema). Exemple de connexion :</p>
+  <pre><code>// dans Application
+\App\Core\Database\Database::getInstance()->connect($this->config->get('database', []));
+</code></pre>
+  <p>Utilisez le QueryBuilder pour construire des requêtes ou le modèle ORM pour relations (BelongsTo, HasMany...).</p>
+
+  <h2 id="security">9) Sécurité (CSRF, Auth)</h2>
+  <p>CSRF est initialisé par <code>App\Core\Security\CSRF::getInstance()</code>. Les middlewares incluent <code>CSRFMiddleware</code> et un système d'authentification est présent sous <code>Core/Auth</code>.</p>
+
+  <h2 id="i18n">10) Internationalisation (I18n)</h2>
+  <p>Le dossier <code>Core/I18n</code> contient un <code>Translator</code>, <code>LanguageLoader</code> et un middleware <code>SetLocaleMiddleware</code>. Les traductions sont mises en cache et chargées via un <code>LanguageCache</code>.</p>
+
+  <h2 id="services">11) Cache, Middleware & Services</h2>
+  <p>Cache: interface & implémentations dans <code>Core/Cache</code>. Middleware: placez-les dans <code>Core/Middleware</code> ou <code>Modules/.../Middleware</code> et attachez-les aux routes.</p>
+
+  <h2 id="utils">12) Utilitaires & scripts</h2>
+  <p>Un fichier utilitaire <code>check_tables.php</code> est inclus. Des helpers sont chargés depuis <code>config/Support/helpers.php</code>. Adaptez selon vos besoins.</p>
+
+  <h2 id="examples">13) Exemples rapides</h2>
+  <h3>Route + Controller + View</h3>
+  <pre><code>// routes/web.php (exemple)
+$router->get('/hello', [App\Controllers\HelloController::class,'index']);
+
+// HelloController.php
+public function index() {
+  $name = $_GET['name'] ?? 'Guest';
+  return view('hello', ['name' => $name]);
+}
+
+// templates/hello.php
+&lt;h1&gt;Bonjour &lt;?= htmlspecialchars($name) ?&gt;&lt;/h1&gt;
+</code></pre>
+
+  <h2 id="faq">14) FAQ & conseils de déploiement</h2>
+  <ul>
+    <li>Assurez-vous d'exclure <code>.env</code> et <code>storage</code> dans le contrôle de version.</li>
+    <li>Activer OPcache pour de meilleures performances en production.</li>
+    <li>Tester les permissions sur <code>storage</code> et <code>templates</code>.</li>
+  </ul>
+
+  <h2>Sources et fichiers clés scannés</h2>
+  <p>Ce document a été produit en inspectant les fichiers suivants présents dans l'archive projet :</p>
+  <ul>
+    <li><code>/Core/Application.php</code></li>
+    <li><code>/Core/Routing/Router.php</code></li>
+    <li><code>/Core/View/View.php</code></li>
+    <li><code>/config/app.php</code></li>
+    <li>Modules, I18n, Database, ORM, Security</li>
+  </ul>
+
+  <h2>Si vous voulez :</h2>
+  <ul>
+    <li>— une version PDF / ZIP de cette doc, dites "génère PDF".</li>
+    <li>— que j'écrive des exemples plus détaillés (migrations, tests, CLI), dites ce que vous voulez prioriser.</li>
+  </ul>
+
+  <p style="margin-top:32px">Bonne continuation — si vous souhaitez, je peux générer une documentation plus complète (pages séparées par sujet) et des exemples pas-à-pas.</p>
+</main>
+  <h2 id="examples-advanced">15) Exemples avancés : Migrations, Seeders, Tests, CLI & Module complet</h2>
+
+  <h3>Migrations</h3>
+  <pre><code>// database/migrations/2024_01_01_create_users.php
+return new class {
+    public function up($schema) {
+        $schema->create('users', function($table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->timestamps();
+        });
+    }
+
+    public function down($schema) {
+        $schema->drop('users');
+    }
+};
+</code></pre>
+
+  <h3>Seeders</h3>
+  <pre><code>// database/seeders/UserSeeder.php
+class UserSeeder {
+    public function run($db) {
+        $db->table('users')->insert([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'password' => password_hash('secret', PASSWORD_BCRYPT)
+        ]);
+    }
+}
+</code></pre>
+
+  <h3>Tests</h3>
+  <pre><code>// tests/Feature/HomeTest.php
+class HomeTest extends TestCase {
+    public function test_home_page_loads() {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+        $response->assertSee('Bienvenue');
+    }
+}
+</code></pre>
+
+  <h3>CLI Commands</h3>
+  <pre><code>// cli/make_model.php
+class MakeModelCommand {
+    public function handle($name) {
+        $path = "App/Models/{$name}.php";
+        file_put_contents($path, "<?php\nclass {$name} extends Model {}\n");
+        echo "Model $name créé avec succès";
+    }
+}
+</code></pre>
+
+  <h3>Module complet : Exemple \"Blog\"</h3>
+  <pre><code>// Modules/Blog/Module.php
+class BlogModule implements ModuleContract {
+    public function registerRoutes($router) {
+        $router->get('/blog', [Controllers\BlogController::class, 'index']);
+        $router->get('/blog/{id}', [Controllers\BlogController::class, 'show']);
+    }
+
+    public function register() {
+        // services, observers...
+    }
+}
+
+// Modules/Blog/Controllers/BlogController.php
+namespace Modules\Blog\Controllers;
+class BlogController {
+    public function index() {
+        $posts = Post::all();
+        return view('blog.index', compact('posts'));
+    }
+
+    public function show($id) {
+        $post = Post::find($id);
+        return view('blog.show', compact('post'));
+    }
+}
+</code></pre>
+
+  <h2 id="orm-example">16) Exemple complet ORM : Model + QueryBuilder</h2>
+
+  <h3>Exemple de Model</h3>
+  <pre><code>// App/Models/Post.php
+class Post extends Model {
+    protected string $table = 'posts';
+    protected array $fillable = ['title', 'content', 'user_id'];
+}
+</code></pre>
+
+  <h3>Exemple du QueryBuilder</h3>
+  <pre><code>// Core/Database/QueryBuilder.php
+class QueryBuilder {
+    protected PDO $pdo;
+    protected string $table;
+    protected array $wheres = [];
+
+    public function __construct(PDO $pdo, string $table) {
+        $this->pdo = $pdo;
+        $this->table = $table;
+    }
+
+    public function where(string $column, string $operator, mixed $value): static {
+        $this->wheres[] = [$column, $operator, $value];
+        return this;
+    }
+
+    public function get(): array {
+        $sql = "SELECT * FROM {$this->table}";
+
+        if (!empty($this->wheres)) {
+            $conditions = array_map(fn($w) => "$w[0] $w[1] ?", $this->wheres);
+            $sql .= " WHERE " . implode(' AND ', $conditions);
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $values = array_column($this->wheres, 2);
+        $stmt->execute($values);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
+</code></pre>
+
+  <h3>Intégration Model + QueryBuilder</h3>
+  <pre><code>// Core/Database/Model.php
+abstract class Model {
+    protected static string $table;
+    protected array $fillable = [];
+
+    public static function query(): QueryBuilder {
+        global $pdo; // instance PDO
+        $instance = new static;
+        return new QueryBuilder($pdo, $instance->table);
+    }
+
+    public static function all(): array {
+        return static::query()->get();
+    }
+
+    public static function find($id): array|null {
+        $results = static::query()->where('id', '=', $id)->get();
+        return $results[0] ?? null;
+    }
+}
+</code></pre>
+
+  <h3>Exemple d'utilisation ORM</h3>
+  <pre><code>// Récupérer tous les posts
+$posts = Post::all();
+
+// Trouver un post
+$post = Post::find(1);
+
+// Ajouter une condition
+$postsUser = Post::query()->where('user_id', '=', 3)->get();
+</code></pre>
+
+</body>
+</html>
