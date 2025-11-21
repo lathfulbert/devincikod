@@ -5,6 +5,8 @@ namespace App\Core\Routing;
 class Router
 {
     protected array $routes = [];
+    protected string $currentPrefix = '';
+    protected array $currentMiddleware = [];
 
     public function get(string $path, callable|array $handler, array $middleware = []): void
     {
@@ -123,6 +125,9 @@ class Router
      */
     protected function addRoute(string $method, string $path, callable|array $handler, array $middleware = []): void
     {
+        $path = $this->currentPrefix . $path;
+        $middleware = array_merge($this->currentMiddleware, $middleware);
+
         $this->routes[] = [
             'method' => $method,
             'path' => $path,

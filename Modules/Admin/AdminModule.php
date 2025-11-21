@@ -9,6 +9,7 @@ class AdminModule extends AbstractModule
     public function getRoutes(): array
     {
         return [
+            // Dashboard and base routes
             ['GET', '/admin', [\Modules\Admin\Controllers\AdminController::class, 'index']],
             ['GET', '/', [\Modules\Admin\Controllers\AdminController::class, 'index']], // Root route
             ['GET', '/admin/dashboard', [\Modules\Admin\Controllers\AdminController::class, 'dashboard']],
@@ -26,6 +27,7 @@ class AdminModule extends AbstractModule
             ['POST', '/admin/users/store', [\Modules\Admin\Controllers\UserController::class, 'store']],
             ['GET', '/admin/users/edit/{id}', [\Modules\Admin\Controllers\UserController::class, 'edit']],
             ['POST', '/admin/users/update/{id}', [\Modules\Admin\Controllers\UserController::class, 'update']],
+            ['GET', '/admin/users/delete/{id}', [\Modules\Admin\Controllers\UserController::class, 'delete']],
             ['POST', '/admin/users/delete/{id}', [\Modules\Admin\Controllers\UserController::class, 'delete']],
 
             // Roles Management
@@ -34,6 +36,7 @@ class AdminModule extends AbstractModule
             ['POST', '/admin/roles/store', [\Modules\Admin\Controllers\RoleController::class, 'store']],
             ['GET', '/admin/roles/edit/{id}', [\Modules\Admin\Controllers\RoleController::class, 'edit']],
             ['POST', '/admin/roles/update/{id}', [\Modules\Admin\Controllers\RoleController::class, 'update']],
+            ['GET', '/admin/roles/delete/{id}', [\Modules\Admin\Controllers\RoleController::class, 'delete']],
             ['POST', '/admin/roles/delete/{id}', [\Modules\Admin\Controllers\RoleController::class, 'delete']],
 
             // Permissions Management
@@ -42,6 +45,7 @@ class AdminModule extends AbstractModule
             ['POST', '/admin/permissions/store', [\Modules\Admin\Controllers\PermissionController::class, 'store']],
             ['GET', '/admin/permissions/edit/{id}', [\Modules\Admin\Controllers\PermissionController::class, 'edit']],
             ['POST', '/admin/permissions/update/{id}', [\Modules\Admin\Controllers\PermissionController::class, 'update']],
+            ['GET', '/admin/permissions/delete/{id}', [\Modules\Admin\Controllers\PermissionController::class, 'delete']],
             ['POST', '/admin/permissions/delete/{id}', [\Modules\Admin\Controllers\PermissionController::class, 'delete']],
         ];
     }
