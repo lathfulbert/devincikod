@@ -1,4 +1,4 @@
-intégrer un SYSTÈME I18n (internationalisation multilingue) dans ton framework LathDevinci, avec :
+intégrer un SYSTÈME I18n (internationalisation multilingue) dans ton framework sunuDevinci, avec :
 
 ✅ Gestion multi-langue
 ✅ Fichiers JSON de traduction
@@ -8,11 +8,11 @@ intégrer un SYSTÈME I18n (internationalisation multilingue) dans ton framework
 ✅ Architecture inspirée de Laravel & Symfony
 ✅ Extensible en module autonome du Core
 
-🎯 PROMPT I18N (à intégrer dans ton projet / documentation / génération de code)
+ I18N (à intégrer dans ton projet / documentation / génération de code)
 
-Prompt :
 
-Mettre en place un système d’internationalisation (I18n) complet dans mon framework PHP LathDevinci, intégré dans le Core, conforme aux principes SOLID, modulaire, et capable de fonctionner comme un service activable/désactivable.
+
+Mettre en place un système d’internationalisation (I18n) complet dans mon framework PHP sunuDevinci, intégré dans le Core, conforme aux principes SOLID, modulaire, et capable de fonctionner comme un service activable/désactivable.
 
 Le système doit inclure :
 
@@ -121,7 +121,7 @@ Exiger :
 
 Respect de l’interface TranslatorInterface
 
-Chargement automatique via le Module Loader du framework LathDevinci
+Chargement automatique via le Module Loader du framework sunuDevinci
 
 Chaque module peut embarquer ses propres fichiers JSON
 
@@ -131,15 +131,15 @@ Les fichiers sont fusionnés dans un ordre hiérarchique
 
 Ajouter commandes :
 
-php lath i18n:list — liste toutes les clés
+php sunu i18n:list — liste toutes les clés
 
-php lath i18n:missing — clés non traduites
+php sunu i18n:missing — clés non traduites
 
-php lath i18n:sync — force la création d’un fichier regroupé
+php sunu i18n:sync — force la création d’un fichier regroupé
 
-php lath i18n:export fr
+php sunu i18n:export fr
 
-php lath i18n:import fr
+php sunu i18n:import fr
 
 7. Exemples de fichiers JSON
 
