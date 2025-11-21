@@ -27,15 +27,72 @@ class Kernel
         } elseif ($command === 'seed') {
             $truncate = ($flag === '--truncate');
             $this->seed($truncate);
+        } elseif (str_starts_with($command ?? '', 'i18n:') || $command === 'i18n') {
+            $this->handleI18nCommand($argv);
         } else {
             echo "Usage: php sunu [command]\n";
             echo "Commands:\n";
-            echo "  migrate          Run pending migrations\n";
-            echo "  migrate --down   Rollback the last batch of migrations\n";
-            echo "  migrate:reset    Rollback all migrations\n";
-            echo "  migrate:fresh    Drop all tables and re-run all migrations\n";
-            echo "  seed             Run seeders\n";
-            echo "  seed --truncate  Truncate tables before seeding\n";
+            echo "  migrate              Run pending migrations\n";
+            echo "  migrate --down       Rollback the last batch of migrations\n";
+            echo "  migrate:reset        Rollback all migrations\n";
+            echo "  migrate:fresh        Drop all tables and re-run all migrations\n";
+            echo "  seed                 Run seeders\n";
+            echo "  seed --truncate      Truncate tables before seeding\n";
+            echo "\n";
+            echo "I18n Commands:\n";
+            echo "  i18n:list [locale]   List all translation keys\n";
+            echo "  i18n:missing [locale] Show missing translations\n";
+            echo "  i18n:sync            Synchronize translations\n";
+            echo "  i18n:export [locale] [file] Export translations\n";
+            echo "  i18n:import [locale] [file] Import translations\n";
+            echo "  i18n:cache:clear [locale] Clear translation cache\n";
+            echo "  i18n:cache:stats     Show cache statistics\n";
+        }
+    }
+
+    protected function handleI18nCommand(array $argv): void
+    {
+        $fullCommand = $argv[1] ?? '';
+        $locale = $argv[2] ?? null;
+        $file = $argv[3] ?? null;
+
+        // Load I18n commands
+        $i18nCommands = new \App\Core\Console\Commands\I18nCommands();
+
+        if ($fullCommand === 'i18n:list') {
+            $i18nCommands->listKeys($locale);
+        } elseif ($fullCommand === 'i18n:missing') {
+            $i18nCommands->missing($locale);
+        } elseif ($fullCommand === 'i18n:sync') {
+            $i18nCommands->sync();
+        } elseif ($fullCommand === 'i18n:export') {
+            if (!$locale) {
+                echo "Error: Locale required for export command.\n";
+                echo "Usage: php sunu i18n:export [locale] [output_file]\n";
+                return;
+            }
+            $i18nCommands->export($locale, $file);
+        } elseif ($fullCommand === 'i18n:import') {
+            if (!$locale || !$file) {
+                echo "Error: Locale and file required for import command.\n";
+                echo "Usage: php sunu i18n:import [locale] [file]\n";
+                return;
+            }
+            $i18nCommands->import($locale, $file);
+        } elseif ($fullCommand === 'i18n:cache:clear') {
+            $i18nCommands->clearCache($locale);
+        } elseif ($fullCommand === 'i18n:cache:stats') {
+            $i18nCommands->cacheStats();
+        } else {
+            echo "Unknown I18n command: {$fullCommand}\n";
+            echo "Available I18n commands:\n";
+            echo "  i18n:list [locale]\n";
+            echo "  i18n:missing [locale]\n";
+            echo "  i18n:sync\n";
+            echo "  i18n:export [locale] [file]\n";
+            echo "  i18n:import [locale] [file]\n";
+            echo "  i18n:cache:clear [locale]\n";
+            echo "  i18n:cache:stats\n";
         }
     }
 
