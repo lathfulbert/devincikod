@@ -117,4 +117,18 @@ interface ModuleContract
      * Hook called when module is uninstalled.
      */
     public function onUninstall(): void;
+
+    /**
+     * Get module API routes.
+     * 
+     * @return array API Route definitions
+     */
+    public function getApiRoutes(): array;
+
+    /**
+     * Get module menu items for the sidebar.
+     * 
+     * @return array Menu items definition
+     */
+    public function getMenuItems(): array;
 }
