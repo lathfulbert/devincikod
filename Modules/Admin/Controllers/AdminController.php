@@ -27,4 +27,9 @@ class AdminController
             'recent_users' => $recent_users
         ]);
     }
+
+    public function dashboard()
+    {
+        return $this->index();
+    }
 }

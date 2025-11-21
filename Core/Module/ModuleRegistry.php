@@ -47,6 +47,8 @@ class ModuleRegistry
             );
         } else {
             // Insert new module
+            $isEnabled = $module->getName() === 'Admin' ? 1 : 0;
+
             $this->db->query(
                 "INSERT INTO modules (name, version, description, author, is_enabled, is_installed, config, created_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
@@ -55,7 +57,7 @@ class ModuleRegistry
                     $module->getVersion(),
                     $module->getDescription(),
                     $module->getAuthor(),
-                    0, // Disabled by default
+                    $isEnabled, // Admin enabled by default
                     1, // Marked as installed
                     json_encode([]), // Empty config
                 ]
