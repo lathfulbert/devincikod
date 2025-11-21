@@ -9,170 +9,200 @@
 
     <!-- Favicon -->
     <link rel="icon" href="<?= url('/assets/images/logo/favicon.png') ?>" type="image/x-icon">
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    position: relative;
-    overflow: hidden;
-    }
 
-    /* Animated Background */
-    body::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background:
-    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-    animation: pulse 15s ease-in-out infinite;
-    }
+    <!-- Bootstrap CSS -->
+    <link href="<?= url('/assets/css/vendors/bootstrap/bootstrap.min.css') ?>" rel="stylesheet">
 
-    @keyframes pulse {
+    <!-- Feather Icons -->
+    <link href="<?= url('/assets/css/vendors/feather-icon/feather-icon.css') ?>" rel="stylesheet">
 
-    0%,
-    100% {
-    opacity: 1;
-    }
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    50% {
-    opacity: 0.8;
-    }
-    }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
 
-    .auth-container {
-    width: 100%;
-    max-width: 450px;
-    padding: 20px;
-    position: relative;
-    z-index: 1;
-    }
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            animation: pulse 15s ease-in-out infinite;
+        }
 
-    .auth-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.5);
-    }
+        @keyframes pulse {
 
-    .auth-logo {
-    text-align: center;
-    margin-bottom: 30px;
-    }
+            0%,
+            100% {
+                opacity: 1;
+            }
 
-    .auth-logo h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 5px;
-    }
+            50% {
+                opacity: 0.8;
+            }
+        }
 
-    .auth-logo p {
-    color: #64748b;
-    font-size: 0.9rem;
-    }
+        .auth-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
 
-    .form-label {
-    font-weight: 500;
-    color: #334155;
-    margin-bottom: 8px;
-    }
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.5);
+        }
 
-    .form-control {
-    padding: 12px 16px;
-    border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-    }
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-    .form-control:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
+        .auth-logo h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
 
-    .btn-login {
-    width: 100%;
-    padding: 14px;
-    font-weight: 600;
-    font-size: 1rem;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    color: white;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    }
+        .auth-logo p {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
 
-    .btn-login:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-    }
+        .form-label {
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 8px;
+        }
 
-    .btn-login:active {
-    transform: translateY(0);
-    }
+        .form-control {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
 
-    .divider {
-    text-align: center;
-    margin: 20px 0;
-    position: relative;
-    }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
 
-    .divider::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: #e2e8f0;
-    }
+        .form-control.is-invalid {
+            border-color: #dc3545;
+        }
 
-    .divider span {
-    background: rgba(255, 255, 255, 0.95);
-    padding: 0 15px;
-    position: relative;
-    color: #64748b;
-    font-size: 0.9rem;
-    }
+        .form-control.is-invalid:focus {
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+        }
 
-    .alert {
-    border-radius: 10px;
-    padding: 12px 16px;
-    margin-bottom: 20px;
-    border: none;
-    }
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
 
-    .form-check {
-    margin: 15px 0;
-    }
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
 
-    .form-check-input:checked {
-    background-color: #667eea;
-    border-color: #667eea;
-    }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
 
-    .text-link {
-    color: #667eea;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
-    }
+        .btn-login:active {
+            transform: translateY(0);
+        }
 
-    .text-link:hover {
-    color: #764ba2;
-    }
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .divider span {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0 15px;
+            position: relative;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .alert {
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            border: none;
+        }
+
+        .form-check {
+            margin: 15px 0;
+        }
+
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+
+        .text-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .text-link:hover {
+            color: #764ba2;
+        }
     </style>
 
     @yield('styles')
