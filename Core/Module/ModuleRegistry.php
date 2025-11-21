@@ -36,21 +36,19 @@ class ModuleRegistry
                     version = ?, 
                     description = ?, 
                     author = ?, 
-                    manifest = ?,
                     updated_at = NOW()
                 WHERE name = ?",
                 [
                     $module->getVersion(),
                     $module->getDescription(),
                     $module->getAuthor(),
-                    json_encode($manifest->toArray()),
                     $module->getName()
                 ]
             );
         } else {
             // Insert new module
             $this->db->query(
-                "INSERT INTO modules (name, version, description, author, is_enabled, is_installed, manifest, created_at, updated_at)
+                "INSERT INTO modules (name, version, description, author, is_enabled, is_installed, config, created_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
                 [
                     $module->getName(),
@@ -59,163 +57,125 @@ class ModuleRegistry
                     $module->getAuthor(),
                     0, // Disabled by default
                     1, // Marked as installed
-                    json_encode($manifest->toArray())
+                    json_encode([]), // Empty config
                 ]
             );
         }
     }
 
-    /**
-     * Unregister a module from the database.
-     * 
-     * @param string $moduleName
-     */
     public function unregister(string $moduleName): void
     {
         $this->db->query("DELETE FROM modules WHERE name = ?", [$moduleName]);
     }
 
-    /**
-     * Check if a module is enabled.
-     * 
-     * @param string $moduleName
-     * @return bool
-     */
     public function isEnabled(string $moduleName): bool
     {
-        $result = $this->db->query(
-            "SELECT is_enabled FROM modules WHERE name = ?",
-            [$moduleName]
-        )->fetch();
+        try {
+            $result = $this->db->query(
+                "SELECT is_enabled FROM modules WHERE name = ?",
+                [$moduleName]
+            )->fetch();
 
-        return $result ? (bool)$result['is_enabled'] : false;
+            return $result ? (bool)$result['is_enabled'] : false;
+        } catch (\PDOException $e) {
+            return false;
+        }
     }
 
-    /**
-     * Check if a module is installed.
-     * 
-     * @param string $moduleName
-     * @return bool
-     */
     public function isInstalled(string $moduleName): bool
     {
-        $result = $this->db->query(
-            "SELECT is_installed FROM modules WHERE name = ?",
-            [$moduleName]
-        )->fetch();
+        try {
+            $result = $this->db->query(
+                "SELECT is_installed FROM modules WHERE name = ?",
+                [$moduleName]
+            )->fetch();
 
-        return $result ? (bool)$result['is_installed'] : false;
+            return $result ? (bool)$result['is_installed'] : false;
+        } catch (\PDOException $e) {
+            return false;
+        }
     }
 
-    /**
-     * Set module enabled status.
-     * 
-     * @param string $moduleName
-     * @param bool $enabled
-     */
     public function setEnabled(string $moduleName, bool $enabled): void
     {
-        $activatedAt = $enabled ? 'NOW()' : 'NULL';
-
         $this->db->query(
-            "UPDATE modules SET is_enabled = ?, activated_at = {$activatedAt}, updated_at = NOW() WHERE name = ?",
+            "UPDATE modules SET is_enabled = ?, updated_at = NOW() WHERE name = ?",
             [$enabled ? 1 : 0, $moduleName]
         );
     }
 
-    /**
-     * Set module installed status.
-     * 
-     * @param string $moduleName
-     * @param bool $installed
-     */
     public function setInstalled(string $moduleName, bool $installed): void
     {
-        $installedAt = $installed ? 'NOW()' : 'NULL';
-
         $this->db->query(
-            "UPDATE modules SET is_installed = ?, installed_at = {$installedAt}, updated_at = NOW() WHERE name = ?",
+            "UPDATE modules SET is_installed = ?, updated_at = NOW() WHERE name = ?",
             [$installed ? 1 : 0, $moduleName]
         );
     }
 
-    /**
-     * Get all registered modules.
-     * 
-     * @return array
-     */
     public function getAll(): array
     {
-        return $this->db->query("SELECT * FROM modules ORDER BY name")->fetchAll();
+        try {
+            return $this->db->query("SELECT * FROM modules ORDER BY name")->fetchAll();
+        } catch (\PDOException $e) {
+            return [];
+        }
     }
 
-    /**
-     * Get all enabled modules.
-     * 
-     * @return array
-     */
     public function getEnabled(): array
     {
-        return $this->db->query("SELECT * FROM modules WHERE is_enabled = 1 ORDER BY name")->fetchAll();
+        try {
+            return $this->db->query("SELECT * FROM modules WHERE is_enabled = 1 ORDER BY name")->fetchAll();
+        } catch (\PDOException $e) {
+            return [];
+        }
     }
 
-    /**
-     * Get all installed modules.
-     * 
-     * @return array
-     */
     public function getInstalled(): array
     {
-        return $this->db->query("SELECT * FROM modules WHERE is_installed = 1 ORDER BY name")->fetchAll();
+        try {
+            return $this->db->query("SELECT * FROM modules WHERE is_installed = 1 ORDER BY name")->fetchAll();
+        } catch (\PDOException $e) {
+            return [];
+        }
     }
 
-    /**
-     * Find a module by name.
-     * 
-     * @param string $moduleName
-     * @return array|null
-     */
     public function find(string $moduleName): ?array
     {
-        $result = $this->db->query(
-            "SELECT * FROM modules WHERE name = ?",
-            [$moduleName]
-        )->fetch();
+        try {
+            $result = $this->db->query(
+                "SELECT * FROM modules WHERE name = ?",
+                [$moduleName]
+            )->fetch();
 
-        return $result ?: null;
+            return $result ?: null;
+        } catch (\PDOException $e) {
+            return null;
+        }
     }
 
-    /**
-     * Update module settings.
-     * 
-     * @param string $moduleName
-     * @param array $settings
-     */
     public function updateSettings(string $moduleName, array $settings): void
     {
         $this->db->query(
-            "UPDATE modules SET settings = ?, updated_at = NOW() WHERE name = ?",
+            "UPDATE modules SET config = ?, updated_at = NOW() WHERE name = ?",
             [json_encode($settings), $moduleName]
         );
     }
 
-    /**
-     * Get module settings.
-     * 
-     * @param string $moduleName
-     * @return array
-     */
     public function getSettings(string $moduleName): array
     {
-        $result = $this->db->query(
-            "SELECT settings FROM modules WHERE name = ?",
-            [$moduleName]
-        )->fetch();
+        try {
+            $result = $this->db->query(
+                "SELECT config FROM modules WHERE name = ?",
+                [$moduleName]
+            )->fetch();
 
-        if ($result && $result['settings']) {
-            return json_decode($result['settings'], true) ?? [];
+            if ($result && $result['config']) {
+                return json_decode($result['config'], true) ?? [];
+            }
+
+            return [];
+        } catch (\PDOException $e) {
+            return [];
         }
-
-        return [];
     }
 }

@@ -1,0 +1,25 @@
+{
+  "name": "Demo",
+  "version": "1.0.0",
+  "description": "Demo Module for Testing",
+  "author": "SunuFramework Team",
+  "license": "MIT",
+  "dependencies": {
+    "php": ">=8.0"
+  },
+  "autoload": {
+    "routes": true,
+    "migrations": false,
+    "services": false,
+    "permissions": false,
+    "views": true,
+    "assets": false,
+    "config": false
+  },
+  "permissions": [],
+  "settings": {},
+  "assets": {
+    "js": [],
+    "css": []
+  }
+}

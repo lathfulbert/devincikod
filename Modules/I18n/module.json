@@ -1,0 +1,29 @@
+{
+  "name": "I18n",
+  "version": "1.0.0",
+  "description": "Internationalization Management Module",
+  "author": "SunuFramework Team",
+  "license": "MIT",
+  "dependencies": {
+    "php": ">=8.0"
+  },
+  "autoload": {
+    "routes": true,
+    "migrations": false,
+    "services": false,
+    "permissions": true,
+    "views": true,
+    "assets": false,
+    "config": false
+  },
+  "permissions": [
+    "manage_translations",
+    "import_translations",
+    "export_translations"
+  ],
+  "settings": {},
+  "assets": {
+    "js": [],
+    "css": []
+  }
+}

@@ -2,34 +2,20 @@
 
 namespace Modules\Blog;
 
-use App\Core\Module\ModuleContract;
-use Modules\Blog\Controllers\BlogController;
+use App\Core\Module\AbstractModule;
 
-class BlogModule implements ModuleContract
+class BlogModule extends AbstractModule
 {
-    public function getName(): string
-    {
-        return 'Blog';
-    }
-
-    public function register(): void
-    {
-        // Register services
-    }
-
-    public function boot(): void
-    {
-        // Boot logic
-    }
-
     public function getRoutes(): array
     {
         return [
-            [
-                'method' => 'GET',
-                'path' => '/blog',
-                'handler' => [new BlogController(), 'index']
-            ]
+            ['GET', '/blog', [\Modules\Blog\Controllers\BlogController::class, 'index']],
+            ['GET', '/blog/{id}', [\Modules\Blog\Controllers\BlogController::class, 'show']],
         ];
+    }
+
+    protected function getModulePath(): string
+    {
+        return __DIR__;
     }
 }

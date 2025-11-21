@@ -1,0 +1,28 @@
+{
+  "name": "Auth",
+  "version": "1.0.0",
+  "description": "Authentication and Authorization Module",
+  "author": "SunuFramework Team",
+  "license": "MIT",
+  "dependencies": {
+    "php": ">=8.0"
+  },
+  "autoload": {
+    "routes": true,
+    "migrations": true,
+    "services": false,
+    "permissions": true,
+    "views": true,
+    "assets": false,
+    "config": false
+  },
+  "permissions": [],
+  "settings": {
+    "allow_registration": true,
+    "require_email_verification": false
+  },
+  "assets": {
+    "js": [],
+    "css": []
+  }
+}

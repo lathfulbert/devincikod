@@ -1,0 +1,33 @@
+{
+  "name": "Blog",
+  "version": "1.0.0",
+  "description": "Blog and Articles Management Module",
+  "author": "SunuFramework Team",
+  "license": "MIT",
+  "dependencies": {
+    "php": ">=8.0"
+  },
+  "autoload": {
+    "routes": true,
+    "migrations": true,
+    "services": false,
+    "permissions": true,
+    "views": true,
+    "assets": false,
+    "config": false
+  },
+  "permissions": [
+    "create_posts",
+    "edit_posts",
+    "delete_posts",
+    "publish_posts"
+  ],
+  "settings": {
+    "posts_per_page": 10,
+    "allow_comments": true
+  },
+  "assets": {
+    "js": [],
+    "css": []
+  }
+}

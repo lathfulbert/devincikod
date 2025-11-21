@@ -1,0 +1,28 @@
+{
+  "name": "RBAC",
+  "version": "1.0.0",
+  "description": "Role-Based Access Control System",
+  "author": "SunuFramework Team",
+  "license": "MIT",
+  "dependencies": {
+    "php": ">=8.0",
+    "modules": {
+      "Auth": ">=1.0.0"
+    }
+  },
+  "autoload": {
+    "routes": false,
+    "migrations": true,
+    "services": true,
+    "permissions": false,
+    "views": false,
+    "assets": false,
+    "config": false
+  },
+  "permissions": [],
+  "settings": {},
+  "assets": {
+    "js": [],
+    "css": []
+  }
+}

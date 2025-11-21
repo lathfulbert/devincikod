@@ -2,25 +2,17 @@
 
 namespace Modules\RBAC;
 
-use App\Core\Module\ModuleContract;
+use App\Core\Module\AbstractModule;
 
-class RBACModule implements ModuleContract
+class RBACModule extends AbstractModule
 {
-    public function getName(): string
-    {
-        return 'RBAC';
-    }
-
-    public function register(): void
-    {
-    }
-
-    public function boot(): void
-    {
-    }
-
     public function getRoutes(): array
     {
-        return [];
+        return [];  // Routes are managed by Admin module
+    }
+
+    protected function getModulePath(): string
+    {
+        return __DIR__;
     }
 }
