@@ -2,18 +2,15 @@
 
 namespace Modules\Admin\Models;
 
-use App\Core\Database\ORM\Model;
+use App\Core\Database\Model;
+use App\Core\Database\Database;
 
 /**
- * CacheConfig Model
- * 
- * Modèle pour la configuration du système de cache.
- * Table singleton (une seule ligne).
+ * CacheConfig Model - Singleton pattern for cache configuration
  */
 class CacheConfig extends Model
 {
-    protected string $table = 'cache_config';
-    protected string $primaryKey = 'id';
+    protected static string $table = 'cache_config';
     protected array $fillable = [
         'driver',
         'enabled',
@@ -47,20 +44,25 @@ class CacheConfig extends Model
         if ($config) {
             // Mise à jour
             foreach ($data as $key => $value) {
-                if (in_array($key, (new self())->fillable)) {
-                    $config->$key = $value;
-                }
+                $config->$key = $value;
             }
-            return $config->save();
+            $config->save();
+            return true;
         } else {
             // Création
-            $config = new self();
+            $db = Database::getInstance();
+            $fields = [];
+            $values = [];
+
             foreach ($data as $key => $value) {
-                if (in_array($key, $config->fillable)) {
-                    $config->$key = $value;
-                }
+                $fields[] = "`{$key}`";
+                $values[] = $value;
             }
-            return $config->save();
+
+            $placeholders = array_fill(0, count($values), '?');
+            $sql = "INSERT INTO cache_config (" . implode(', ', $fields) . ") VALUES (" . implode(', ', $placeholders) . ")";
+            $db->query($sql, $values);
+            return true;
         }
     }
 
@@ -69,12 +71,13 @@ class CacheConfig extends Model
      */
     public function getMemcachedServersArray(): array
     {
-        if (empty($this->memcached_servers)) {
+        $servers = $this->memcached_servers ?? '';
+        if (empty($servers)) {
             return [];
         }
 
-        $servers = json_decode($this->memcached_servers, true);
-        return is_array($servers) ? $servers : [];
+        $decoded = json_decode($servers, true);
+        return is_array($decoded) ? $decoded : [];
     }
 
     /**

@@ -1,11 +1,12 @@
-<?php
+@extends('admin.layout')
 
-/**
- * Vue de configuration du cache
- * @var object $config Configuration actuelle
- * @var array $extensions Extensions disponibles
- */
-?>
+@section('content')
+<div class="header">
+    <h1><?= $title ?? 'Configuration du Cache' ?></h1>
+    <div>
+        <a href="<?= url('/admin/cache/stats') ?>" class="btn btn-primary">Statistiques</a>
+    </div>
+</div>
 
 <?php
 // Afficher les messages flash
@@ -16,13 +17,6 @@ if (isset($_SESSION['flash'])) {
     unset($_SESSION['flash']);
 }
 ?>
-
-<div class="header">
-    <h1><?= $title ?? 'Configuration du Cache' ?></h1>
-    <div>
-        <a href="<?= url('/admin/cache/stats') ?>" class="btn btn-primary">Statistiques</a>
-    </div>
-</div>
 
 <div class="card">
     <h2>Configuration Générale</h2>
@@ -180,3 +174,4 @@ if (isset($_SESSION['flash'])) {
             });
     }
 </script>
+@endsection
