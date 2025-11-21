@@ -479,3 +479,90 @@ if (!function_exists('flash')) {
         $_SESSION['_flash'][$key] = $value;
     }
 }
+
+/*
+|--------------------------------------------------------------------------
+| Cache Helpers
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('cache')) {
+    /**
+     * Cache helper - Get/Set/Manage cache
+     * 
+     * @param string|null $key Cache key
+     * @param mixed $value Value to cache (if provided, acts as SET)
+     * @param int|null $ttl Time to live in seconds
+     * @return mixed|App\Core\Cache\CacheManager
+     */
+    function cache(?string $key = null, mixed $value = null, ?int $ttl = null): mixed
+    {
+        $cacheManager = \App\Core\Cache\CacheManager::getInstance();
+
+        // No arguments: return the cache manager instance
+        if ($key === null) {
+            return $cacheManager;
+        }
+
+        // Two or three arguments: SET operation
+        if (func_num_args() >= 2) {
+            return $cacheManager->set($key, $value, $ttl);
+        }
+
+        // One argument: GET operation
+        return $cacheManager->get($key);
+    }
+}
+
+if (!function_exists('cache_remember')) {
+    /**
+     * Get an item from cache, or execute the callback and store the result
+     * 
+     * @param string $key Cache key
+     * @param callable $callback Callback to execute if key doesn't exist
+     * @param int|null $ttl Time to live in seconds
+     * @return mixed
+     */
+    function cache_remember(string $key, callable $callback, ?int $ttl = null): mixed
+    {
+        return \App\Core\Cache\CacheManager::getInstance()->remember($key, $callback, $ttl);
+    }
+}
+
+if (!function_exists('cache_forget')) {
+    /**
+     * Remove an item from cache
+     * 
+     * @param string $key Cache key to remove
+     * @return bool
+     */
+    function cache_forget(string $key): bool
+    {
+        return \App\Core\Cache\CacheManager::getInstance()->delete($key);
+    }
+}
+
+if (!function_exists('cache_flush')) {
+    /**
+     * Clear all items from cache
+     * 
+     * @return bool
+     */
+    function cache_flush(): bool
+    {
+        return \App\Core\Cache\CacheManager::getInstance()->clear();
+    }
+}
+
+if (!function_exists('cache_has')) {
+    /**
+     * Check if an item exists in cache
+     * 
+     * @param string $key Cache key to check
+     * @return bool
+     */
+    function cache_has(string $key): bool
+    {
+        return \App\Core\Cache\CacheManager::getInstance()->has($key);
+    }
+}

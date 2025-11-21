@@ -8,6 +8,7 @@ use Modules\Admin\Controllers\UserController;
 use Modules\Admin\Controllers\RoleController;
 use Modules\Admin\Controllers\PermissionController;
 use Modules\Admin\Controllers\ModuleController;
+use Modules\Admin\Controllers\CacheController;
 use App\Core\Auth\Auth;
 
 class AdminModule implements ModuleContract
@@ -191,6 +192,38 @@ class AdminModule implements ModuleContract
                 'method' => 'POST',
                 'path' => '/admin/modules/{id}/delete',
                 'handler' => [new ModuleController(), 'delete'],
+                'middleware' => [$adminMiddleware]
+            ],
+
+            // Cache
+            [
+                'method' => 'GET',
+                'path' => '/admin/cache',
+                'handler' => [new CacheController(), 'index'],
+                'middleware' => [$adminMiddleware]
+            ],
+            [
+                'method' => 'POST',
+                'path' => '/admin/cache/update',
+                'handler' => [new CacheController(), 'update'],
+                'middleware' => [$adminMiddleware]
+            ],
+            [
+                'method' => 'POST',
+                'path' => '/admin/cache/test-driver',
+                'handler' => [new CacheController(), 'testDriver'],
+                'middleware' => [$adminMiddleware]
+            ],
+            [
+                'method' => 'GET',
+                'path' => '/admin/cache/stats',
+                'handler' => [new CacheController(), 'stats'],
+                'middleware' => [$adminMiddleware]
+            ],
+            [
+                'method' => 'POST',
+                'path' => '/admin/cache/clear',
+                'handler' => [new CacheController(), 'clear'],
                 'middleware' => [$adminMiddleware]
             ],
         ];
