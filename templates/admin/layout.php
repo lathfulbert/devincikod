@@ -15,34 +15,43 @@
     <link rel="icon" href="<?= url('/assets/images/logo/favicon.png') ?>" type="image/x-icon">
     <link rel="shortcut icon" href="<?= url('/assets/images/logo/favicon.png') ?>" type="image/x-icon">
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google font-->
+    <link href="https://fonts.googleapis.com/css?family=Rubik:400,400i,500,500i,700,700i&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i,900&amp;display=swap" rel="stylesheet">
 
-    <!-- Bootstrap CSS -->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/fontawesome.css') ?>">
+
+    <!-- Ico-font -->
+    <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/vendors/icofont.css') ?>">
+
+    <!-- Themify icon -->
+    <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/vendors/themify.css') ?>">
+
+    <!-- Flag icon -->
+    <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/vendors/flag-icon.css') ?>">
+
+    <!-- Feather icon -->
+    <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/vendors/feather-icon.css') ?>">
+
+    <!-- Bootstrap css -->
     <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/vendors/bootstrap.css') ?>">
 
-    <!-- App CSS -->
+    <!-- App css -->
     <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/style.css') ?>">
+    <link id="color" rel="stylesheet" href="<?= url('/assets/css/color-1.css') ?>" media="screen">
 
-    <!-- Theme Color (default: color-1) -->
-    <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/color-1.css') ?>" id="color">
-
-    <!-- Responsive CSS -->
+    <!-- Responsive css -->
     <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/responsive.css') ?>">
-
-    <!-- Custom CSS -->
-    <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/custom.css') ?>">
-
-    <!-- Icons -->
-    <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/vendors/feather-icon.css') ?>">
-    <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/fontawesome.css') ?>">
 
     <!-- DataTables (si nécessaire) -->
     <?php if (isset($datatable) && $datatable): ?>
         <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/vendors/dataTables.bootstrap5.css') ?>">
     <?php endif; ?>
+
+    <!-- Vite Assets -->
+    <?= vite('resources/css/app.css') ?>
+    <?= vite('resources/js/app.js') ?>
 
     <!-- Styles additionnels par page -->
     @yield('styles')

@@ -580,3 +580,60 @@ if (!function_exists('cache_has')) {
         return \App\Core\Cache\CacheManager::getInstance()->has($key);
     }
 }
+
+/*
+|--------------------------------------------------------------------------
+| Vite Helpers
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('vite')) {
+    /**
+     * Vite Asset Helper
+     */
+    function vite(string $path)
+    {
+        $devServer = 'http://localhost:5173';
+        $manifestPath = __DIR__ . '/../../public/build/.vite/manifest.json';
+
+        // Check if dev server is running
+        $isDev = false;
+        $handle = @fsockopen('localhost', 5173, $errno, $errstr, 0.1);
+        if ($handle) {
+            $isDev = true;
+            fclose($handle);
+        }
+
+        if ($isDev) {
+            return '<script type="module" src="' . $devServer . '/@vite/client"></script>' .
+                '<script type="module" src="' . $devServer . '/' . $path . '"></script>';
+        }
+
+        if (!file_exists($manifestPath)) {
+            return '<!-- Vite Manifest not found. Run npm run build -->';
+        }
+
+        $manifest = json_decode(file_get_contents($manifestPath), true);
+        $file = $manifest[$path]['file'] ?? null;
+        $css = $manifest[$path]['css'] ?? [];
+
+        if (!$file) {
+            return "<!-- Asset $path not found in manifest -->";
+        }
+
+        $html = '';
+        $ext = pathinfo($file, PATHINFO_EXTENSION);
+
+        if ($ext === 'css') {
+            $html .= '<link rel="stylesheet" href="' . url('build/' . $file) . '">';
+        } else {
+            $html .= '<script type="module" src="' . url('build/' . $file) . '"></script>';
+        }
+
+        foreach ($css as $cssFile) {
+            $html .= '<link rel="stylesheet" href="' . url('build/' . $cssFile) . '">';
+        }
+
+        return $html;
+    }
+}
