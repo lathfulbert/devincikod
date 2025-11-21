@@ -25,7 +25,7 @@
                     class="form-control <?= has_error('email') ? 'is-invalid' : '' ?>"
                     placeholder="votre@email.com"
                     autofocus
-                    value="<?= old('email') ?>">
+                    value="<?= escape(old('email')) ?>">
                 <?php component('error', ['field' => 'email']) ?>
                 <small class="text-muted">
                     Nous vous enverrons un lien de réinitialisation
@@ -71,17 +71,21 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Animation d'entrée
         const card = document.querySelector('.auth-card');
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
+        if (card) {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
 
-        setTimeout(() => {
-            card.style.transition = 'all 0.5s ease';
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, 100);
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100);
+        }
 
         // Feather icons
-        feather.replace();
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
     });
 </script>
 @endsection

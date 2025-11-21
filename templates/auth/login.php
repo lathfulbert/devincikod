@@ -24,7 +24,7 @@
                 class="form-control <?= has_error('username') ? 'is-invalid' : '' ?>"
                 placeholder="Entrez votre nom d'utilisateur"
                 autofocus
-                value="<?= old('username') ?>">
+                value="<?= escape(old('username')) ?>">
             <?php component('error', ['field' => 'username']) ?>
             <small class="text-muted">Par défaut: admin</small>
         </div>
@@ -88,17 +88,21 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Animation d'entrée
         const card = document.querySelector('.auth-card');
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
+        if (card) {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
 
-        setTimeout(() => {
-            card.style.transition = 'all 0.5s ease';
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, 100);
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100);
+        }
 
         // Feather icons
-        feather.replace();
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
     });
 </script>
 @endsection
