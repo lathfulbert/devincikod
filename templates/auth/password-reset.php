@@ -8,21 +8,9 @@
         <p>Récupérez l'accès à votre compte</p>
     </div>
 
-    <?php if (isset($success)): ?>
-        <div class="alert alert-success d-flex align-items-center">
-            <i data-feather="check-circle" class="me-2" style="width: 20px; height: 20px;"></i>
-            <?= htmlspecialchars($success) ?>
-        </div>
-    <?php endif; ?>
+    <?php component('alert') ?>
 
-    <?php if (isset($error)): ?>
-        <div class="alert alert-danger d-flex align-items-center">
-            <i data-feather="alert-circle" class="me-2" style="width: 20px; height: 20px;"></i>
-            <?= htmlspecialchars($error) ?>
-        </div>
-    <?php endif; ?>
-
-    <?php if (!isset($success)): ?>
+    <?php if (!flash('success')): ?>
         <form method="POST" action="<?= url('/password/reset') ?>">
             <?= csrf_field() ?>
 
@@ -34,11 +22,11 @@
                     type="email"
                     name="email"
                     id="email"
-                    class="form-control"
+                    class="form-control <?= has_error('email') ? 'is-invalid' : '' ?>"
                     placeholder="votre@email.com"
-                    required
                     autofocus
-                    value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
+                    value="<?= old('email') ?>">
+                <?php component('error', ['field' => 'email']) ?>
                 <small class="text-muted">
                     Nous vous enverrons un lien de réinitialisation
                 </small>

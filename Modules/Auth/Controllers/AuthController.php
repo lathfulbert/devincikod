@@ -17,33 +17,53 @@ class AuthController
     public function login()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Simple hardcoded check for demo
-            $username = $_POST['username'] ?? '';
-            $password = $_POST['password'] ?? '';
+            // Validation des données
+            $validator = validator($_POST, [
+                'username' => 'required|min:3|max:50',
+                'password' => 'required|min:6'
+            ], [
+                'username.required' => 'Le nom d\'utilisateur est obligatoire.',
+                'username.min' => 'Le nom d\'utilisateur doit contenir au moins 3 caractères.',
+                'password.required' => 'Le mot de passe est obligatoire.',
+                'password.min' => 'Le mot de passe doit contenir au moins 6 caractères.'
+            ]);
 
-            $username = $_POST['username'] ?? '';
-            $password = $_POST['password'] ?? '';
+            if ($validator->fails()) {
+                flash('danger', 'Veuillez corriger les erreurs de saisie.');
+                redirect_back_with_errors($validator->errors());
+                return;
+            }
 
-            // Use Model to find user
-            // For MVP, we don't have 'where' on Model yet, let's add it or use raw query via Model
-            // Let's use the Model's underlying DB for now or implement a simple where in Model later.
-            // Actually, let's implement a simple findBy in Model or just raw query here for speed.
-            
+            $validatedData = $validator->validated();
+            $username = $validatedData['username'];
+            $password = $validatedData['password'];
+
+            // Recherche de l'utilisateur
             $db = \App\Core\Database\Database::getInstance();
             $stmt = $db->query("SELECT * FROM users WHERE username = ?", [$username]);
             $user = $stmt->fetch();
 
             if ($user && password_verify($password, $user['password'])) {
-                $this->auth->login(['id' => $user['id'], 'username' => $user['username'], 'role' => $user['role']]);
+                $this->auth->login([
+                    'id' => $user['id'],
+                    'username' => $user['username'],
+                    'role' => $user['role']
+                ]);
+
+                flash('success', 'Connexion réussie! Bienvenue ' . $user['username'] . '.');
                 redirect('/admin/dashboard');
-                exit;
+                return;
             } else {
-                $error = "Invalid credentials";
+                $errorBag = new \App\Core\Validation\ErrorBag();
+                $errorBag->add('username', 'Nom d\'utilisateur ou mot de passe incorrect.');
+                flash('danger', 'Identifiants invalides. Veuillez réessayer.');
+                redirect_back_with_errors($errorBag);
+                return;
             }
         }
 
         $app = Application::getInstance();
-        echo $app->view->render('auth/login', ['title' => 'Login', 'error' => $error ?? null]);
+        echo $app->view->render('auth/login', ['title' => 'Login']);
     }
 
     public function logout()
@@ -52,7 +72,7 @@ class AuthController
         redirect('/login');
         exit;
     }
-    
+
     public function dashboard()
     {
         $app = Application::getInstance();

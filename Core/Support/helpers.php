@@ -474,6 +474,7 @@ if (!function_exists('old')) {
     }
 }
 
+
 if (!function_exists('flash')) {
     /**
      * Flash data to session
@@ -493,6 +494,101 @@ if (!function_exists('flash')) {
         $_SESSION['_flash'][$key] = $value;
     }
 }
+
+if (!function_exists('validator')) {
+    /**
+     * Créer une instance de validation
+     */
+    function validator(array $data, array $rules, array $messages = []): \App\Core\Validation\Validator
+    {
+        return \App\Core\Validation\Validator::make($data, $rules, $messages);
+    }
+}
+
+if (!function_exists('errors')) {
+    /**
+     * Récupérer le ErrorBag de la session
+     */
+    function errors(): ?\App\Core\Validation\ErrorBag
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $errors = $_SESSION['_errors'] ?? null;
+
+        if ($errors && $errors instanceof \App\Core\Validation\ErrorBag) {
+            return $errors;
+        }
+
+        // Retourner un ErrorBag vide si pas d'erreurs
+        return new \App\Core\Validation\ErrorBag();
+    }
+}
+
+if (!function_exists('has_error')) {
+    /**
+     * Vérifier si un champ a une erreur
+     */
+    function has_error(string $field): bool
+    {
+        return errors()->has($field);
+    }
+}
+
+if (!function_exists('error')) {
+    /**
+     * Récupérer la première erreur d'un champ
+     */
+    function error(string $field): ?string
+    {
+        return errors()->first($field);
+    }
+}
+
+if (!function_exists('redirect_back_with_errors')) {
+    /**
+     * Redirection avec erreurs et old input
+     */
+    function redirect_back_with_errors(\App\Core\Validation\ErrorBag $errors): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Stocker les erreurs
+        $_SESSION['_errors'] = $errors;
+
+        // Stocker l'ancien input
+        $_SESSION['_old_input'] = $_POST;
+
+        // Rediriger vers la page précédente
+        $referer = $_SERVER['HTTP_REFERER'] ?? '/';
+        header('Location: ' . $referer);
+        exit;
+    }
+}
+
+if (!function_exists('with_errors')) {
+    /**
+     * Rediriger avec des erreurs vers une URL spécifique
+     */
+    function redirect_with_errors(string $url, \App\Core\Validation\ErrorBag $errors): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Stocker les erreurs
+        $_SESSION['_errors'] = $errors;
+
+        // Stocker l'ancien input
+        $_SESSION['_old_input'] = $_POST;
+
+        redirect($url);
+    }
+}
+
 
 /*
 |--------------------------------------------------------------------------
