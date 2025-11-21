@@ -1,163 +1,277 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'Admin' ?> - SunuFramework</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-        }
+    <meta name="description" content="SunuFramework - Administration">
+    <meta name="keywords" content="admin, dashboard">
+    <meta name="author" content="SunuFramework">
 
-        .sidebar {
-            width: 250px;
-            background: #333;
-            color: #fff;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-        }
+    <title><?= $title ?? 'Dashboard' ?> - SunuFramework Admin</title>
 
-        .sidebar a {
-            color: #ccc;
-            text-decoration: none;
-            padding: 10px;
-            margin-bottom: 5px;
-            border-radius: 4px;
-        }
+    <!-- Favicon -->
+    <link rel="icon" href="<?= url('/assets/images/logo/favicon.png') ?>" type="image/x-icon">
+    <link rel="shortcut icon" href="<?= url('/assets/images/logo/favicon.png') ?>" type="image/x-icon">
 
-        .sidebar a:hover {
-            background: #444;
-            color: #fff;
-        }
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-        .sidebar .brand {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-bottom: 30px;
-            color: #fff;
-        }
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/vendors/bootstrap.css') ?>">
 
-        .content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background: #f4f4f4;
-        }
+    <!-- App CSS -->
+    <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/style.css') ?>">
 
-        .card {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
+    <!-- Theme Color (default: color-1) -->
+    <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/color-1.css') ?>" id="color">
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/responsive.css') ?>">
 
-        th,
-        td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/custom.css') ?>">
 
-        th {
-            background-color: #f8f9fa;
-        }
+    <!-- Icons -->
+    <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/vendors/feather-icon.css') ?>">
+    <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/fontawesome.css') ?>">
 
-        .btn {
-            padding: 8px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-            color: #fff;
-            display: inline-block;
-            cursor: pointer;
-            border: none;
-            font-size: 14px;
-        }
+    <!-- DataTables (si nécessaire) -->
+    <?php if (isset($datatable) && $datatable): ?>
+        <link rel="stylesheet" type="text/css" href="<?= url('/assets/css/vendors/dataTables.bootstrap5.css') ?>">
+    <?php endif; ?>
 
-        .btn-primary {
-            background-color: #007bff;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-        }
-
-        .btn-sm {
-            padding: 4px 8px;
-            font-size: 12px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        .checkbox-group {
-            margin-top: 5px;
-        }
-
-        .checkbox-group label {
-            display: inline-block;
-            margin-right: 15px;
-            font-weight: normal;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-    </style>
+    <!-- Styles additionnels par page -->
+    @yield('styles')
 </head>
 
 <body>
-    <div class="sidebar">
-        <div class="brand">Sunu Admin</div>
-        <a href="<?= url('/admin/dashboard') ?>">Dashboard</a>
-        <a href="<?= url('/admin/users') ?>">Users</a>
-        <a href="<?= url('/admin/roles') ?>">Roles</a>
-        <a href="<?= url('/admin/permissions') ?>">Permissions</a>
-        <a href="<?= url('/admin/modules') ?>">Modules</a>
-        <a href="<?= url('/admin/cache') ?>">Cache</a>
-        <div style="margin-top: auto;">
-            <a href="<?= url('/') ?>">Back to Site</a>
-            <a href="<?= url('/logout') ?>">Logout</a>
+    <!-- Page Loader Start -->
+    <div class="loader-wrapper">
+        <div class="loader"></div>
+    </div>
+    <!-- Page Loader End -->
+
+    <!-- Page Body Start -->
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+
+        <!-- Page Header Start -->
+        <div class="page-header">
+            <div class="header-wrapper row m-0">
+                <!-- Logo & Toggle -->
+                <div class="header-logo-wrapper col-auto p-0">
+                    <div class="logo-wrapper">
+                        <a href="<?= url('/admin/dashboard') ?>">
+                            <h4 class="mb-0" style="color: #7366ff; font-weight: 700;">SunuFramework</h4>
+                        </a>
+                    </div>
+                    <div class="toggle-sidebar">
+                        <i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i>
+                    </div>
+                </div>
+
+                <!-- Search & Right Nav -->
+                <div class="nav-right col-xxl-7 col-xl-6 col-md-7 col-8 pull-right right-header p-0 ms-auto">
+                    <ul class="nav-menus">
+                        <!-- Notifications -->
+                        <li class="onhover-dropdown">
+                            <div class="notification-box">
+                                <i data-feather="bell"></i>
+                                <span class="badge rounded-pill badge-secondary">3</span>
+                            </div>
+                            <ul class="notification-dropdown onhover-show-div">
+                                <li>
+                                    <i data-feather="shopping-bag"></i>
+                                    <h6 class="f-18 mb-0">Notifications</h6>
+                                </li>
+                                <li>
+                                    <p>
+                                        <i class="fa fa-circle-o me-3 font-primary"></i>Nouvelle permission ajoutée
+                                        <span class="pull-right">Il y a 2 heures</span>
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <i class="fa fa-circle-o me-3 font-success"></i>Cache vidé avec succès
+                                        <span class="pull-right">Il y a 5 heures</span>
+                                    </p>
+                                </li>
+                                <li class="text-center">
+                                    <a href="javascript:void(0)" class="btn btn-primary">Voir toutes</a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <!-- Profile -->
+                        <li class="profile-nav onhover-dropdown p-0 me-0">
+                            <div class="media profile-media">
+                                <img class="b-r-10" src="<?= url('/assets/images/dashboard/profile.jpg') ?>" alt="" style="width: 35px; height: 35px; object-fit: cover;">
+                                <div class="media-body">
+                                    <span><?= $_SESSION['user']['username'] ?? 'Administrateur' ?></span>
+                                    <p class="mb-0 font-roboto">Admin <i class="middle fa fa-angle-down"></i></p>
+                                </div>
+                            </div>
+                            <ul class="profile-dropdown onhover-show-div">
+                                <li>
+                                    <a href="<?= url('/admin/profile') ?>">
+                                        <i data-feather="user"></i><span>Profil</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?= url('/admin/settings') ?>">
+                                        <i data-feather="settings"></i><span>Paramètres</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?= url('/logout') ?>">
+                                        <i data-feather="log-out"></i><span>Déconnexion</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
+        <!-- Page Header End -->
+
+        <!-- Page Body Start -->
+        <div class="page-body-wrapper">
+
+            <!-- Sidebar Start -->
+            <div class="sidebar-wrapper">
+                <div class="logo-wrapper">
+                    <a href="<?= url('/admin/dashboard') ?>">
+                        <h4 class="mb-0" style="color: #7366ff; font-weight: 700;">Sunu</h4>
+                    </a>
+                    <div class="back-btn">
+                        <i class="fa fa-angle-left"></i>
+                    </div>
+                    <div class="toggle-sidebar">
+                        <i class="status_toggle middle sidebar-toggle" data-feather="grid"></i>
+                    </div>
+                </div>
+
+                <nav class="sidebar-main">
+                    <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
+                    <div id="sidebar-menu">
+                        <ul class="sidebar-links" id="simple-bar">
+                            <li class="back-btn">
+                                <a href="<?= url('/admin/dashboard') ?>">
+                                    <img class="img-fluid" src="<?= url('/assets/images/logo/logo-icon.png') ?>" alt="">
+                                </a>
+                                <div class="mobile-back text-end">
+                                    <span>Retour</span><i class="fa fa-angle-right ps-2" aria-hidden="true"></i>
+                                </div>
+                            </li>
+
+                            <!-- Dashboard -->
+                            <li class="sidebar-list">
+                                <a class="sidebar-link sidebar-title" href="<?= url('/admin/dashboard') ?>">
+                                    <i data-feather="home"></i><span>Dashboard</span>
+                                </a>
+                            </li>
+
+                            <!-- Gestion -->
+                            <li class="sidebar-list">
+                                <label class="badge badge-light-primary">Gestion</label>
+                                <a class="sidebar-link sidebar-title" href="javascript:void(0)">
+                                    <i data-feather="users"></i><span>Utilisateurs</span>
+                                </a>
+                                <ul class="sidebar-submenu">
+                                    <li><a href="<?= url('/admin/users') ?>">Liste des utilisateurs</a></li>
+                                    <li><a href="<?= url('/admin/roles') ?>">Rôles</a></li>
+                                    <li><a href="<?= url('/admin/permissions') ?>">Permissions</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- Système -->
+                            <li class="sidebar-list">
+                                <label class="badge badge-light-secondary">Système</label>
+                                <a class="sidebar-link sidebar-title" href="javascript:void(0)">
+                                    <i data-feather="settings"></i><span>Configuration</span>
+                                </a>
+                                <ul class="sidebar-submenu">
+                                    <li><a href="<?= url('/admin/modules') ?>">Modules</a></li>
+                                    <li><a href="<?= url('/admin/cache') ?>">Cache</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- Retour au site -->
+                            <li class="sidebar-list">
+                                <a class="sidebar-link sidebar-title" href="<?= url('/') ?>">
+                                    <i data-feather="external-link"></i><span>Retour au site</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
+                </nav>
+            </div>
+            <!-- Sidebar End -->
+
+            <!-- Page Content Start -->
+            <div class="page-body">
+                <!-- Container-fluid Start -->
+                <div class="container-fluid">
+                    @yield('content')
+                </div>
+                <!-- Container-fluid End -->
+            </div>
+            <!-- Page Content End -->
+
+            <!-- Footer Start -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-6 p-0 footer-copyright">
+                            <p class="mb-0">Copyright © 2024 SunuFramework. Tous droits réservés.</p>
+                        </div>
+                        <div class="col-md-6 p-0">
+                            <p class="heart mb-0 text-end">Développé avec <i class="fa fa-heart font-danger"></i></p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+            <!-- Footer End -->
+        </div>
+        <!-- Page Body End -->
     </div>
-    <div class="content">
-        @yield('content')
-    </div>
+    <!-- Page Body End -->
+
+    <!-- jQuery -->
+    <script src="<?= url('/assets/js/jquery-3.5.1.min.js') ?>"></script>
+
+    <!-- Bootstrap -->
+    <script src="<?= url('/assets/js/bootstrap/bootstrap.bundle.min.js') ?>"></script>
+
+    <!-- Feather Icons -->
+    <script src="<?= url('/assets/js/icons/feather-icon/feather.min.js') ?>"></script>
+    <script src="<?= url('/assets/js/icons/feather-icon/feather-icon.js') ?>"></script>
+
+    <!-- Sidebar -->
+    <script src="<?= url('/assets/js/sidebar-menu.js') ?>"></script>
+
+    <!-- Config -->
+    <script src="<?= url('/assets/js/config.js') ?>"></script>
+
+    <!-- DataTables (si nécessaire) -->
+    <?php if (isset($datatable) && $datatable): ?>
+        <script src="<?= url('/assets/js/datatable/datatables/jquery.dataTables.min.js') ?>"></script>
+        <script src="<?= url('/assets/js/datatable/datatables/datatable.custom.js') ?>"></script>
+    <?php endif; ?>
+
+    <!-- Custom Script -->
+    <script src="<?= url('/assets/js/script.js') ?>"></script>
+
+    <!-- Scripts additionnels par page -->
+    @yield('scripts')
+
+    <!-- Theme Customizer (optionnel) -->
+    <!-- <script src="<?= url('/assets/js/theme-customizer/customizer.js') ?>"></script> -->
 </body>
 
 </html>

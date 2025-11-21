@@ -96,6 +96,20 @@ if (!function_exists('env')) {
     }
 }
 
+if (!function_exists('component')) {
+    /**
+     * Include an admin component with absolute path
+     */
+    function component(string $name, array $data = [])
+    {
+        extract($data);
+        $componentPath = dirname(__DIR__, 2) . '/templates/admin/components/' . $name . '.php';
+        if (file_exists($componentPath)) {
+            include $componentPath;
+        }
+    }
+}
+
 /*
 |--------------------------------------------------------------------------
 | URL & Routing Helpers

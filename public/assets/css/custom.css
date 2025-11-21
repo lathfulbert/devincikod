@@ -1,0 +1,284 @@
+/* ================================
+   SunuFramework2 - Custom Admin Styles
+   ================================ */
+
+/* Variables globales */
+:root {
+  --primary-color: #7366ff;
+  --secondary-color: #f73164;
+  --success-color: #51bb25;
+  --info-color: #a927f9;
+  --warning-color: #f8d62b;
+  --danger-color: #dc3545;
+  --dark-color: #2c323f;
+  --light-color: #f4f4f4;
+  --white-color: #ffffff;
+  --border-color: #e6edef;
+  --text-color: #2b2b2b;
+  --text-muted: #6c757d;
+  --transition: all 0.3s ease;
+}
+
+/* Surcharges personnalisées */
+body {
+  font-family: "Rubik", sans-serif;
+  color: var(--text-color);
+}
+
+/* Amélioration des cartes */
+.card {
+  box-shadow: 0 0 20px rgba(89, 102, 122, 0.1);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  margin-bottom: 24px;
+  transition: var(--transition);
+}
+
+.card:hover {
+  box-shadow: 0 0 30px rgba(89, 102, 122, 0.15);
+}
+
+.card-header {
+  background-color: var(--white-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 20px;
+  border-radius: 10px 10px 0 0;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+/* Boutons améliorés */
+.btn {
+  border-radius: 5px;
+  padding: 8px 20px;
+  font-weight: 500;
+  transition: var(--transition);
+  border: none;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--white-color);
+}
+
+.btn-primary:hover {
+  background-color: #5847d9;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(115, 102, 255, 0.3);
+}
+
+.btn-success {
+  background-color: var(--success-color);
+  color: var(--white-color);
+}
+
+.btn-success:hover {
+  background-color: #429a1d;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(81, 187, 37, 0.3);
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: var(--white-color);
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+}
+
+/* Formulaires */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-control {
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  padding: 10px 15px;
+  transition: var(--transition);
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(115, 102, 255, 0.25);
+}
+
+/* Tables améliorées */
+.table {
+  margin-bottom: 0;
+}
+
+.table thead th {
+  background-color: #f8f9fa;
+  color: var(--text-color);
+  font-weight: 600;
+  border-bottom: 2px solid var(--border-color);
+  padding: 15px;
+}
+
+.table tbody tr {
+  transition: var(--transition);
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.table tbody td {
+  padding: 15px;
+  vertical-align: middle;
+}
+
+/* Alerts personnalisées */
+.alert {
+  border-radius: 5px;
+  border: none;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+}
+
+.alert-success {
+  background-color: rgba(81, 187, 37, 0.1);
+  color: var(--success-color);
+  border-left: 4px solid var(--success-color);
+}
+
+.alert-danger {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: var(--danger-color);
+  border-left: 4px solid var(--danger-color);
+}
+
+.alert-warning {
+  background-color: rgba(248, 214, 43, 0.1);
+  color: #856404;
+  border-left: 4px solid var(--warning-color);
+}
+
+.alert-info {
+  background-color: rgba(169, 39, 249, 0.1);
+  color: var(--info-color);
+  border-left: 4px solid var(--info-color);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  background-color: transparent;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  content: "›";
+  color: var(--text-muted);
+}
+
+/* Stats Cards */
+.stats-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.stats-card .icon {
+  font-size: 3rem;
+  opacity: 0.3;
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.stats-card h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.stats-card p {
+  color: var(--text-muted);
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+/* Loading spinner */
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(115, 102, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive ajustements */
+@media (max-width: 768px) {
+  .card-body {
+    padding: 15px;
+  }
+
+  .table {
+    font-size: 0.875rem;
+  }
+
+  .btn {
+    padding: 6px 15px;
+    font-size: 0.875rem;
+  }
+}
+
+/* Utility classes */
+.text-primary {
+  color: var(--primary-color) !important;
+}
+.text-success {
+  color: var(--success-color) !important;
+}
+.text-danger {
+  color: var(--danger-color) !important;
+}
+.text-warning {
+  color: #856404 !important;
+}
+.text-info {
+  color: var(--info-color) !important;
+}
+
+.bg-primary-light {
+  background-color: rgba(115, 102, 255, 0.1) !important;
+}
+.bg-success-light {
+  background-color: rgba(81, 187, 37, 0.1) !important;
+}
+.bg-danger-light {
+  background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+.shadow-sm {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+.shadow {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+.shadow-lg {
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+}
+
+/* Transition helpers */
+.transition {
+  transition: var(--transition);
+}
+.no-transition {
+  transition: none !important;
+}
