@@ -147,6 +147,7 @@
         <a href="<?= url('/admin/users') ?>">Users</a>
         <a href="<?= url('/admin/roles') ?>">Roles</a>
         <a href="<?= url('/admin/permissions') ?>">Permissions</a>
+        <a href="<?= url('/admin/modules') ?>">Modules</a>
         <div style="margin-top: auto;">
             <a href="<?= url('/') ?>">Back to Site</a>
             <a href="<?= url('/logout') ?>">Logout</a>

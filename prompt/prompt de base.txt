@@ -1,0 +1,15 @@
+Renforcer le CORE :
+
+Base de données (Database) ORM migration/seeder/factory (comme laravel)
+
+Cache (Cache) (extensible 
+
+Middleware (Middleware)
+
+Sécurité (Security) Guard comme laravel (can, canont,middlewart
+
+Gestion des fichiers (Files)
+
+Services globaux (Helpers, Logger, etc.)
+
+Routing centralisé (routes principales et modules).
