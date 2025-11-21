@@ -45,10 +45,11 @@ class CacheManager implements CacheInterface
     {
         try {
             $db = Database::getInstance();
-            $result = $db->query("SELECT * FROM cache_config LIMIT 1");
+            $stmt = $db->query("SELECT * FROM cache_config LIMIT 1");
+            $config = $stmt->fetch();
 
-            if ($result && count($result) > 0) {
-                $this->config = $result[0];
+            if ($config) {
+                $this->config = $config;
                 $this->prefix = $this->config['prefix'] ?? '';
             } else {
                 // Configuration par défaut si pas en base
