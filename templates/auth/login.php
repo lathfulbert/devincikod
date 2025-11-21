@@ -67,6 +67,16 @@
         </a>
     </div>
 
+    <div class="text-center mt-2">
+        <p class="mb-0">
+            Pas encore de compte ?
+            <a href="<?= url('/register') ?>" class="text-link">
+                <i data-feather="user-plus" style="width: 14px; height: 14px;"></i>
+                S'inscrire
+            </a>
+        </p>
+    </div>
+
     <div class="text-center mt-3">
         <small class="text-muted">
             <i data-feather="shield" style="width: 14px; height: 14px;"></i>

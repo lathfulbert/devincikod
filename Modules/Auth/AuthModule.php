@@ -13,17 +13,13 @@ class AuthModule implements ModuleContract
         return 'Auth';
     }
 
-    public function register(): void
-    {
-    }
+    public function register(): void {}
 
-    public function boot(): void
-    {
-    }
+    public function boot(): void {}
 
     public function getRoutes(): array
     {
-        $authMiddleware = function() {
+        $authMiddleware = function () {
             $auth = new Auth();
             if (!$auth->check()) {
                 redirect('/login');
@@ -36,7 +32,7 @@ class AuthModule implements ModuleContract
             [
                 'method' => 'GET',
                 'path' => '/',
-                'handler' => function() {
+                'handler' => function () {
                     redirect('/login');
                 }
             ],
@@ -49,6 +45,16 @@ class AuthModule implements ModuleContract
                 'method' => 'POST',
                 'path' => '/login',
                 'handler' => [new AuthController(), 'login']
+            ],
+            [
+                'method' => 'GET',
+                'path' => '/register',
+                'handler' => [new AuthController(), 'register']
+            ],
+            [
+                'method' => 'POST',
+                'path' => '/register',
+                'handler' => [new AuthController(), 'register']
             ],
             [
                 'method' => 'GET',
