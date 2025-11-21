@@ -8,20 +8,7 @@
         <p>Connectez-vous à votre compte</p>
     </div>
 
-    <?php if (isset($error)): ?>
-        <div class="alert alert-danger d-flex align-items-center">
-            <i data-feather="alert-circle" class="me-2" style="width: 20px; height: 20px;"></i>
-            <?= htmlspecialchars($error) ?>
-        </div>
-    <?php endif; ?>
-
-    <?php if (isset($_SESSION['flash']['success'])): ?>
-        <div class="alert alert-success d-flex align-items-center">
-            <i data-feather="check-circle" class="me-2" style="width: 20px; height: 20px;"></i>
-            <?= htmlspecialchars($_SESSION['flash']['success']) ?>
-        </div>
-        <?php unset($_SESSION['flash']['success']); ?>
-    <?php endif; ?>
+    <?php component('alert') ?>
 
     <form method="POST" action="<?= url('/login') ?>">
         <?= csrf_field() ?>
@@ -34,11 +21,11 @@
                 type="text"
                 name="username"
                 id="username"
-                class="form-control"
+                class="form-control <?= has_error('username') ? 'is-invalid' : '' ?>"
                 placeholder="Entrez votre nom d'utilisateur"
-                required
                 autofocus
-                value="<?= htmlspecialchars($_POST['username'] ?? '') ?>">
+                value="<?= old('username') ?>">
+            <?php component('error', ['field' => 'username']) ?>
             <small class="text-muted">Par défaut: admin</small>
         </div>
 
@@ -50,9 +37,9 @@
                 type="password"
                 name="password"
                 id="password"
-                class="form-control"
-                placeholder="Entrez votre mot de passe"
-                required>
+                class="form-control <?= has_error('password') ? 'is-invalid' : '' ?>"
+                placeholder="Entrez votre mot de passe">
+            <?php component('error', ['field' => 'password']) ?>
             <small class="text-muted">Par défaut: password</small>
         </div>
 
