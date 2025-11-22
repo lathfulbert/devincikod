@@ -80,22 +80,35 @@ class TemplateEngine
     {
         // Match @extends('layout')
         // We replace it with PHP code that sets the extends property on the engine
-        return preg_replace('/@extends\s*\([\'"](.+?)[\'"]\)/', '<?php $this->engine->setExtends(\'$1\'); ?>', $value);
+        return preg_replace('/@extends\s*\([\'"](.+?)[\'"]\)/', '<?php $__view->setExtends(\'$1\'); ?>', $value);
     }
 
     protected function compileSection(string $value): string
     {
-        // @section('name')
-        $value = preg_replace('/@section\s*\([\'"](.+?)[\'"]\)/', '<?php $this->startSection(\'$1\'); ?>', $value);
+        // @section('name', 'value') - Short syntax with inline value
+        $value = preg_replace_callback(
+            '/@section\s*\(\s*[\'"](.+?)[\'"]\s*,\s*(.+?)\s*\)/',
+            function ($matches) {
+                $name = $matches[1];
+                $content = $matches[2];
+                return "<?php \$__view->startSection('$name'); echo $content; \$__view->endSection(); ?>";
+            },
+            $value
+        );
+
+        // @section('name') - Block syntax
+        $value = preg_replace('/@section\s*\([\'"](.+?)[\'"]\)/', '<?php $__view->startSection(\'$1\'); ?>', $value);
+
         // @endsection
-        $value = preg_replace('/@endsection/', '<?php $this->endSection(); ?>', $value);
+        $value = preg_replace('/@endsection/', '<?php $__view->endSection(); ?>', $value);
+
         return $value;
     }
 
     protected function compileYield(string $value): string
     {
         // @yield('name')
-        return preg_replace('/@yield\s*\([\'"](.+?)[\'"]\)/', '<?= $this->yieldSection(\'$1\') ?>', $value);
+        return preg_replace('/@yield\s*\([\'"](.+?)[\'"]\)/', '<?= $__view->yieldSection(\'$1\') ?>', $value);
     }
 
     protected function compileInclude(string $value): string
@@ -105,14 +118,14 @@ class TemplateEngine
 
         return preg_replace_callback($pattern, function ($matches) {
             $view = $matches[1];
-            $vars = $matches[2] ?? 'get_defined_vars()';
+            $vars = $matches[2] ?? '\$__view->getTemplateVars()';
 
-            if ($vars !== 'get_defined_vars()') {
+            if ($vars !== '\$__view->getTemplateVars()') {
                 // Merge with current vars
-                return "<?php echo \$this->make('$view', array_merge(get_defined_vars(), $vars)); ?>";
+                return "<?php echo \$__view->make('$view', array_merge(\$__view->getTemplateVars(), $vars)); ?>";
             }
 
-            return "<?php echo \$this->make('$view', get_defined_vars()); ?>";
+            return "<?php echo \$__view->make('$view', \$__view->getTemplateVars()); ?>";
         }, $value);
     }
 

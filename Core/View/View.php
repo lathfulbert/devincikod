@@ -7,6 +7,7 @@ class View
     protected string $layout = 'default';
     protected string $templatePath;
     protected TemplateEngine $engine;
+    protected array $templateVars = [];
 
     public function __construct(string $templatePath)
     {
@@ -21,7 +22,21 @@ class View
 
     public function render(string $view, array $data = [], string $module = null, bool $useLayout = true, bool $reset = true): string
     {
-        file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "Rendering: $view\n", FILE_APPEND);
+        static $depth = 0;
+        $depth++;
+
+        file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', str_repeat("  ", $depth - 1) . "[$depth] Rendering: $view (reset=$reset)\n", FILE_APPEND);
+
+        if ($depth > 20) {
+            file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "INFINITE LOOP DETECTED!\n", FILE_APPEND);
+            die("Infinite loop detected in view rendering");
+        }
+
+        // Inject View instance for use in compiled templates
+        $data['__view'] = $this;
+
+        // Store template vars (excluding __view for safety)
+        $this->templateVars = array_diff_key($data, ['__view' => true]);
 
         extract($data);
 
@@ -57,9 +72,11 @@ class View
             // We pass the same data, but we don't need to useLayout again recursively in the same way
             // The parent layout will yield sections that were defined in the child
             // IMPORTANT: Do NOT reset the engine, or we lose the sections we just captured!
+            $depth--;
             return $this->render($extends, $data, null, false, false);
         }
 
+        $depth--;
         return $content;
     }
 
@@ -72,16 +89,18 @@ class View
         $tplFile = $this->templatePath . '/' . $viewPath . '.tpl';
         $phpFile = $this->templatePath . '/' . $viewPath . '.php';
 
+        file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "Resolving '$view' -> viewPath='$viewPath'\n  tpl=$tplFile (exists=" . (file_exists($tplFile) ? 'YES' : 'NO') . ")\n  php=$phpFile (exists=" . (file_exists($phpFile) ? 'YES' : 'NO') . ")\n", FILE_APPEND);
+
         if (file_exists($tplFile)) {
-            file_put_contents(dirname(dirname(__DIR__)) . '/debug_view_render.log', "Resolved to: $tplFile\n", FILE_APPEND);
+            file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to: $tplFile\n", FILE_APPEND);
             return $tplFile;
         }
         if (file_exists($phpFile)) {
-            file_put_contents(dirname(dirname(__DIR__)) . '/debug_view_render.log', "Resolved to: $phpFile\n", FILE_APPEND);
+            file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to: $phpFile\n", FILE_APPEND);
             return $phpFile;
         }
 
-        file_put_contents(dirname(dirname(__DIR__)) . '/debug_view_render.log', "Failed to resolve: $view\n", FILE_APPEND);
+        file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Failed to resolve: $view\n", FILE_APPEND);
         return null;
     }
 
@@ -117,5 +136,20 @@ class View
     public function yieldSection(string $name, string $default = ''): string
     {
         return $this->engine->yieldSection($name, $default);
+    }
+
+    public function setExtends(string $layout): void
+    {
+        $this->engine->setExtends($layout);
+    }
+
+    public function getEngine(): TemplateEngine
+    {
+        return $this->engine;
+    }
+
+    public function getTemplateVars(): array
+    {
+        return $this->templateVars;
     }
 }
