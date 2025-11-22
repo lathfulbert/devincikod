@@ -23,6 +23,7 @@ class Application
         // Load Helpers
         require_once __DIR__ . '/Support/helpers.php';
         require_once __DIR__ . '/Support/authorization_helpers.php';
+        require_once __DIR__ . '/Files/Helpers/file_helpers.php';
 
         // Load .env
         (new \App\Core\Support\DotEnv($basePath . '/.env'))->load();
@@ -82,6 +83,14 @@ class Application
         // Register Authorization Middleware
         $this->router->middleware('can', \App\Core\Middleware\PermissionMiddleware::class);
         $this->router->middleware('role', \App\Core\Middleware\RoleMiddleware::class);
+        $this->router->middleware('secure_upload', \App\Core\Files\Middleware\SecureUploadMiddleware::class);
+
+        // Load Global Routes
+        $routesPath = $this->basePath . '/routes/web.php';
+        if (file_exists($routesPath)) {
+            $router = $this->router;
+            require $routesPath;
+        }
 
         $this->moduleManager->discover();
         try {
