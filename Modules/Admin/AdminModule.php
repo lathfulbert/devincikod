@@ -16,6 +16,10 @@ class AdminModule extends AbstractModule
             ['GET', '/', [\Modules\Admin\Controllers\AdminController::class, 'index'], [$authMiddleware]], // Root route
             ['GET', '/admin/dashboard', [\Modules\Admin\Controllers\AdminController::class, 'dashboard'], [$authMiddleware]],
 
+            // Monitoring Routes
+            ['GET', '/admin/monitoring', [\Modules\Admin\Controllers\MonitoringController::class, 'index'], [$authMiddleware]],
+            ['POST', '/admin/monitoring/clear', [\Modules\Admin\Controllers\MonitoringController::class, 'clear'], [$authMiddleware]],
+
             // Module Management
             ['GET', '/admin/modules', [\Modules\Admin\Controllers\ModuleController::class, 'index'], [$authMiddleware]],
             ['POST', '/admin/modules/enable', [\Modules\Admin\Controllers\ModuleController::class, 'enable'], [$authMiddleware]],
@@ -65,6 +69,13 @@ class AdminModule extends AbstractModule
                 'title' => 'Dashboard',
                 'icon' => 'home',
                 'url' => '/admin/dashboard',
+                'class' => 'link-nav'
+            ],
+            [
+                'type' => 'link',
+                'title' => 'Monitoring',
+                'icon' => 'activity',
+                'url' => '/admin/monitoring',
                 'class' => 'link-nav'
             ],
             [

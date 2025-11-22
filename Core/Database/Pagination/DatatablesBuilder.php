@@ -88,7 +88,7 @@ class DatatablesBuilder
     }
 
     /**
-     * Apply search to the query.
+     * Apply search to the query using OR WHERE for multi-column search.
      */
     protected function applySearch(string $searchValue): void
     {
@@ -96,22 +96,26 @@ class DatatablesBuilder
             return;
         }
 
-        // Build an OR condition for all searchable columns
-        // Note: This is a simplified version. In a real implementation,
-        // you'd want to use a more sophisticated approach with query grouping
         $searchColumns = array_filter($this->columns, function ($col) {
             return !empty($col);
         });
 
-        if (!empty($searchColumns)) {
-            // For the first column
-            $firstColumn = array_shift($searchColumns);
-            $this->query->where($firstColumn, 'LIKE', "%{$searchValue}%");
-
-            // This is a limitation - we need to extend QueryBuilder to support OR WHERE
-            // For now, we'll just search on the first column
-            // TODO: Implement orWhere in QueryBuilder
+        if (empty($searchColumns)) {
+            return;
         }
+
+        // Use a WHERE group to create (col1 LIKE ? OR col2 LIKE ? OR ...)
+        $this->query->whereGroup(function ($q) use ($searchColumns, $searchValue) {
+            $firstColumn = true;
+            foreach ($searchColumns as $column) {
+                if ($firstColumn) {
+                    $q->where($column, 'LIKE', "%{$searchValue}%");
+                    $firstColumn = false;
+                } else {
+                    $q->orWhere($column, 'LIKE', "%{$searchValue}%");
+                }
+            }
+        });
     }
 
     /**

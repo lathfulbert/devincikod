@@ -42,6 +42,11 @@ class Application
             $registry,
             $activator
         );
+        $this->moduleManager->discover();
+
+        // Register Exception Handler
+        $exceptionHandler = new \App\Core\Exceptions\ExceptionHandler($this);
+        $exceptionHandler->register();
     }
 
     public static function getInstance(): Application
@@ -135,5 +140,71 @@ class Application
         $uri = '/' . ltrim($uri, '/');
 
         $this->router->dispatch($method, $uri);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Service Container Methods
+    |--------------------------------------------------------------------------
+    */
+
+    protected array $bindings = [];
+    protected array $instances = [];
+
+    /**
+     * Register a binding in the container.
+     */
+    public function bind(string $abstract, $concrete = null): void
+    {
+        if ($concrete === null) {
+            $concrete = $abstract;
+        }
+
+        $this->bindings[$abstract] = $concrete;
+    }
+
+    /**
+     * Register a shared binding (singleton) in the container.
+     */
+    public function singleton(string $abstract, $concrete = null): void
+    {
+        $this->bind($abstract, $concrete);
+        $this->instances[$abstract] = null;
+    }
+
+    /**
+     * Resolve a binding from the container.
+     */
+    public function make(string $abstract)
+    {
+        // Check if we have a singleton instance
+        if (isset($this->instances[$abstract]) && $this->instances[$abstract] !== null) {
+            return $this->instances[$abstract];
+        }
+
+        // Get the concrete implementation
+        $concrete = $this->bindings[$abstract] ?? $abstract;
+
+        // If it's a callable, execute it
+        if (is_callable($concrete)) {
+            $object = $concrete($this);
+        } else {
+            $object = new $concrete();
+        }
+
+        // Store if it's a singleton
+        if (array_key_exists($abstract, $this->instances)) {
+            $this->instances[$abstract] = $object;
+        }
+
+        return $object;
+    }
+
+    /**
+     * Check if a binding exists.
+     */
+    public function bound(string $abstract): bool
+    {
+        return isset($this->bindings[$abstract]);
     }
 }

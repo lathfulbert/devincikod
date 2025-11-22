@@ -8,10 +8,12 @@ class QueryBuilder
     protected $table;
     protected $select = '*';
     protected $wheres = [];
+    protected $whereGroups = []; // For grouping OR conditions
     protected $bindings = [];
     protected $orderBy = [];
     protected $limit;
     protected $offset;
+    protected $with = []; // Relations to eager load
 
     public function __construct(string $modelClass)
     {
@@ -32,8 +34,63 @@ class QueryBuilder
             $operator = '=';
         }
 
-        $this->wheres[] = "{$column} {$operator} ?";
+        $this->wheres[] = [
+            'type' => 'and',
+            'column' => $column,
+            'operator' => $operator,
+            'value' => $value
+        ];
         $this->bindings[] = $value;
+        return $this;
+    }
+
+    public function orWhere($column, $operator = null, $value = null)
+    {
+        if ($value === null) {
+            $value = $operator;
+            $operator = '=';
+        }
+
+        $this->wheres[] = [
+            'type' => 'or',
+            'column' => $column,
+            'operator' => $operator,
+            'value' => $value
+        ];
+        $this->bindings[] = $value;
+        return $this;
+    }
+
+    /**
+     * Add a grouped OR WHERE clause.
+     * Example: ->whereGroup(function($q) { $q->where('a', 1)->orWhere('b', 2); })
+     */
+    public function whereGroup(callable $callback)
+    {
+        $subQuery = new static($this->model);
+        $callback($subQuery);
+
+        if (!empty($subQuery->wheres)) {
+            $this->whereGroups[] = $subQuery->wheres;
+            $this->bindings = array_merge($this->bindings, $subQuery->bindings);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Specify relations to eager load.
+     *
+     * @param string|array $relations
+     * @return $this
+     */
+    public function with($relations)
+    {
+        if (is_string($relations)) {
+            $relations = [$relations];
+        }
+
+        $this->with = array_merge($this->with, $relations);
         return $this;
     }
 
@@ -60,7 +117,93 @@ class QueryBuilder
         $sql = $this->toSql();
         $db = Database::getInstance();
         $stmt = $db->query($sql, $this->bindings);
-        return $stmt->fetchAll(\PDO::FETCH_CLASS, $this->model);
+        $results = $stmt->fetchAll(\PDO::FETCH_CLASS, $this->model);
+
+        // Load relations if specified
+        if (!empty($this->with) && !empty($results)) {
+            $this->loadRelations($results);
+        }
+
+        return $results;
+    }
+
+    /**
+     * Load relations for a collection of models.
+     */
+    protected function loadRelations(array $models): void
+    {
+        foreach ($this->with as $relation) {
+            $this->loadRelationForModels($models, $relation);
+        }
+    }
+
+    /**
+     * Load a specific relation for models.
+     */
+    protected function loadRelationForModels(array $models, string $relation): void
+    {
+        // Get the first model to determine the relation type
+        $firstModel = $models[0];
+
+        // Check if the relation method exists
+        if (!method_exists($firstModel, $relation)) {
+            return;
+        }
+
+        // Call the relation method
+        $relationInstance = $firstModel->$relation();
+
+        // Only support BelongsToMany for now
+        if ($relationInstance instanceof \App\Core\Database\ORM\Relations\BelongsToMany) {
+            $this->loadBelongsToManyRelation($models, $relation, $relationInstance);
+        }
+    }
+
+    /**
+     * Load BelongsToMany relation for multiple models.
+     */
+    protected function loadBelongsToManyRelation(array $models, string $relationName, $relationInstance): void
+    {
+        // Get all IDs
+        $ids = array_map(fn($model) => $model->id, $models);
+
+        // Get pivot table info from the relation
+        $pivotTable = $relationInstance->getPivotTable();
+        $foreignKey = $relationInstance->getForeignPivotKey();
+        $relatedKey = $relationInstance->getRelatedPivotKey();
+        $relatedTable = $relationInstance->getRelated()->getTable();
+
+        // Query to get all related records
+        $db = Database::getInstance();
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+        $sql = "SELECT {$relatedTable}.*, {$pivotTable}.{$foreignKey} as pivot_parent_id 
+                FROM {$relatedTable}
+                INNER JOIN {$pivotTable} ON {$relatedTable}.id = {$pivotTable}.{$relatedKey}
+                WHERE {$pivotTable}.{$foreignKey} IN ({$placeholders})";
+
+        $stmt = $db->query($sql, $ids);
+        $relatedRecords = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        // Group by parent ID
+        $grouped = [];
+        foreach ($relatedRecords as $record) {
+            $parentId = $record['pivot_parent_id'];
+            unset($record['pivot_parent_id']);
+
+            if (!isset($grouped[$parentId])) {
+                $grouped[$parentId] = [];
+            }
+
+            // Create model instance
+            $relatedModel = new ($relationInstance->getRelated())($record);
+            $grouped[$parentId][] = $relatedModel;
+        }
+
+        // Assign to models
+        foreach ($models as $model) {
+            $model->$relationName = $grouped[$model->id] ?? [];
+        }
     }
 
     public function first()
@@ -140,8 +283,21 @@ class QueryBuilder
     {
         $sql = "SELECT {$this->select} FROM {$this->table}";
 
+        // Build WHERE clause
+        $whereClauses = [];
+
+        // Process regular wheres
         if (!empty($this->wheres)) {
-            $sql .= " WHERE " . implode(' AND ', $this->wheres);
+            $whereClauses[] = $this->buildWhereClause($this->wheres);
+        }
+
+        // Process where groups (parenthesized OR groups)
+        foreach ($this->whereGroups as $group) {
+            $whereClauses[] = '(' . $this->buildWhereClause($group) . ')';
+        }
+
+        if (!empty($whereClauses)) {
+            $sql .= " WHERE " . implode(' AND ', $whereClauses);
         }
 
         if (!empty($this->orderBy)) {
@@ -157,5 +313,28 @@ class QueryBuilder
         }
 
         return $sql;
+    }
+
+    /**
+     * Build WHERE clause from array of conditions.
+     */
+    protected function buildWhereClause(array $conditions): string
+    {
+        $clauses = [];
+
+        foreach ($conditions as $index => $condition) {
+            $clause = "{$condition['column']} {$condition['operator']} ?";
+
+            if ($index === 0) {
+                // First condition, no conjunction needed
+                $clauses[] = $clause;
+            } else {
+                // Add AND or OR based on type
+                $conjunction = strtoupper($condition['type']);
+                $clauses[] = "{$conjunction} {$clause}";
+            }
+        }
+
+        return implode(' ', $clauses);
     }
 }
