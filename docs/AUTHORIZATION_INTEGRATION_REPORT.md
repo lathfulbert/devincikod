@@ -37,6 +37,11 @@
 
 - Création de `templates/errors/403.php` avec un design propre.
 
+### 6. ✅ Directive @role Ajoutée
+
+- Ajout du helper `has_role()` dans `authorization_helpers.php`.
+- Ajout de la directive `@role('admin')` dans `TemplateEngine.php`.
+
 ---
 
 ## 💡 Comment Utiliser
@@ -69,6 +74,10 @@ public function update($id) {
 @can('edit-posts')
     <button>Edit</button>
 @endcan
+
+@role('admin')
+    <a href="/admin">Admin Panel</a>
+@endrole
 ```
 
 ---
@@ -80,5 +89,6 @@ Tous les fichiers critiques ont été vérifiés sans erreur de syntaxe :
 - `Core/Support/helpers.php` ✅
 - `Core/Routing/Router.php` ✅
 - `Core/Application.php` ✅
+- `Core/View/TemplateEngine.php` ✅
 
 Le système est maintenant prêt à l'emploi ! 🎉

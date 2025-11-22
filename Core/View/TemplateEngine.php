@@ -64,6 +64,7 @@ class TemplateEngine
         $result = $this->compileAuth($result);
         $result = $this->compileGuest($result);
         $result = $this->compileCan($result);
+        $result = $this->compileRole($result);
         $result = $this->compileSwitch($result);
         $result = $this->compileForeach($result);
         $result = $this->compileEndforeach($result);
@@ -298,6 +299,16 @@ class TemplateEngine
         );
         $value = preg_replace('/\B@endcannot/', '<?php endif; ?>', $value);
 
+        return $value;
+    }
+
+    /**
+     * Compile @role statements.
+     */
+    protected function compileRole(string $value): string
+    {
+        $value = preg_replace('/\B@role\s*\((.*)\)/', '<?php if(has_role($1)): ?>', $value);
+        $value = preg_replace('/\B@endrole/', '<?php endif; ?>', $value);
         return $value;
     }
 

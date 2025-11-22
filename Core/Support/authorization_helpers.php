@@ -60,3 +60,36 @@ if (!function_exists('gate')) {
         return $gate;
     }
 }
+
+if (!function_exists('has_role')) {
+    /**
+     * Check if the current user has a given role.
+     * 
+     * @param string $role Role name
+     * @return bool
+     */
+    function has_role(string $role): bool
+    {
+        if (!function_exists('auth') || !auth()->check()) {
+            return false;
+        }
+
+        $user = auth()->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        // Object
+        if (is_object($user) && method_exists($user, 'hasRole')) {
+            return $user->hasRole($role);
+        }
+
+        // Array
+        if (is_array($user) && isset($user['role'])) {
+            return $user['role'] === $role;
+        }
+
+        return false;
+    }
+}
