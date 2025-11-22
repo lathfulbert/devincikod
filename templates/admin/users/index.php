@@ -97,26 +97,23 @@ component('breadcrumb');
         </table>
 
         <?php
-        $card_footer = "Total : " . count($users ?? []) . " utilisateur(s)";
+        // Card footer with pagination info
+        $card_footer = "Total : " . ($users->total() ?? 0) . " utilisateur(s)";
         component('card-end');
         ?>
+
+        <!-- Pagination Links -->
+        <div class="mt-4">
+            <?= $users->links() ?>
+        </div>
     </div>
 </div>
 
 @endsection
 
 @section('scripts')
-<?php
-$datatable_id = 'usersTable';
-$datatable_config = [
-    'order' => [[0, 'asc']],
-    'pageLength' => 10,
-    'responsive' => true
-];
-component('datatable-init');
-?>
 <script>
-    // Réinitialiser les icônes Feather après le rendu DataTable
+    // Réinitialiser les icônes Feather
     feather.replace();
 </script>
 @endsection
