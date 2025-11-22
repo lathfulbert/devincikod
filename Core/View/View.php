@@ -21,6 +21,8 @@ class View
 
     public function render(string $view, array $data = [], string $module = null, bool $useLayout = true, bool $reset = true): string
     {
+        file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "Rendering: $view\n", FILE_APPEND);
+
         extract($data);
 
         // Reset engine state for new render
@@ -70,9 +72,16 @@ class View
         $tplFile = $this->templatePath . '/' . $viewPath . '.tpl';
         $phpFile = $this->templatePath . '/' . $viewPath . '.php';
 
-        if (file_exists($tplFile)) return $tplFile;
-        if (file_exists($phpFile)) return $phpFile;
+        if (file_exists($tplFile)) {
+            file_put_contents(dirname(dirname(__DIR__)) . '/debug_view_render.log', "Resolved to: $tplFile\n", FILE_APPEND);
+            return $tplFile;
+        }
+        if (file_exists($phpFile)) {
+            file_put_contents(dirname(dirname(__DIR__)) . '/debug_view_render.log', "Resolved to: $phpFile\n", FILE_APPEND);
+            return $phpFile;
+        }
 
+        file_put_contents(dirname(dirname(__DIR__)) . '/debug_view_render.log', "Failed to resolve: $view\n", FILE_APPEND);
         return null;
     }
 
