@@ -29,7 +29,7 @@ class MonitoringController
             'today' => $this->countLogsToday(),
         ];
 
-        // Get recent logs with pagination
+        // Pagination
         $page = $_GET['page'] ?? 1;
         $perPage = 20;
         $offset = ($page - 1) * $perPage;
@@ -38,13 +38,12 @@ class MonitoringController
         $totalLogs = $stats['total_logs'];
         $totalPages = ceil($totalLogs / $perPage);
 
-        // Render view
         echo $this->view->render('admin/monitoring/index', [
             'title' => 'Monitoring Dashboard',
             'stats' => $stats,
             'logs' => $logs,
             'currentPage' => $page,
-            'totalPages' => $totalPages
+            'totalPages' => $totalPages,
         ]);
     }
 
@@ -53,27 +52,28 @@ class MonitoringController
      */
     public function clear()
     {
-        // Check CSRF here if implemented
-
+        // CSRF check could be added here
         try {
             $this->db->query("TRUNCATE TABLE logs");
 
-            // Also clear file logs if needed
+            // Clear log files
             $files = glob(storage_path('logs/*.log'));
             foreach ($files as $file) {
                 file_put_contents($file, '');
             }
 
-            header('Location: /admin/monitoring?success=Logs cleared successfully');
+            // Flash success message
+            flash('success', 'Logs cleared successfully');
         } catch (\Exception $e) {
-            header('Location: /admin/monitoring?error=' . urlencode($e->getMessage()));
+            // Flash error message
+            flash('error', $e->getMessage());
         }
+
+        // Redirect back to monitoring page
+        header('Location: ' . url('/admin/monitoring'));
         exit;
     }
 
-    /**
-     * Get logs from database.
-     */
     protected function getLogs(int $limit, int $offset): array
     {
         try {
