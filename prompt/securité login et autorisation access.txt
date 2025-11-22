@@ -1,0 +1,63 @@
+Prompt :
+
+Créer un système d’authentification et de sécurité pour mon framework PHP personnalisé, inspiré de Laravel, avec les fonctionnalités suivantes :
+
+1. Gestion des utilisateurs et authentification :
+
+Système de login/logout sécurisé avec hash des mots de passe (bcrypt ou Argon2).
+
+Possibilité de gérer la réinitialisation du mot de passe et la vérification de l’email.
+
+Implémenter "remember me" et sessions sécurisées.
+
+2. Gestion des rôles et permissions :
+
+Chaque utilisateur peut avoir un ou plusieurs rôles.
+
+Chaque rôle contient plusieurs permissions.
+
+Possibilité de vérifier si un utilisateur peut effectuer une action via des méthodes can() et cannot().
+
+Gestion fine de l’accès aux routes et fonctionnalités selon les rôles et permissions.
+
+3. Middleware de sécurité :
+
+Middleware pour protéger les routes selon l’état de l’authentification.
+
+Middleware pour vérifier les permissions (can, cannot) avant l’accès à certaines routes.
+
+Redirection ou réponse JSON si l’utilisateur n’a pas les droits.
+
+4. Intégration dans le framework :
+
+Système modulaire, facilement attachable à n’importe quel module ou route du framework.
+
+Possibilité de déclarer les permissions et rôles via une migration ou un fichier de configuration.
+
+Exemple concret d’utilisation :
+
+Route::get('/admin', AdminController::class)->middleware('auth', 'can:manage-users');
+
+Dans le controller : $this->authorize('update-post', $post);
+
+5. Sécurité avancée :
+
+Protection CSRF sur tous les formulaires.
+
+Gestion des tentatives de login (throttling).
+
+Vérification des accès API via token JWT ou OAuth si nécessaire.
+
+Fournir également un exemple concret complet incluant :
+
+Migration pour utilisateurs, rôles, permissions
+
+Model User avec méthodes roles(), permissions(), can(), cannot()
+
+Middleware AuthMiddleware et PermissionMiddleware
+
+Exemple de controller sécurisé avec routes protégées
+
+Gestion des réponses JSON et redirections selon le contexte (web/API)
+
+Si tu veux, je peux te générer directement un exemple complet prêt à intégrer dans LathDevinci, avec User model, migration, middleware, gate can/cannot et routes protégées, tout dans un seul fichier ou un mini-module.

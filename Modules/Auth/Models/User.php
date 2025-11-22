@@ -36,4 +36,20 @@ class User extends Model
         }
         return false;
     }
+
+    /**
+     * Check if user has a permission via Gate
+     */
+    public function can(string $permission, $model = null): bool
+    {
+        return gate()->forUser($this)->allows($permission, $model);
+    }
+
+    /**
+     * Check if user does NOT have a permission via Gate
+     */
+    public function cannot(string $permission, $model = null): bool
+    {
+        return !$this->can($permission, $model);
+    }
 }

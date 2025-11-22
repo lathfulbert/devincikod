@@ -22,6 +22,7 @@ class Application
 
         // Load Helpers
         require_once __DIR__ . '/Support/helpers.php';
+        require_once __DIR__ . '/Support/authorization_helpers.php';
 
         // Load .env
         (new \App\Core\Support\DotEnv($basePath . '/.env'))->load();
@@ -77,6 +78,10 @@ class Application
 
         // Initialize I18n (Internationalization)
         \App\Core\I18n\Middleware\SetLocaleMiddleware::run();
+
+        // Register Authorization Middleware
+        $this->router->middleware('can', \App\Core\Middleware\PermissionMiddleware::class);
+        $this->router->middleware('role', \App\Core\Middleware\RoleMiddleware::class);
 
         $this->moduleManager->discover();
         try {
