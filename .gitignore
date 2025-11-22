@@ -1,9 +1,13 @@
+#IA
+.agent/
+
 # Vendor
 temp/
 /vendor/
 composer.lock
 
 # IDE
+
 .idea/
 .vscode/
 *.sublime-project

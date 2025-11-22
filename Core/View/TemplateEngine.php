@@ -58,6 +58,13 @@ class TemplateEngine
         $result = $this->compileIf($result);
         $result = $this->compileElse($result);
         $result = $this->compileEndif($result);
+        $result = $this->compileUnless($result);
+        $result = $this->compileIsset($result);
+        $result = $this->compileEmpty($result);
+        $result = $this->compileAuth($result);
+        $result = $this->compileGuest($result);
+        $result = $this->compileCan($result);
+        $result = $this->compileSwitch($result);
         $result = $this->compileForeach($result);
         $result = $this->compileEndforeach($result);
         $result = $this->compileFor($result);
@@ -92,8 +99,20 @@ class TemplateEngine
 
     protected function compileInclude(string $value): string
     {
-        // @include('view')
-        return preg_replace('/@include\s*\([\'"](.+?)[\'"]\)/', '<?php echo $this->make(\'$1\', get_defined_vars()); ?>', $value);
+        // Match @include('view', ['var' => 'value']) or @include('view')
+        $pattern = '/@include\s*\(\s*[\'"](.+?)[\'"]\s*(?:,\s*(\[.*?\]))?\s*\)/s';
+
+        return preg_replace_callback($pattern, function ($matches) {
+            $view = $matches[1];
+            $vars = $matches[2] ?? 'get_defined_vars()';
+
+            if ($vars !== 'get_defined_vars()') {
+                // Merge with current vars
+                return "<?php echo \$this->make('$view', array_merge(get_defined_vars(), $vars)); ?>";
+            }
+
+            return "<?php echo \$this->make('$view', get_defined_vars()); ?>";
+        }, $value);
     }
 
     /**
@@ -198,6 +217,111 @@ class TemplateEngine
     protected function compilePhp(string $value): string
     {
         return preg_replace('/\B@php/', '<?php', $value);
+    }
+
+    /**
+     * Compile @unless statements.
+     */
+    protected function compileUnless(string $value): string
+    {
+        $value = preg_replace('/\B@unless\s*\((.*)\)/', '<?php if(!($1)): ?>', $value);
+        $value = preg_replace('/\B@endunless/', '<?php endif; ?>', $value);
+        return $value;
+    }
+
+    /**
+     * Compile @isset statements.
+     */
+    protected function compileIsset(string $value): string
+    {
+        $value = preg_replace('/\B@isset\s*\((.*)\)/', '<?php if(isset($1)): ?>', $value);
+        $value = preg_replace('/\B@endisset/', '<?php endif; ?>', $value);
+        return $value;
+    }
+
+    /**
+     * Compile @empty statements.
+     */
+    protected function compileEmpty(string $value): string
+    {
+        $value = preg_replace('/\B@empty\s*\((.*)\)/', '<?php if(empty($1)): ?>', $value);
+        $value = preg_replace('/\B@endempty/', '<?php endif; ?>', $value);
+        return $value;
+    }
+
+    /**
+     * Compile @auth statements.
+     */
+    protected function compileAuth(string $value): string
+    {
+        $value = preg_replace('/\B@auth/', '<?php if(auth()->check()): ?>', $value);
+        $value = preg_replace('/\B@endauth/', '<?php endif; ?>', $value);
+        return $value;
+    }
+
+    /**
+     * Compile @guest statements.
+     */
+    protected function compileGuest(string $value): string
+    {
+        $value = preg_replace('/\B@guest/', '<?php if(!auth()->check()): ?>', $value);
+        $value = preg_replace('/\B@endguest/', '<?php endif; ?>', $value);
+        return $value;
+    }
+
+    /**
+     * Compile @can statements.
+     */
+    protected function compileCan(string $value): string
+    {
+        // @can('permission', $model)
+        $value = preg_replace_callback(
+            '/\B@can\s*\(\s*[\'"](.+?)[\'"]\s*(?:,\s*(.+?))?\s*\)/',
+            function ($matches) {
+                $permission = $matches[1];
+                $model = $matches[2] ?? 'null';
+                return "<?php if(can('$permission', $model)): ?>";
+            },
+            $value
+        );
+        $value = preg_replace('/\B@endcan/', '<?php endif; ?>', $value);
+
+        // @cannot('permission', $model)
+        $value = preg_replace_callback(
+            '/\B@cannot\s*\(\s*[\'"](.+?)[\'"]\s*(?:,\s*(.+?))?\s*\)/',
+            function ($matches) {
+                $permission = $matches[1];
+                $model = $matches[2] ?? 'null';
+                return "<?php if(!can('$permission', $model)): ?>";
+            },
+            $value
+        );
+        $value = preg_replace('/\B@endcannot/', '<?php endif; ?>', $value);
+
+        return $value;
+    }
+
+    /**
+     * Compile @switch statements.
+     */
+    protected function compileSwitch(string $value): string
+    {
+        // @switch($variable)
+        $value = preg_replace('/\B@switch\s*\((.*)\)/', '<?php switch($1): ?>', $value);
+
+        // @case(value)
+        $value = preg_replace('/\B@case\s*\((.*)\)/', '<?php case $1: ?>', $value);
+
+        // @break
+        $value = preg_replace('/\B@break/', '<?php break; ?>', $value);
+
+        // @default
+        $value = preg_replace('/\B@default/', '<?php default: ?>', $value);
+
+        // @endswitch
+        $value = preg_replace('/\B@endswitch/', '<?php endswitch; ?>', $value);
+
+        return $value;
     }
 
     /**

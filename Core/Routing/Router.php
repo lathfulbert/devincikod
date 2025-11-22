@@ -7,6 +7,13 @@ class Router
     protected array $routes = [];
     protected string $currentPrefix = '';
     protected array $currentMiddleware = [];
+    protected ?string $currentRouteName = null;
+    protected array $middlewareAliases = [];
+
+    public function middleware(string $alias, string $class): void
+    {
+        $this->middlewareAliases[$alias] = $class;
+    }
 
     public function get(string $path, callable|array $handler, array $middleware = []): void
     {
@@ -34,9 +41,46 @@ class Router
             $match = $this->matchRoute($route['path'], $uri);
 
             if ($route['method'] === $method && $match !== false) {
+                // Store current route name for helper functions
+                $this->currentRouteName = $route['name'] ?? null;
+
                 // Handle Middleware
                 if (isset($route['middleware']) && !empty($route['middleware'])) {
                     foreach ($route['middleware'] as $middleware) {
+
+                        // Handle string middleware (alias with parameters support)
+                        if (is_string($middleware)) {
+                            $params = [];
+                            if (strpos($middleware, ':') !== false) {
+                                [$name, $paramStr] = explode(':', $middleware, 2);
+                                $params = explode(',', $paramStr);
+                            } else {
+                                $name = $middleware;
+                            }
+
+                            if (isset($this->middlewareAliases[$name])) {
+                                $className = $this->middlewareAliases[$name];
+                                if (class_exists($className)) {
+                                    $instance = new $className();
+                                    if (method_exists($instance, 'handle')) {
+                                        // Create simple request object/array
+                                        $request = $_REQUEST;
+                                        $next = function ($req) {
+                                            return true;
+                                        };
+
+                                        $result = $instance->handle($request, $next, ...$params);
+
+                                        // If middleware returns response (not true/null), stop dispatch
+                                        if ($result !== true && $result !== null) {
+                                            return;
+                                        }
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+
                         if (is_callable($middleware)) {
                             if (!$middleware()) {
                                 return; // Middleware blocked request
@@ -241,5 +285,15 @@ class Router
     public function getRoutes(): array
     {
         return $this->routes;
+    }
+
+    /**
+     * Get the current route name.
+     * 
+     * @return string|null
+     */
+    public function currentRouteName(): ?string
+    {
+        return $this->currentRouteName;
     }
 }

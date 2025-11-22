@@ -53,6 +53,25 @@ if (!function_exists('app')) {
     }
 }
 
+if (!function_exists('auth')) {
+    /**
+     * Get the Auth instance.
+     * 
+     * @return \App\Core\Auth\Auth
+     */
+    function auth(): \App\Core\Auth\Auth
+    {
+        static $auth = null;
+
+        if ($auth === null) {
+            $auth = new \App\Core\Auth\Auth();
+        }
+
+        return $auth;
+    }
+}
+
+
 if (!function_exists('config')) {
     /**
      * Get / set the specified configuration value.
@@ -172,6 +191,128 @@ if (!function_exists('redirect')) {
     }
 }
 
+/*
+|--------------------------------------------------------------------------
+| Route Helpers
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('route')) {
+    /**
+     * Generate a URL for a named route.
+     * 
+     * @param string $name Route name
+     * @param array $params Route parameters
+     * @return string Generated URL
+     */
+    function route(string $name, array $params = []): string
+    {
+        return app()->router->route($name, $params);
+    }
+}
+
+if (!function_exists('current_route_name')) {
+    /**
+     * Get the current route name.
+     * 
+     * @return string|null Current route name or null
+     */
+    function current_route_name(): ?string
+    {
+        return app()->router->currentRouteName();
+    }
+}
+
+if (!function_exists('is_active_route')) {
+    /**
+     * Check if the given route name matches the current route.
+     * 
+     * @param string|array $routeNames Route name(s) to check
+     * @param string $activeClass CSS class to return if active
+     * @return string Active class or empty string
+     */
+    function is_active_route(string|array $routeNames, string $activeClass = 'active'): string
+    {
+        $currentRoute = current_route_name();
+
+        if (!$currentRoute) {
+            return '';
+        }
+
+        $routeNames = (array) $routeNames;
+
+        foreach ($routeNames as $routeName) {
+            // Exact match
+            if ($currentRoute === $routeName) {
+                return $activeClass;
+            }
+
+            // Support wildcard matching (e.g., 'admin.*')
+            if (str_ends_with($routeName, '.*')) {
+                $prefix = substr($routeName, 0, -2);
+                if (str_starts_with($currentRoute, $prefix . '.')) {
+                    return $activeClass;
+                }
+            }
+        }
+
+        return '';
+    }
+}
+
+if (!function_exists('can')) {
+    /**
+     * Check if the current user has a given permission.
+     * 
+     * @param string $permission Permission name
+     * @param mixed $model Optional model instance
+     * @return bool
+     */
+    function can(string $permission, $model = null): bool
+    {
+        // Check if auth system exists
+        if (!function_exists('auth')) {
+            return false;
+        }
+
+        $user = auth()->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        // If user is an object with can() method, use it
+        if (is_object($user) && method_exists($user, 'can')) {
+            return $user->can($permission, $model);
+        }
+
+        // If user is an object with hasPermission() method, use it
+        if (is_object($user) && method_exists($user, 'hasPermission')) {
+            return $user->hasPermission($permission);
+        }
+
+        // If user is an object, check if admin
+        if (is_object($user) && method_exists($user, 'isAdmin') && $user->isAdmin()) {
+            return true;
+        }
+
+        // If user is an array, check role
+        if (is_array($user)) {
+            // Check if user is admin (array format)
+            if (isset($user['role']) && $user['role'] === 'admin') {
+                return true;
+            }
+
+            // Check if user has permission in permissions array
+            if (isset($user['permissions']) && is_array($user['permissions'])) {
+                return in_array($permission, $user['permissions']);
+            }
+        }
+
+        return false;
+    }
+}
+
 if (!function_exists('current_url')) {
     /**
      * Get the current URL.
@@ -182,6 +323,7 @@ if (!function_exists('current_url')) {
         return $protocol . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
     }
 }
+
 
 /*
 |--------------------------------------------------------------------------
