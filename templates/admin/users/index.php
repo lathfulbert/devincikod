@@ -50,11 +50,11 @@ component('breadcrumb');
                             </td>
                             <td>
                                 <?php
-                                $roles = $user->roles()->getResults();
-                                $roleNames = array_map(fn($r) => $r->name, $roles);
-                                if (!empty($roleNames)) {
-                                    foreach ($roleNames as $roleName) {
-                                        echo '<span class="badge bg-primary me-1">' . htmlspecialchars($roleName) . '</span>';
+                                // Use eager loaded roles (no N+1 problem!)
+                                $roles = $user->roles ?? [];
+                                if (!empty($roles)) {
+                                    foreach ($roles as $role) {
+                                        echo '<span class="badge bg-primary me-1">' . htmlspecialchars($role->name) . '</span>';
                                     }
                                 } else {
                                     echo '<span class="text-muted">Aucun rôle</span>';

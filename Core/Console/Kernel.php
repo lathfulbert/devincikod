@@ -166,7 +166,8 @@ class Kernel
             // Get executed migrations
             $executedMigrations = $db->query("SELECT migration FROM migrations")->fetchAll(\PDO::FETCH_COLUMN);
 
-            $modules = $this->app->moduleManager->getModules();
+            // Use getAllModules() to include all discovered modules, not just enabled ones
+            $modules = $this->app->moduleManager->getAllModules();
 
             foreach ($modules as $module) {
                 $moduleName = $module->getName();
@@ -200,8 +201,14 @@ class Kernel
                                 echo "  ✓ Migrated: {$className}\n";
                             }
                         } catch (\Exception $e) {
-                            echo "  ✗ Error migrating {$className}: " . $e->getMessage() . "\n";
-                            echo "  Stack trace:\n" . $e->getTraceAsString() . "\n";
+                            // Check if error is "Table already exists"
+                            if (strpos($e->getMessage(), 'already exists') !== false || strpos($e->getMessage(), '42S01') !== false) {
+                                echo "  ⚠️  Table already exists. Marking migration as executed: {$className}\n";
+                                $db->query("INSERT INTO migrations (migration) VALUES (?)", [$className]);
+                            } else {
+                                echo "  ✗ Error migrating {$className}: " . $e->getMessage() . "\n";
+                                echo "  Stack trace:\n" . $e->getTraceAsString() . "\n";
+                            }
                         }
                     }
                 }

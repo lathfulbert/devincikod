@@ -71,4 +71,36 @@ class BelongsToMany extends Relation
         $this->detach();
         $this->attach($ids);
     }
+
+    /**
+     * Get the pivot table name.
+     */
+    public function getPivotTable(): string
+    {
+        return $this->table;
+    }
+
+    /**
+     * Get the foreign pivot key.
+     */
+    public function getForeignPivotKey(): string
+    {
+        return $this->foreignPivotKey;
+    }
+
+    /**
+     * Get the related pivot key.
+     */
+    public function getRelatedPivotKey(): string
+    {
+        return $this->relatedPivotKey;
+    }
+
+    /**
+     * Get the related model instance.
+     */
+    public function getRelated(): Model
+    {
+        return $this->related;
+    }
 }

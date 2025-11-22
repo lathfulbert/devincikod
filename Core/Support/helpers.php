@@ -854,3 +854,86 @@ if (!function_exists('is_locale_supported')) {
         return App\Core\I18n\LanguageManager::getInstance()->isLocaleSupported($locale);
     }
 }
+
+/*
+|--------------------------------------------------------------------------
+| Logging Helpers
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('logger')) {
+    /**
+     * Get a logger instance.
+     *
+     * @param string|null $channel
+     * @return \App\Core\Logging\LoggerInterface|\App\Core\Logging\LogManager
+     */
+    function logger(?string $channel = null)
+    {
+        $logManager = \App\Core\Application::getInstance()->make('log');
+
+        return $channel ? $logManager->channel($channel) : $logManager;
+    }
+}
+
+if (!function_exists('logs')) {
+    /**
+     * Alias for logger().
+     *
+     * @param string|null $channel
+     * @return \App\Core\Logging\LoggerInterface|\App\Core\Logging\LogManager
+     */
+    function logs(?string $channel = null)
+    {
+        return logger($channel);
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Path Helpers
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('storage_path')) {
+    /**
+     * Get the path to the storage folder.
+     *
+     * @param string $path
+     * @return string
+     */
+    function storage_path(string $path = ''): string
+    {
+        $basePath = dirname(dirname(__DIR__)) . '/storage';
+
+        return $path ? $basePath . '/' . ltrim($path, '/') : $basePath;
+    }
+}
+
+if (!function_exists('logs_path')) {
+    /**
+     * Get the path to the logs folder.
+     *
+     * @param string $path
+     * @return string
+     */
+    function logs_path(string $path = ''): string
+    {
+        return storage_path('logs' . ($path ? '/' . ltrim($path, '/') : ''));
+    }
+}
+
+if (!function_exists('database_path')) {
+    /**
+     * Get the path to the database folder.
+     *
+     * @param string $path
+     * @return string
+     */
+    function database_path(string $path = ''): string
+    {
+        $basePath = dirname(dirname(__DIR__)) . '/database';
+
+        return $path ? $basePath . '/' . ltrim($path, '/') : $basePath;
+    }
+}
