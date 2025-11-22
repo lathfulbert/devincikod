@@ -165,67 +165,90 @@
                     </div>
                     <div class="logo-icon-wrapper">
                         <a href="<?= url('/admin/dashboard') ?>">
-                            <!-- Sidebar End -->
-
-                            <!-- Page Content Start -->
-                            <div class="page-body">
-                                <!-- Container-fluid Start -->
-                                <div class="container-fluid">
-                                    @yield('content')
-                                </div>
-                                <!-- Container-fluid End -->
-                            </div>
-                            <!-- Page Content End -->
-
-                            <!-- Footer Start -->
-                            <footer class="footer">
-                                <div class="container-fluid">
-                                    <div class="row">
-                                        <div class="col-md-6 p-0 footer-copyright">
-                                            <p class="mb-0">Copyright © 2024 SunuFramework. Tous droits réservés.</p>
-                                        </div>
-                                        <div class="col-md-6 p-0">
-                                            <p class="heart mb-0 text-end">Développé avec <i class="fa fa-heart font-danger"></i></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </footer>
-                            <!-- Footer End -->
+                            <img class="img-fluid" src="<?= url('/assets/images/logo/logo-icon.png') ?>" alt="">
+                        </a>
                     </div>
-                    <!-- Page Body End -->
+                    <nav class="sidebar-main">
+                        <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
+                        <div id="sidebar-menu">
+                            <ul class="sidebar-links" id="simple-bar">
+                                <li class="back-btn">
+                                    <a href="<?= url('/admin/dashboard') ?>">
+                                        <img class="img-fluid" src="<?= url('/assets/images/logo/logo-icon.png') ?>" alt="">
+                                    </a>
+                                    <div class="mobile-back text-end">
+                                        <span>Retour</span><i class="fa fa-angle-right ps-2" aria-hidden="true"></i>
+                                    </div>
+                                </li>
+
+                                <?php \App\Core\View\SidebarService::render(); ?>
+                            </ul>
+                        </div>
+                        <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
+                    </nav>
                 </div>
-                <!-- Page Body End -->
+            </div>
+            <!-- Sidebar End -->
 
-                <!-- jQuery -->
-                <script src="<?= url('/assets/js/jquery-3.5.1.min.js') ?>"></script>
+            <!-- Page Content Start -->
+            <div class="page-body">
+                <!-- Container-fluid Start -->
+                <div class="container-fluid">
+                    @yield('content')
+                </div>
+                <!-- Container-fluid End -->
+            </div>
+            <!-- Page Content End -->
 
-                <!-- Bootstrap -->
-                <script src="<?= url('/assets/js/bootstrap/bootstrap.bundle.min.js') ?>"></script>
+            <!-- Footer Start -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-6 p-0 footer-copyright">
+                            <p class="mb-0">Copyright © 2024 SunuFramework. Tous droits réservés.</p>
+                        </div>
+                        <div class="col-md-6 p-0">
+                            <p class="heart mb-0 text-end">Développé avec <i class="fa fa-heart font-danger"></i></p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+            <!-- Footer End -->
+        </div>
+        <!-- Page Body End -->
+    </div>
+    <!-- Page Body End -->
 
-                <!-- Feather Icons -->
-                <script src="<?= url('/assets/js/icons/feather-icon/feather.min.js') ?>"></script>
-                <script src="<?= url('/assets/js/icons/feather-icon/feather-icon.js') ?>"></script>
+    <!-- jQuery -->
+    <script src="<?= url('/assets/js/jquery-3.5.1.min.js') ?>"></script>
 
-                <!-- Sidebar -->
-                <script src="<?= url('/assets/js/sidebar-menu.js') ?>"></script>
+    <!-- Bootstrap -->
+    <script src="<?= url('/assets/js/bootstrap/bootstrap.bundle.min.js') ?>"></script>
 
-                <!-- Config -->
-                <script src="<?= url('/assets/js/config.js') ?>"></script>
+    <!-- Feather Icons -->
+    <script src="<?= url('/assets/js/icons/feather-icon/feather.min.js') ?>"></script>
+    <script src="<?= url('/assets/js/icons/feather-icon/feather-icon.js') ?>"></script>
 
-                <!-- DataTables (si nécessaire) -->
-                <?php if (isset($datatable) && $datatable): ?>
-                    <script src="<?= url('/assets/js/datatable/datatables/jquery.dataTables.min.js') ?>"></script>
-                    <script src="<?= url('/assets/js/datatable/datatables/datatable.custom.js') ?>"></script>
-                <?php endif; ?>
+    <!-- Sidebar -->
+    <script src="<?= url('/assets/js/sidebar-menu.js') ?>"></script>
 
-                <!-- Custom Script -->
-                <script src="<?= url('/assets/js/script.js') ?>"></script>
+    <!-- Config -->
+    <script src="<?= url('/assets/js/config.js') ?>"></script>
 
-                <!-- Scripts additionnels par page -->
-                @yield('scripts')
+    <!-- DataTables (si nécessaire) -->
+    <?php if (isset($datatable) && $datatable): ?>
+        <script src="<?= url('/assets/js/datatable/datatables/jquery.dataTables.min.js') ?>"></script>
+        <script src="<?= url('/assets/js/datatable/datatables/datatable.custom.js') ?>"></script>
+    <?php endif; ?>
 
-                <!-- Theme Customizer (optionnel) -->
-                <!-- <script src="<?= url('/assets/js/theme-customizer/customizer.js') ?>"></script> -->
+    <!-- Custom Script -->
+    <script src="<?= url('/assets/js/script.js') ?>"></script>
+
+    <!-- Scripts additionnels par page -->
+    @yield('scripts')
+
+    <!-- Theme Customizer (optionnel) -->
+    <!-- <script src="<?= url('/assets/js/theme-customizer/customizer.js') ?>"></script> -->
 </body>
 
 </html>
