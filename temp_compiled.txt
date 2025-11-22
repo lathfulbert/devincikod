@@ -10,12 +10,12 @@
     <meta name="author" content="pixelstrap">
     <link rel="icon" href="<?= url('/assets/images/favicon.png') ?>" type="image/x-icon">
     <link rel="shortcut icon" href="<?= url('/assets/images/logo/favicon.png') ?>" type="image/x-icon">
-    <title>@yield('title')</title>
+    <title><?= $this->yieldSection('title') ?></title>
     <!-- Google font-->
     <link href="https://fonts.googleapis.com/css?family=Rubik:400,400i,500,500i,700,700i&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i,900&amp;display=swap" rel="stylesheet">
     <!-- css -->
-       @include('backend.layouts.css')  
+       <?php echo $this->make('backend.layouts.css', get_defined_vars()); ?>  
     
 </head>
 
@@ -41,7 +41,7 @@
     <div class="page-wrapper compact-wrapper" id="pageWrapper">
 
         <!-- Header Start -->
-         @include('backend.layouts.header')
+         <?php echo $this->make('backend.layouts.header', get_defined_vars()); ?>
  
         <!--Header End  -->
 
@@ -49,24 +49,24 @@
         <div class="page-body-wrapper">
 
             <!-- Page Sidebar Start-->
-            @include('backend.layouts.sidebar')
+            <?php echo $this->make('backend.layouts.sidebar', get_defined_vars()); ?>
             <!-- Page Sidebar Ends-->
 
             <div class="page-body">
                 <!-- Main Content Start -->
-                 @yield('content')
+                 <?= $this->yieldSection('content') ?>
                
                 <!-- Main Content End -->
             </div>
 
             <!-- Footer -->
-            @include('backend.layouts.footer')
+            <?php echo $this->make('backend.layouts.footer', get_defined_vars()); ?>
 
         </div>
     </div>
 
     <!-- Script-->
-     @include('layouts.script')
+     <?php echo $this->make('layouts.script', get_defined_vars()); ?>
 
      
   
