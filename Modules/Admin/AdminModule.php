@@ -108,6 +108,8 @@ class AdminModule extends AbstractModule
 
     public function getApiRoutes(): array
     {
-        return [];
+        return [
+            ['GET', '/users/datatable', [\Modules\Admin\Controllers\UserApiController::class, 'datatable']],
+        ];
     }
 }
