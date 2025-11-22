@@ -85,6 +85,40 @@ class QueryBuilder
         return $result->count;
     }
 
+    /**
+     * Paginate the given query.
+     *
+     * @param int $perPage
+     * @param int|null $currentPage
+     * @return \App\Core\Database\Pagination\LengthAwarePaginator
+     */
+    public function paginate(int $perPage = 15, ?int $currentPage = null)
+    {
+        // Get total count
+        $total = $this->count();
+
+        // Get current page
+        $currentPage = $currentPage ?: ($_GET['page'] ?? 1);
+        $currentPage = max(1, (int) $currentPage);
+
+        // Calculate offset
+        $offset = ($currentPage - 1) * $perPage;
+
+        // Clone the current query and apply limit/offset
+        $this->limit($perPage)->offset($offset);
+
+        // Get the items
+        $items = $this->get();
+
+        // Return paginator
+        return new \App\Core\Database\Pagination\LengthAwarePaginator(
+            $items,
+            $total,
+            $perPage,
+            $currentPage
+        );
+    }
+
     public function toSql()
     {
         $sql = "SELECT {$this->select} FROM {$this->table}";

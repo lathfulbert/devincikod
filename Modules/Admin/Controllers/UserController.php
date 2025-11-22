@@ -12,7 +12,7 @@ class UserController
     public function index()
     {
         $app = Application::getInstance();
-        $users = User::all();
+        $users = User::query()->orderBy('id', 'DESC')->paginate(10);
         echo $app->view->render('admin/users/index', ['title' => 'Users', 'users' => $users]);
     }
 
