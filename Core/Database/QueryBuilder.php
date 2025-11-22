@@ -119,6 +119,23 @@ class QueryBuilder
         );
     }
 
+    /**
+     * Create a DataTables builder for server-side processing.
+     *
+     * @param array $columns Searchable/orderable column names
+     * @return \App\Core\Database\Pagination\DatatablesBuilder
+     */
+    public function datatables(array $columns = [])
+    {
+        $builder = new \App\Core\Database\Pagination\DatatablesBuilder($this);
+
+        if (!empty($columns)) {
+            $builder->setColumns($columns);
+        }
+
+        return $builder;
+    }
+
     public function toSql()
     {
         $sql = "SELECT {$this->select} FROM {$this->table}";
