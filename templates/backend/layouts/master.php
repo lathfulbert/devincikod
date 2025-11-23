@@ -16,13 +16,10 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i,900&amp;display=swap" rel="stylesheet">
     <!-- css -->
     @include('backend.layouts.css')
-      <!-- Vite Assets -->
-    <?= vite('resources/css/app.css') ?>
-    <?= vite('resources/js/app.js') ?>
 
 </head>
 
-<body >
+<body onload="startTime()">
     <!-- loader starts-->
     <div class="loader-wrapper">
         <div class="loader-index"><span></span></div>
@@ -70,6 +67,8 @@
 
     <!-- Script-->
     @include('backend.layouts.script')
+
+    @include('backend.inc.alerts')
 
 
 
