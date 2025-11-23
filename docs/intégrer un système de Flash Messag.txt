@@ -1,0 +1,171 @@
+ intégrer un système de Flash Messages (succès, erreurs, échecs) dans mon framework , inspiré de Laravel et Symfony.
+
+Ajouter des exports Excel/PDF
+
+✅ Prompt : Système de gestion des Flash Messages (success, error, warning, info) 
+
+Mets en place dans le Core de mon framework  un système complet de Flash Messages, géré via la session, permettant d’afficher des retours après les soumissions de formulaires ou des actions du système.
+Le système doit être modulaire, propre, inspiré de Laravel/CodeIgniter/Symfony, avec une API simple.
+
+🎯 Objectifs du système
+
+Gestion de plusieurs types de messages :
+
+success
+
+error
+
+warning
+
+info
+
+Stockage automatique dans la Session et suppression après affichage (flash).
+
+API simple côté PHP :
+
+flash()->success("Utilisateur créé avec succès.");
+flash()->error("Échec de l'opération.");
+flash()->warning("Attention, champ manquant.");
+flash()->info("Information mise à jour.");
+
+
+Alias simple également :
+
+Flash::success("...");
+
+
+Récupération côté vue :
+
+<?= flash()->display(); ?>
+
+
+Possibilité de styler automatiquement avec Bootstrap, Tailwind ou un système custom.
+
+Extensible à d'autres types de notifications (toast, popup JS…).
+
+Le système doit être intégré dans le Core du framework :
+
+Core/Flash/
+
+Core/Flash/Flash.php (classe principale)
+
+Core/Flash/FlashServiceProvider.php
+
+Core/Session/Session.php (si nécessaire)
+
+Helper global : flash() → instance du gestionnaire
+
+Ajouter une méthode pour vérifier :
+
+if (flash()->has('error')) { ... }
+
+
+Le système clean automatiquement les messages après leur affichage.
+
+📁 Structure demandée
+Core/
+ ├── Flash/
+ │    ├── Flash.php
+ │    ├── FlashServiceProvider.php
+ │
+ └── Session/
+      └── Session.php
+helpers/
+ └── flash.php
+
+🧩 Contenu attendu
+1. Classe Flash.php
+
+Propriétés : types autorisés, clefs de session
+
+Méthodes :
+
+success($message)
+
+error($message)
+
+warning($message)
+
+info($message)
+
+add($type, $message)
+
+get($type)
+
+all()
+
+has($type)
+
+clear()
+
+display() → retourne du HTML Bootstrap/Tailwind
+
+2. Session.php
+
+Méthodes nécessaires :
+
+set()
+
+get()
+
+flash()
+
+remove()
+
+3. FlashServiceProvider
+
+Enregistrer automatiquement le service Flash dans le container
+
+Rendre accessible via app('flash') ou flash()
+
+4. Helper flash()
+
+Retourne l’instance du gestionnaire
+
+5. Exemple concret d’utilisation
+
+Exemple de contrôleur qui renvoie un succès
+
+Exemple d’une erreur de validation
+
+Exemple HTML d'affichage
+
+Exemple JS si tu veux ajouter des toasts (optionnel)
+
+🎨 Style d’affichage demandé
+
+Prévoir deux options :
+
+Option A : Bootstrap
+<div class="alert alert-success">...</div>
+<div class="alert alert-danger">...</div>
+
+Option B : Tailwind
+<div class="p-4 mb-2 text-green-800 bg-green-100 rounded">...</div>
+<div class="p-4 mb-2 text-red-800 bg-red-100 rounded">...</div>
+
+
+Choisir automatiquement en fonction de la configuration :
+
+config/ui.php → 'flash_style' => 'bootstrap' | 'tailwind'
+
+🧪 Tests attendus
+
+Créer un exemple de test unitaire simple pour vérifier :
+
+L’ajout d’un message
+
+La récupération
+
+La suppression automatique après affichage
+
+💬 Résumé
+
+Le système doit être simple, propre, modulaire, intégré dans le core, compatible avec les vues, extensible, et inspiré des meilleurs frameworks (Laravel, Symfony, CodeIgniter).
+
+Si tu veux, je peux maintenant :
+
+✅ Générer le code complet
+✅ Créer le package Composer
+✅ Créer la doc Markdown
+✅ L’intégrer à ton Core actuel framework
