@@ -22,10 +22,13 @@ class AdminModule extends AbstractModule
 
             // Module Management
             ['GET', '/admin/modules', [\Modules\Admin\Controllers\ModuleController::class, 'index'], [$authMiddleware]],
+            ['GET', '/admin/modules/upload', [\Modules\Admin\Controllers\ModuleController::class, 'upload'], [$authMiddleware]],
+            ['POST', '/admin/modules/process-upload', [\Modules\Admin\Controllers\ModuleController::class, 'processUpload'], [$authMiddleware]],
             ['POST', '/admin/modules/enable', [\Modules\Admin\Controllers\ModuleController::class, 'enable'], [$authMiddleware]],
             ['POST', '/admin/modules/disable', [\Modules\Admin\Controllers\ModuleController::class, 'disable'], [$authMiddleware]],
             ['POST', '/admin/modules/install', [\Modules\Admin\Controllers\ModuleController::class, 'install'], [$authMiddleware]],
             ['POST', '/admin/modules/uninstall', [\Modules\Admin\Controllers\ModuleController::class, 'uninstall'], [$authMiddleware]],
+            ['POST', '/admin/modules/{name}/delete', [\Modules\Admin\Controllers\ModuleController::class, 'delete'], [$authMiddleware]],
 
             // Users Management
             ['GET', '/admin/users', [\Modules\Admin\Controllers\UserController::class, 'index'], [$authMiddleware]],
