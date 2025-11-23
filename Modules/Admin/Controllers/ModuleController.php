@@ -41,7 +41,7 @@ class ModuleController
             ];
         }
 
-        echo $app->view->render('admin/modules/index', [
+        echo $app->view->render('backend/modules/index', [
             'title' => 'Gestion des Modules',
             'modules' => $viewData
         ]);

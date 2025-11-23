@@ -13,14 +13,14 @@ class RoleController
     {
         $app = Application::getInstance();
         $roles = Role::all();
-        echo $app->view->render('admin/roles/index', ['title' => 'Roles', 'roles' => $roles]);
+        echo $app->view->render('backend/roles/index', ['title' => 'Roles', 'roles' => $roles]);
     }
 
     public function create()
     {
         $app = Application::getInstance();
         $permissions = Permission::all();
-        echo $app->view->render('admin/roles/create', ['title' => 'Create Role', 'permissions' => $permissions]);
+        echo $app->view->render('backend/roles/create', ['title' => 'Create Role', 'permissions' => $permissions]);
     }
 
     public function store()
@@ -61,7 +61,7 @@ class RoleController
         $rolePermissions = $role->permissions()->getResults();
         $rolePermissionIds = array_map(fn($p) => $p->id, $rolePermissions);
 
-        echo $app->view->render('admin/roles/edit', [
+        echo $app->view->render('backend/roles/edit', [
             'title' => 'Edit Role',
             'role' => $role,
             'permissions' => $permissions,
