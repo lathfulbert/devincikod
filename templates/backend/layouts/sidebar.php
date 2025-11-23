@@ -65,22 +65,22 @@
                             </svg><span class="lan">Laravel Example</span></a>
                         <ul class="sidebar-submenu">
                             @can('role.index')
-                                <li><a href="{{ route('admin.role.index') }}">Role Management</a></li>
+                            <li><a href="{{ route('admin.role.index') }}">Role Management</a></li>
                             @endcan
                             @can('user.index')
-                                <li><a  href="{{ route('admin.user.index') }}">User Management</a></li>
+                            <li><a href="{{ route('admin.user.index') }}">User Management</a></li>
                             @endcan
                             @can('blog.index')
-                                <li><a href="{{ route('admin.blog.index') }}">Blog Management</a></li>
+                            <li><a href="{{ route('admin.blog.index') }}">Blog Management</a></li>
                             @endcan
                             @can('category.index')
-                                <li><a href="{{ route('admin.category.index') }}">Category Management</a></li>
+                            <li><a href="{{ route('admin.category.index') }}">Category Management</a></li>
                             @endcan
                             @can('tag.index')
-                                <li><a href="{{ route('admin.tag.index') }}">Tag Management</a></li>
+                            <li><a href="{{ route('admin.tag.index') }}">Tag Management</a></li>
                             @endcan
                             @can('page.index')
-                                <li><a href="{{ route('admin.page.index') }}">Page Management</a></li>
+                            <li><a href="{{ route('admin.page.index') }}">Page Management</a></li>
                             @endcan
                         </ul>
                     </li>
@@ -127,6 +127,19 @@
                                     href="{{ route('admin.details_project') }}">Project Details</a></li>
                             <li><a href="{{ route('admin.list_project') }}">Project List</a></li>
                             <li><a href="{{ route('admin.create_project') }}">Create new</a></li>
+                        </ul>
+                    </li>
+                    <li class="sidebar-list"><i class="fa-solid fa-thumbtack"> </i><a
+                            class="sidebar-link sidebar-title" href="javascript:void(0)"><svg class="stroke-icon">
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-learning') }}"></use>
+                            </svg><svg class="fill-icon">
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#fill-learning') }}"></use>
+                            </svg><span>AI Module</span></a>
+                        <ul class="sidebar-submenu">
+                            <li><a href="/admin/ai">Dashboard</a></li>
+                            <li><a href="/admin/ai/test">Test AI</a></li>
+                            <li><a href="/admin/ai/logs">Logs</a></li>
+                            <li><a href="/admin/ai/settings">Settings</a></li>
                         </ul>
                     </li>
                     <li class="sidebar-list"><i class="fa-solid fa-thumbtack"></i><a
@@ -625,7 +638,8 @@
                             <li><a href="{{ route('admin.masonry_gallery_with_disc') }}">Masonry with Desc</a></li>
                             <li><a href="{{ route('admin.gallery_hover') }}">Hover Effects</a></li>
                             <li>
-                            <label class="badge badge-light-success">New</label><a href="{{ route('admin.gallery_placeholder') }}">Gallery Placeholder</a></li>
+                                <label class="badge badge-light-success">New</label><a href="{{ route('admin.gallery_placeholder') }}">Gallery Placeholder</a>
+                            </li>
                         </ul>
                     </li>
                     <li class="sidebar-list"><i class="fa-solid fa-thumbtack"></i><a
