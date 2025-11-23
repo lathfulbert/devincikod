@@ -1,5 +1,5 @@
 <!-- font awesome -->
-<link rel="stylesheet" type="text/css" href="<?= url() ?>/assets/css/font-awesome.css">
+<link rel="stylesheet" type="text/css" href="<?= url() ?>/assets/css/fontawesome.css">
 <!-- ico-font-->
 <link rel="stylesheet" type="text/css" href="<?= url() ?>/assets/css/vendors/icofont.css">
 <!-- Themify icon-->
