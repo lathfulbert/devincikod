@@ -25,19 +25,31 @@ class AIController
         $settings = $registry->getSettings('AI');
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $defaultModel = $_POST['default_model'] ?? 'gpt-3.5-turbo';
-            $apiKey = $_POST['openai_api_key'] ?? '';
+            try {
+                $defaultModel = $_POST['default_model'] ?? 'gpt-3.5-turbo';
+                $apiKey = $_POST['openai_api_key'] ?? '';
 
-            // Save model to module settings
-            $settings['default_model'] = $defaultModel;
-            $registry->updateSettings('AI', $settings);
+                // Save model to module settings
+                $settings['default_model'] = $defaultModel;
+                $registry->updateSettings('AI', $settings);
 
-            // Update .env for API Key if provided and different
-            if (!empty($apiKey) && $apiKey !== '****************') {
-                $this->updateEnv('OPENAI_API_KEY', $apiKey);
+                // Update .env for API Key if provided and different
+                if (!empty($apiKey) && $apiKey !== '****************') {
+                    $this->updateEnv('OPENAI_API_KEY', $apiKey);
+
+                    // Reinitialize AIManager with new key
+                    $manager = \App\Core\AI\AIManager::getInstance();
+                    // Force recreation on next request
+                }
+
+                $_SESSION['flash']['success'] = 'Paramètres enregistrés avec succès. Modèle: ' . $defaultModel;
+
+                // Redirect to avoid form resubmission
+                header('Location: ' . url('/admin/ai/settings'));
+                exit;
+            } catch (\Exception $e) {
+                $_SESSION['flash']['danger'] = 'Erreur lors de l\'enregistrement: ' . $e->getMessage();
             }
-
-            $_SESSION['flash']['success'] = 'Paramètres enregistrés avec succès.';
         }
 
         echo $app->view->render('backend/ai/settings', [
@@ -97,36 +109,43 @@ class AIController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $prompt = $_POST['prompt'] ?? '';
-            $manager = AIManager::getInstance();
-            $client = $manager->getOpenAIClient();
 
-            if ($client) {
-                try {
-                    $result = $client->chat()->create([
-                        'model' => $model,
-                        'messages' => [
-                            ['role' => 'user', 'content' => $prompt],
-                        ],
-                    ]);
-                    $response = $result->choices[0]->message->content;
-                    $_SESSION['flash']['success'] = 'Réponse reçue !';
-
-                    // Log the interaction
-                    // TODO: Implement logging to database
-
-                } catch (\Exception $e) {
-                    $_SESSION['flash']['danger'] = 'Erreur : ' . $e->getMessage();
-                }
+            if (empty($prompt)) {
+                $_SESSION['flash']['warning'] = 'Veuillez entrer un prompt.';
             } else {
-                $apiKey = getenv('OPENAI_API_KEY');
-                $maskedKey = $apiKey ? substr($apiKey, 0, 5) . '...' : 'Non définie';
-                $_SESSION['flash']['danger'] = 'Client OpenAI non initialisé. Clé API: ' . $maskedKey . '. Vérifiez les paramètres.';
+                $manager = AIManager::getInstance();
+                $client = $manager->getOpenAIClient();
+
+                if ($client) {
+                    try {
+                        $result = $client->chat()->create([
+                            'model' => $model,
+                            'messages' => [
+                                ['role' => 'user', 'content' => $prompt],
+                            ],
+                        ]);
+                        $response = $result->choices[0]->message->content;
+                        $_SESSION['flash']['success'] = 'Réponse reçue avec le modèle: ' . $model;
+
+                        // Log the interaction
+                        // TODO: Implement logging to database
+
+                    } catch (\Exception $e) {
+                        $_SESSION['flash']['danger'] = 'Erreur API: ' . $e->getMessage();
+                        $response = null;
+                    }
+                } else {
+                    $apiKey = getenv('OPENAI_API_KEY');
+                    $maskedKey = $apiKey ? substr($apiKey, 0, 7) . '...' : 'Non définie';
+                    $_SESSION['flash']['danger'] = 'Client OpenAI non initialisé. Clé API: ' . $maskedKey . '. Configurez la clé dans Settings.';
+                }
             }
         }
 
         echo $app->view->render('backend/ai/test', [
             'title' => 'Test AI',
-            'response' => $response
+            'response' => $response,
+            'model' => $model
         ]);
     }
 }

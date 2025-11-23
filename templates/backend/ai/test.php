@@ -26,16 +26,17 @@
             <div class="card">
                 <div class="card-header">
                     <h5>Tester une requête</h5>
+                    <p class="text-muted mb-0"><i data-feather="cpu"></i> Modèle actuel: <strong><?= $model ?? 'gpt-3.5-turbo' ?></strong></p>
                 </div>
                 <div class="card-body">
                     <form action="<?= url('/admin/ai/test') ?>" method="POST">
                         <?= csrf_field() ?>
                         <div class="mb-3">
                             <label class="form-label">Prompt</label>
-                            <textarea class="form-control" name="prompt" rows="5" placeholder="Entrez votre prompt ici..."></textarea>
+                            <textarea class="form-control" name="prompt" rows="5" placeholder="Entrez votre prompt ici..." required></textarea>
                         </div>
                         <div class="card-footer text-end">
-                            <button class="btn btn-primary" type="submit">Envoyer</button>
+                            <button class="btn btn-primary" type="submit"><i data-feather="send"></i> Envoyer</button>
                         </div>
                     </form>
                 </div>
@@ -48,12 +49,12 @@
                     <h5>Réponse</h5>
                 </div>
                 <div class="card-body">
-                    <?php if (isset($response)): ?>
-                        <div class="alert alert-light-primary" role="alert">
-                            <pre><?= htmlspecialchars($response) ?></pre>
+                    <?php if (isset($response) && !empty($response)): ?>
+                        <div class="alert alert-light-success" role="alert">
+                            <pre style="white-space: pre-wrap;"><?= htmlspecialchars($response) ?></pre>
                         </div>
                     <?php else: ?>
-                        <p class="text-muted">La réponse s'affichera ici.</p>
+                        <p class="text-muted"><i data-feather="message-circle"></i> La réponse s'affichera ici après l'envoi.</p>
                     <?php endif; ?>
                 </div>
             </div>
