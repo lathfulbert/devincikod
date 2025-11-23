@@ -230,7 +230,7 @@ class CacheController
 
         $stats = $cache->getStats();
 
-        echo $app->view->render('admin/cache/stats', [
+        echo $app->view->render('backend/cache/stats', [
             'title' => 'Statistiques du Cache',
             'stats' => $stats
         ]);

@@ -12,14 +12,14 @@ class PermissionController
     {
         $app = Application::getInstance();
         $permissions = Permission::all();
-        echo $app->view->render('admin/permissions/index', ['title' => 'Permissions', 'permissions' => $permissions]);
+        echo $app->view->render('backend/permissions/index', ['title' => 'Permissions', 'permissions' => $permissions]);
     }
 
     public function create()
     {
         $app = Application::getInstance();
         $modules = Module::all();
-        echo $app->view->render('admin/permissions/create', [
+        echo $app->view->render('backend/permissions/create', [
             'title' => 'Créer une Permission',
             'modules' => $modules
         ]);
@@ -62,7 +62,7 @@ class PermissionController
         $permission = Permission::find($id);
         $modules = Module::all();
 
-        echo $app->view->render('admin/permissions/edit', [
+        echo $app->view->render('backend/permissions/edit', [
             'title' => 'Modifier la Permission',
             'permission' => $permission,
             'modules' => $modules

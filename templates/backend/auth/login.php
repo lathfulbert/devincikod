@@ -1,117 +1,83 @@
-@extends('auth.layout')
+@extends('backend.layouts.auth.master')
+
+@section('title', 'Login with Sweetalert')
+
+@section('css')
+@endsection
 
 @section('content')
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 p-0">
+            <div class="login-card login-dark">
+                <div>
+                    <div><a class="logo text-start" href="{{ route('admin.dashboard') }}"><img class="img-fluid for-light"
+                                src="{{ asset('assets/images/logo/logo.png') }}" alt="looginpage"><img
+                                class="img-fluid for-dark" src="{{ asset('assets/images/logo/logo_dark.png') }}"
+                                alt="looginpage"></a></div>
+                    <div class="login-main">
+                        <form class="theme-form" method="POST" action="<?= url('/login') ?>">
+                            <?= csrf_field() ?>
+                            <h4>Sign in to account</h4>
+                            <p>Enter your email & password to login</p>
+                            <div class="form-group">
+                                <label class="col-form-label">Email Address</label>
+                                <input name="username"
+                                    id="username" class="form-control <?= has_error('username') ? 'is-invalid' : '' ?>" type="text" required="" placeholder="Login" value="<?= escape(old('username')) ?>">
+                            </div>
 
-<div class="auth-card">
-    <div class="auth-logo">
-        <h1><i data-feather="zap"></i> SunuFramework</h1>
-        <p>Connectez-vous à votre compte</p>
-    </div>
+                            <?php component('error', ['field' => 'username']) ?>
 
-    <?php component('alert') ?>
 
-    <form method="POST" action="<?= url('/login') ?>">
-        <?= csrf_field() ?>
-
-        <div class="mb-3">
-            <label for="username" class="form-label">
-                <i data-feather="user" style="width: 16px; height: 16px;"></i> Nom d'utilisateur
-            </label>
-            <input
-                type="text"
-                name="username"
-                id="username"
-                class="form-control <?= has_error('username') ? 'is-invalid' : '' ?>"
-                placeholder="Entrez votre nom d'utilisateur"
-                autofocus
-                value="<?= escape(old('username')) ?>">
-            <?php component('error', ['field' => 'username']) ?>
-            <small class="text-muted">Par défaut: admin</small>
+                            <div class="form-group">
+                                <label class="col-form-label">Password</label>
+                                <div class="form-input position-relative">
+                                    <input type="password"
+                                        name="password"
+                                        id="password" class="form-control <?= has_error('password') ? 'is-invalid' : '' ?>" type="password" name="password" required=""
+                                        placeholder="*********">
+                                    <?php component('error', ['field' => 'password']) ?>
+                                    <div class="show-hide"><span class="show"> </span></div>
+                                </div>
+                            </div>
+                            <div class="form-group mb-0">
+                                <div class="form-check">
+                                    <input class="checkbox-primary form-check-input" id="checkbox1" type="checkbox">
+                                    <label class="text-muted form-check-label" for="checkbox1">Remember password</label>
+                                </div><a class="link" href="{{ route('admin.forget_password') }}">Forgot password?</a>
+                                <div class="text-end">
+                                    <button class="btn btn-primary btn-block w-100 mt-3" type="submit">Sign in</button>
+                                </div>
+                            </div>
+                            <h6 class="text-muted mt-4 or">Or Sign in with</h6>
+                            <div class="social mt-4">
+                                <div class="btn-showcase"><a class="btn btn-light" href="https://www.linkedin.com/login"
+                                        target="_blank"><i class="fa-brands fa-linkedin-in"></i></a><a
+                                        class="btn btn-light" href="https://twitter.com/login?lang=en"
+                                        target="_blank"><i class="fa-brands fa-x-twitter"></i></a><a
+                                        class="btn btn-light" href="https://www.facebook.com/" target="_blank"><i
+                                            class="fa-brands fa-facebook-f"></i></a><a class="btn btn-light"
+                                        href="https://www.google.com/" target="_blank"><i
+                                            class="fa-brands fa-google"></i></a></div>
+                            </div>
+                            <p class="mt-4 mb-0 text-center">Don't have account?<a class="ms-2"
+                                    href="{{ route('admin.sign_up') }}">Create Account</a></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="mb-3">
-            <label for="password" class="form-label">
-                <i data-feather="lock" style="width: 16px; height: 16px;"></i> Mot de passe
-            </label>
-            <input
-                type="password"
-                name="password"
-                id="password"
-                class="form-control <?= has_error('password') ? 'is-invalid' : '' ?>"
-                placeholder="Entrez votre mot de passe">
-            <?php component('error', ['field' => 'password']) ?>
-            <small class="text-muted">Par défaut: password</small>
-        </div>
-
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="remember" id="remember">
-            <label class="form-check-label" for="remember">
-                Se souvenir de moi
-            </label>
-        </div>
-
-        <button type="submit" class="btn btn-login mt-3">
-            <i data-feather="log-in" style="width: 18px; height: 18px;"></i>
-            Se connecter
-        </button>
-    </form>
-
-    <div class="divider">
-        <span><i data-feather="more-horizontal" style="width: 16px; height: 16px;"></i></span>
-    </div>
-
-    <div class="text-center">
-        <a href="<?= url('/password/reset') ?>" class="text-link">
-            <i data-feather="help-circle" style="width: 14px; height: 14px;"></i>
-            Mot de passe oublié ?
-        </a>
-    </div>
-
-    <div class="text-center mt-2">
-        <p class="mb-0">
-            Pas encore de compte ?
-            <a href="<?= url('/register') ?>" class="text-link">
-                <i data-feather="user-plus" style="width: 14px; height: 14px;"></i>
-                S'inscrire
-            </a>
-        </p>
-    </div>
-
-    <div class="text-center mt-3">
-        <small class="text-muted">
-            <i data-feather="shield" style="width: 14px; height: 14px;"></i>
-            Connexion sécurisée avec chiffrement SSL
-        </small>
     </div>
 </div>
-
-<div class="text-center mt-3">
-    <small style="color: rgba(255,255,255,0.8);">
-        © <?= date('Y') ?> SunuFramework - Tous droits réservés
-    </small>
-</div>
-
 @endsection
 
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Animation d'entrée
-        const card = document.querySelector('.auth-card');
-        if (card) {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-
-            setTimeout(() => {
-                card.style.transition = 'all 0.5s ease';
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            }, 100);
-        }
-
-        // Feather icons
-        if (typeof feather !== 'undefined') {
-            feather.replace();
+    $(document).on('click', '#error', function(e) {
+        if ($('.email').val() == '' || $('.pwd').val() == '') {
+            swal(
+                "Error!", "Sorry, looks like some data are not filled, please try again !", "error"
+            )
         }
     });
 </script>

@@ -38,7 +38,7 @@ class MonitoringController
         $totalLogs = $stats['total_logs'];
         $totalPages = ceil($totalLogs / $perPage);
 
-        echo $this->view->render('admin/monitoring/index', [
+        echo $this->view->render('backend/monitoring/index', [
             'title' => 'Monitoring Dashboard',
             'stats' => $stats,
             'logs' => $logs,
