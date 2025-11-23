@@ -28,7 +28,8 @@
                     <h5>Paramètres Globaux</h5>
                 </div>
                 <div class="card-body">
-                    <form action="" method="POST">
+                    <form action="<?= url('/admin/ai/settings') ?>" method="POST">
+                        <?= csrf_field() ?>
                         <div class="mb-3">
                             <label class="form-label">Clé API OpenAI</label>
                             <input class="form-control" type="password" name="openai_api_key" value="<?= getenv('OPENAI_API_KEY') ? '****************' : '' ?>" placeholder="sk-...">
@@ -37,8 +38,9 @@
                         <div class="mb-3">
                             <label class="form-label">Modèle par défaut</label>
                             <select class="form-select" name="default_model">
-                                <option value="gpt-3.5-turbo" selected>gpt-3.5-turbo</option>
-                                <option value="gpt-4">gpt-4</option>
+                                <option value="gpt-3.5-turbo" <?= (isset($settings['default_model']) && $settings['default_model'] === 'gpt-3.5-turbo') ? 'selected' : '' ?>>gpt-3.5-turbo</option>
+                                <option value="gpt-4" <?= (isset($settings['default_model']) && $settings['default_model'] === 'gpt-4') ? 'selected' : '' ?>>gpt-4</option>
+                                <option value="gpt-4o" <?= (isset($settings['default_model']) && $settings['default_model'] === 'gpt-4o') ? 'selected' : '' ?>>gpt-4o</option>
                             </select>
                         </div>
                         <div class="card-footer text-end">

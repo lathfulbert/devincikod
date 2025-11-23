@@ -28,7 +28,8 @@
                     <h5>Tester une requête</h5>
                 </div>
                 <div class="card-body">
-                    <form action="" method="POST">
+                    <form action="<?= url('/admin/ai/test') ?>" method="POST">
+                        <?= csrf_field() ?>
                         <div class="mb-3">
                             <label class="form-label">Prompt</label>
                             <textarea class="form-control" name="prompt" rows="5" placeholder="Entrez votre prompt ici..."></textarea>

@@ -49,7 +49,7 @@
                                             <td><?= get_class($agent) ?></td>
                                             <td><?= method_exists($agent, 'getModel') ? htmlspecialchars($agent->getModel()) : 'N/A' ?></td>
                                             <td>
-                                                <a href="/admin/ai/settings" class="btn btn-sm btn-primary">Configurer</a>
+                                                <a href="<?= url('/admin/ai/settings') ?>" class="btn btn-sm btn-primary">Configurer</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -64,9 +64,9 @@
 
     <div class="row mt-3">
         <div class="col-sm-12">
-            <a href="/admin/ai/test" class="btn btn-info">Tester l'IA</a>
-            <a href="/admin/ai/settings" class="btn btn-secondary">Paramètres</a>
-            <a href="/admin/ai/logs" class="btn btn-warning">Logs</a>
+            <a href="<?= url('/admin/ai/test') ?>" class="btn btn-info">Tester l'IA</a>
+            <a href="<?= url('/admin/ai/settings') ?>" class="btn btn-secondary">Paramètres</a>
+            <a href="<?= url('/admin/ai/logs') ?>" class="btn btn-warning">Logs</a>
         </div>
     </div>
 </div>

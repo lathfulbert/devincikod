@@ -68,6 +68,7 @@
     <!-- Script-->
     @include('backend.layouts.script')
 
+    <!-- Flash Messages -->
     @include('backend.inc.alerts')
 
 
