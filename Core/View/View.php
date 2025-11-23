@@ -85,7 +85,7 @@ class View
         // Handle dot notation: layouts.app -> layouts/app
         $viewPath = str_replace('.', '/', $view);
 
-        // Check for .tpl first, then .php
+        // 1. Check in standard templates directory first (priority)
         $tplFile = $this->templatePath . '/' . $viewPath . '.tpl';
         $phpFile = $this->templatePath . '/' . $viewPath . '.php';
 
@@ -98,6 +98,31 @@ class View
         if (file_exists($phpFile)) {
             file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to: $phpFile\n", FILE_APPEND);
             return $phpFile;
+        }
+
+        // 2. Check in module directories (fallback)
+        // Extract module name from view path (e.g., "akpa/index" -> "Akpa")
+        $parts = explode('/', $viewPath);
+        if (count($parts) >= 2) {
+            $moduleName = ucfirst($parts[0]); // First segment is module name
+            $moduleViewPath = implode('/', array_slice($parts, 1)); // Rest is the view path
+
+            $basePath = dirname(dirname(__DIR__));
+            $moduleBasePath = $basePath . '/Modules/' . $moduleName . '/Views/' . $moduleViewPath;
+
+            $moduleTplFile = $moduleBasePath . '.tpl';
+            $modulePhpFile = $moduleBasePath . '.php';
+
+            file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  Checking module views:\n    tpl=$moduleTplFile (exists=" . (file_exists($moduleTplFile) ? 'YES' : 'NO') . ")\n    php=$modulePhpFile (exists=" . (file_exists($modulePhpFile) ? 'YES' : 'NO') . ")\n", FILE_APPEND);
+
+            if (file_exists($moduleTplFile)) {
+                file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to MODULE: $moduleTplFile\n", FILE_APPEND);
+                return $moduleTplFile;
+            }
+            if (file_exists($modulePhpFile)) {
+                file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to MODULE: $modulePhpFile\n", FILE_APPEND);
+                return $modulePhpFile;
+            }
         }
 
         file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Failed to resolve: $view\n", FILE_APPEND);

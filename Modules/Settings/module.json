@@ -1,0 +1,40 @@
+{
+  "name": "Settings",
+  "version": "1.0.0",
+  "description": "General Configuration and Settings Management Module",
+  "author": "SunuFramework Team",
+  "license": "MIT",
+  "dependencies": {
+    "php": ">=8.0"
+  },
+  "autoload": {
+    "routes": true,
+    "migrations": true,
+    "services": true,
+    "permissions": true,
+    "views": true,
+    "assets": true,
+    "config": true
+  },
+  "permissions": [
+    "manage_settings",
+    "manage_site_settings",
+    "manage_theme_settings",
+    "manage_api_settings",
+    "manage_translations",
+    "view_settings"
+  ],
+  "settings": {
+    "site_name": "SunuFramework",
+    "site_description": "Modern PHP Framework",
+    "default_language": "fr",
+    "default_timezone": "Africa/Dakar",
+    "theme_mode": "light",
+    "primary_color": "#7366FF",
+    "secondary_color": "#838383"
+  },
+  "assets": {
+    "js": ["settings.js"],
+    "css": ["settings.css"]
+  }
+}

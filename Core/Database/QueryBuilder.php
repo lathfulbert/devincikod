@@ -96,7 +96,7 @@ class QueryBuilder
 
     public function orderBy($column, $direction = 'ASC')
     {
-        $this->orderBy[] = "{$column} {$direction}";
+        $this->orderBy[] = "`{$column}` {$direction}";
         return $this;
     }
 
@@ -281,7 +281,7 @@ class QueryBuilder
 
     public function toSql()
     {
-        $sql = "SELECT {$this->select} FROM {$this->table}";
+        $sql = "SELECT {$this->select} FROM `{$this->table}`";
 
         // Build WHERE clause
         $whereClauses = [];
@@ -323,7 +323,7 @@ class QueryBuilder
         $clauses = [];
 
         foreach ($conditions as $index => $condition) {
-            $clause = "{$condition['column']} {$condition['operator']} ?";
+            $clause = "`{$condition['column']}` {$condition['operator']} ?";
 
             if ($index === 0) {
                 // First condition, no conjunction needed
@@ -336,5 +336,75 @@ class QueryBuilder
         }
 
         return implode(' ', $clauses);
+    }
+
+    /**
+     * Update records
+     */
+    public function update(array $data): bool
+    {
+        if (empty($data)) {
+            return false;
+        }
+
+        $sets = [];
+        $values = [];
+
+        foreach ($data as $column => $value) {
+            $sets[] = "`{$column}` = ?";
+            $values[] = $value;
+        }
+
+        $sql = "UPDATE `{$this->table}` SET " . implode(', ', $sets);
+
+        if (!empty($this->wheres)) {
+            $sql .= " WHERE " . $this->buildWhereClause($this->wheres);
+            $values = array_merge($values, $this->bindings);
+        }
+
+        $db = Database::getInstance();
+        $db->query($sql, $values);
+
+        return true;
+    }
+
+    /**
+     * Delete records
+     */
+    public function delete(): bool
+    {
+        $sql = "DELETE FROM `{$this->table}`";
+
+        if (!empty($this->wheres)) {
+            $sql .= " WHERE " . $this->buildWhereClause($this->wheres);
+        }
+
+        $db = Database::getInstance();
+        $db->query($sql, $this->bindings);
+
+        return true;
+    }
+
+    /**
+     * Create a new record
+     */
+    public function create(array $data): bool
+    {
+        $model = new ($this->model)();
+
+        foreach ($data as $key => $value) {
+            $model->$key = $value;
+        }
+
+        $model->save();
+        return true;
+    }
+
+    /**
+     * Check if records exist
+     */
+    public function exists(): bool
+    {
+        return $this->count() > 0;
     }
 }

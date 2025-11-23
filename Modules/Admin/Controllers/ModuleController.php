@@ -55,15 +55,15 @@ class ModuleController
         $name = $params['name'] ?? $_POST['name'] ?? null;
 
         if (!$name) {
-            flash('error', 'Nom du module manquant.');
+            $_SESSION['flash']['danger'] = 'Nom du module manquant.';
             redirect('/admin/modules');
             return;
         }
 
         if ($this->moduleManager->activateModule($name)) {
-            flash('success', "Module {$name} activé avec succès.");
+            $_SESSION['flash']['success'] = "Module {$name} activé avec succès.";
         } else {
-            flash('error', "Impossible d'activer le module {$name}.");
+            $_SESSION['flash']['danger'] = "Impossible d'activer le module {$name}.";
         }
 
         redirect('/admin/modules');
@@ -77,15 +77,15 @@ class ModuleController
         $name = $params['name'] ?? $_POST['name'] ?? null;
 
         if (!$name) {
-            flash('error', 'Nom du module manquant.');
+            $_SESSION['flash']['danger'] = 'Nom du module manquant.';
             redirect('/admin/modules');
             return;
         }
 
         if ($this->moduleManager->deactivateModule($name)) {
-            flash('success', "Module {$name} désactivé avec succès.");
+            $_SESSION['flash']['success'] = "Module {$name} désactivé avec succès.";
         } else {
-            flash('error', "Impossible de désactiver le module {$name}.");
+            $_SESSION['flash']['danger'] = "Impossible de désactiver le module {$name}.";
         }
 
         redirect('/admin/modules');
@@ -99,15 +99,15 @@ class ModuleController
         $name = $params['name'] ?? $_POST['name'] ?? null;
 
         if (!$name) {
-            flash('error', 'Nom du module manquant.');
+            $_SESSION['flash']['danger'] = 'Nom du module manquant.';
             redirect('/admin/modules');
             return;
         }
 
         if ($this->moduleManager->installModule($name)) {
-            flash('success', "Module {$name} installé avec succès.");
+            $_SESSION['flash']['success'] = "Module {$name} installé avec succès.";
         } else {
-            flash('error', "Impossible d'installer le module {$name}.");
+            $_SESSION['flash']['danger'] = "Impossible d'installer le module {$name}.";
         }
 
         redirect('/admin/modules');
@@ -121,15 +121,15 @@ class ModuleController
         $name = $params['name'] ?? $_POST['name'] ?? null;
 
         if (!$name) {
-            flash('error', 'Nom du module manquant.');
+            $_SESSION['flash']['danger'] = 'Nom du module manquant.';
             redirect('/admin/modules');
             return;
         }
 
         if ($this->moduleManager->uninstallModule($name)) {
-            flash('success', "Module {$name} désinstallé avec succès.");
+            $_SESSION['flash']['success'] = "Module {$name} désinstallé avec succès.";
         } else {
-            flash('error', "Impossible de désinstaller le module {$name}.");
+            $_SESSION['flash']['danger'] = "Impossible de désinstaller le module {$name}.";
         }
 
         redirect('/admin/modules');

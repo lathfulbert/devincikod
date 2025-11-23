@@ -1,0 +1,21 @@
+{
+  "name": "Akpa",
+  "version": "1.0.0",
+  "description": "Module de gestion de akpa - Module de test pour démontrer l'installation via ZIP",
+  "author": "SunuFramework Team",
+  "license": "MIT",
+  "dependencies": [],
+  "autoload": {
+    "routes": true,
+    "migrations": true,
+    "services": false,
+    "permissions": false,
+    "views": true,
+    "assets": false,
+    "config": false
+  },
+  "settings": {
+    "posts_per_page": 10,
+    "enable_comments": true
+  }
+}
