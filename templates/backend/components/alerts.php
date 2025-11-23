@@ -2,39 +2,38 @@
 
 /**
  * Component: Alerts
- * Affiche des messages flash stylisés
- * 
- * Usage:
- *   include __DIR__ . '/components/alerts.php';
+ * Affiche des messages flash stylisés via SweetAlert2 toast notifications.
  */
-
 if (isset($_SESSION['flash'])):
     foreach ($_SESSION['flash'] as $type => $messages):
         if (!is_array($messages)) {
             $messages = [$messages];
         }
-
-        // Déterminer la classe d'icône selon le type
-        $icons = [
-            'success' => 'check-circle',
-            'danger' => 'x-circle',
-            'warning' => 'alert-triangle',
-            'info' => 'info'
+        // Mapping type to SweetAlert2 icon
+        $iconMap = [
+            'success' => 'success',
+            'danger'  => 'error',
+            'warning' => 'warning',
+            'info'    => 'info',
         ];
-        $icon = $icons[$type] ?? 'info';
-
+        $icon = $iconMap[$type] ?? 'info';
         foreach ($messages as $message):
+            $jsMessage = json_encode($message);
 ?>
-            <div class="alert alert-<?= $type ?> alert-dismissible fade show" role="alert">
-                <i data-feather="<?= $icon ?>"></i>
-                <strong><?= ucfirst($type) ?>!</strong> <?= htmlspecialchars($message) ?>
-                <button class="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+            <script>
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: '<?php echo $icon; ?>',
+                    title: <?php echo $jsMessage; ?>,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                });
+            </script>
 <?php
         endforeach;
     endforeach;
-
-    // Nettoyer les messages flash après les avoir affichés
     unset($_SESSION['flash']);
 endif;
 ?>
