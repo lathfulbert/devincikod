@@ -27,7 +27,16 @@ abstract class Model
     {
         $db = Database::getInstance();
         $table = static::getTable();
-        $stmt = $db->query("SELECT * FROM {$table}");
+
+        // Check if model uses SoftDeletes trait
+        $usesSoftDeletes = in_array('App\Core\Database\Traits\SoftDeletes', class_uses(static::class));
+
+        if ($usesSoftDeletes) {
+            $stmt = $db->query("SELECT * FROM `{$table}` WHERE `deleted_at` IS NULL");
+        } else {
+            $stmt = $db->query("SELECT * FROM `{$table}`");
+        }
+
         return $stmt->fetchAll(\PDO::FETCH_CLASS, static::class);
     }
 
@@ -35,7 +44,16 @@ abstract class Model
     {
         $db = Database::getInstance();
         $table = static::getTable();
-        $stmt = $db->query("SELECT * FROM {$table} WHERE id = ?", [$id]);
+
+        // Check if model uses SoftDeletes trait
+        $usesSoftDeletes = in_array('App\Core\Database\Traits\SoftDeletes', class_uses(static::class));
+
+        if ($usesSoftDeletes) {
+            $stmt = $db->query("SELECT * FROM `{$table}` WHERE id = ? AND `deleted_at` IS NULL", [$id]);
+        } else {
+            $stmt = $db->query("SELECT * FROM `{$table}` WHERE id = ?", [$id]);
+        }
+
         $result = $stmt->fetchObject(static::class);
         return $result ?: null;
     }
