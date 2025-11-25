@@ -1,0 +1,123 @@
+<?php
+
+namespace App\Core\Cron;
+
+use App\Core\Cron\Contracts\CronTaskContract;
+use App\Core\Database\Database;
+
+/**
+ * Class CronRunner
+ * 
+ * Executes cron tasks and handles logging.
+ */
+class CronRunner
+{
+    private CronScheduler $scheduler;
+    private Database $db;
+    private bool $loggingEnabled;
+    private string $logTable;
+
+    public function __construct()
+    {
+        $this->scheduler = CronScheduler::getInstance();
+        $this->db = Database::getInstance();
+
+        $config = require __DIR__ . '/../../config/cron.php';
+        $this->loggingEnabled = $config['logging']['enabled'] ?? true;
+        $this->logTable = $config['logging']['table'] ?? 'cron_logs';
+    }
+
+    /**
+     * Run all due tasks.
+     */
+    public function run(): void
+    {
+        $dueTasks = $this->scheduler->getDueTasks();
+
+        if (empty($dueTasks)) {
+            // No tasks due
+            return;
+        }
+
+        echo "Found " . count($dueTasks) . " due task(s).\n";
+
+        foreach ($dueTasks as $task) {
+            $this->executeTask($task);
+        }
+    }
+
+    /**
+     * Execute a single task.
+     */
+    private function executeTask(CronTaskContract $task): void
+    {
+        $className = get_class($task);
+
+        // Check for overlapping
+        if ($this->scheduler->isRunning($task)) {
+            echo "Skipping $className (already running)\n";
+            return;
+        }
+
+        // Acquire lock
+        if (!$this->scheduler->acquireLock($task)) {
+            echo "Failed to acquire lock for $className\n";
+            return;
+        }
+
+        echo "Running $className...\n";
+        $startTime = microtime(true);
+
+        try {
+            // Execute task
+            $task->handle();
+
+            $duration = microtime(true) - $startTime;
+            echo "✅ $className completed in " . round($duration, 2) . "s\n";
+
+            $this->logSuccess($task, $duration);
+        } catch (\Throwable $e) {
+            $duration = microtime(true) - $startTime;
+            echo "❌ $className failed: " . $e->getMessage() . "\n";
+
+            $this->logFailure($task, $e, $duration);
+        } finally {
+            // Release lock
+            $this->scheduler->releaseLock($task);
+        }
+    }
+
+    private function logSuccess(CronTaskContract $task, float $duration): void
+    {
+        if (!$this->loggingEnabled) return;
+
+        try {
+            $sql = "INSERT INTO {$this->logTable} (task_class, status, output, duration, created_at) VALUES (?, ?, ?, ?, NOW())";
+            $this->db->query($sql, [
+                get_class($task),
+                'success',
+                'Completed successfully',
+                $duration
+            ]);
+        } catch (\Throwable $e) {
+            // Ignore logging errors
+        }
+    }
+
+    private function logFailure(CronTaskContract $task, \Throwable $e, float $duration): void
+    {
+        if (!$this->loggingEnabled) return;
+
+        try {
+            $sql = "INSERT INTO {$this->logTable} (task_class, status, output, duration, created_at) VALUES (?, ?, ?, ?, NOW())";
+            $this->db->query($sql, [
+                get_class($task),
+                'failed',
+                $e->getMessage(),
+                $duration
+            ]);
+        } catch (\Throwable $e) {
+            // Ignore logging errors
+        }
+    }
+}

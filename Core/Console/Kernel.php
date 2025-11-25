@@ -33,6 +33,10 @@ class Kernel
             $this->handleModuleCommand($argv);
         } elseif (str_starts_with($command ?? '', 'cache:')) {
             $this->handleCacheCommand($argv);
+        } elseif (str_starts_with($command ?? '', 'queue:')) {
+            $this->handleQueueCommand($argv);
+        } elseif (str_starts_with($command ?? '', 'cron:')) {
+            $this->handleCronCommand($argv);
         } elseif ($command === 'list' || $command === '--list' || $command === '--help') {
             $this->listCommands();
         } else {
@@ -65,6 +69,64 @@ class Kernel
         }
     }
 
+    protected function handleQueueCommand(array $argv): void
+    {
+        $commandName = $argv[1] ?? '';
+        $args = array_slice($argv, 2);
+
+        $commands = [
+            'queue:work' => \App\Core\Console\Command\QueueWorkCommand::class,
+            'queue:failed' => \App\Core\Console\Command\QueueFailedCommand::class,
+            'queue:retry' => \App\Core\Console\Command\QueueRetryCommand::class,
+            'queue:flush' => \App\Core\Console\Command\QueueFlushCommand::class,
+            'queue:restart' => \App\Core\Console\Command\QueueRestartCommand::class,
+        ];
+
+        if (isset($commands[$commandName])) {
+            $class = $commands[$commandName];
+            if (class_exists($class)) {
+                $cmd = new $class();
+                $cmd->execute($this->app, $args);
+            } else {
+                echo "Command class $class not found.\n";
+            }
+        } else {
+            echo "Unknown queue command: $commandName\n";
+            echo "Available commands:\n";
+            echo "  queue:work [queue]     Start a queue worker\n";
+            echo "  queue:failed           List failed jobs\n";
+            echo "  queue:retry <id|--all> Retry failed jobs\n";
+            echo "  queue:flush [queue]    Clear all jobs from queue\n";
+            echo "  queue:restart          Restart all workers\n";
+        }
+    }
+
+    protected function handleCronCommand(array $argv): void
+    {
+        $commandName = $argv[1] ?? '';
+        $args = array_slice($argv, 2);
+
+        $commands = [
+            'cron:run' => \App\Core\Console\Command\CronRunCommand::class,
+            'cron:list' => \App\Core\Console\Command\CronListCommand::class,
+        ];
+
+        if (isset($commands[$commandName])) {
+            $class = $commands[$commandName];
+            if (class_exists($class)) {
+                $cmd = new $class();
+                $cmd->execute($this->app, $args);
+            } else {
+                echo "Command class $class not found.\n";
+            }
+        } else {
+            echo "Unknown cron command: $commandName\n";
+            echo "Available commands:\n";
+            echo "  cron:run                 Run the scheduler\n";
+            echo "  cron:list                List registered tasks\n";
+        }
+    }
+
     protected function handleCacheCommand(array $argv): void
     {
         $commandName = $argv[1] ?? '';
@@ -88,42 +150,6 @@ class Kernel
             echo "Unknown cache command: $commandName\n";
             echo "Available commands: cache:clear, cache:stats, cache:forget <key>\n";
         }
-    }
-
-    protected function listCommands(): void
-    {
-        echo "Available commands:\n";
-        echo "  migrate              Run pending migrations\n";
-        echo "  migrate --down       Rollback the last batch of migrations\n";
-        echo "  migrate:reset        Rollback all migrations\n";
-        echo "  migrate:fresh        Drop all tables and re-run all migrations\n";
-        echo "  seed                 Run seeders\n";
-        echo "  seed --truncate      Truncate tables before seeding\n";
-        echo "\n";
-        echo "I18n Commands:\n";
-        echo "  i18n:list [locale]   List all translation keys\n";
-        echo "  i18n:missing [locale] Show missing translations\n";
-        echo "  i18n:sync            Synchronize translations\n";
-        echo "  i18n:export [locale] [file] Export translations\n";
-        echo "  i18n:import [locale] [file] Import translations\n";
-        echo "  i18n:cache:clear [locale] Clear translation cache\n";
-        echo "  i18n:cache:stats     Show cache statistics\n";
-        echo "\n";
-        echo "Module Commands:\n";
-        echo "  module:activate <name>   Activate a module\n";
-        echo "  module:deactivate <name> Deactivate a module\n";
-        echo "  module:delete <name>     Delete a module\n";
-        echo "  module:create <name>     Create a new module skeleton\n";
-        echo "\n";
-        echo "Cache Commands:\n";
-        echo "  cache:clear              Clear all cache (application + views)\n";
-        echo "  cache:stats              Show cache statistics\n";
-        echo "  cache:forget <key>       Delete a specific cache key\n";
-        echo "\n";
-        echo "Cache Helpers (PHP):\n";
-        echo "  cache('key')             Get/Set cache values in code\n";
-        echo "  cache_remember()         Get or set with callback\n";
-        echo "  cache_has('key')            Check existence of a key\n";
     }
 
     protected function handleI18nCommand(array $argv): void
@@ -170,6 +196,55 @@ class Kernel
             echo "  i18n:cache:clear [locale]\n";
             echo "  i18n:cache:stats\n";
         }
+    }
+
+    protected function listCommands(): void
+    {
+        echo "Available commands:\n";
+        echo "  migrate              Run pending migrations\n";
+        echo "  migrate --down       Rollback the last batch of migrations\n";
+        echo "  migrate:reset        Rollback all migrations\n";
+        echo "  migrate:fresh        Drop all tables and re-run all migrations\n";
+        echo "  seed                 Run seeders\n";
+        echo "  seed --truncate      Truncate tables before seeding\n";
+        echo "\n";
+        echo "I18n Commands:\n";
+        echo "  i18n:list [locale]   List all translation keys\n";
+        echo "  i18n:missing [locale] Show missing translations\n";
+        echo "  i18n:sync            Synchronize translations\n";
+        echo "  i18n:export [locale] [file] Export translations\n";
+        echo "  i18n:import [locale] [file] Import translations\n";
+        echo "  i18n:cache:clear [locale] Clear translation cache\n";
+        echo "  i18n:cache:stats     Show cache statistics\n";
+        echo "\n";
+        echo "Module Commands:\n";
+        echo "  module:activate <name>   Activate a module\n";
+        echo "  module:deactivate <name> Deactivate a module\n";
+        echo "  module:delete <name>     Delete a module\n";
+        echo "  module:create <name>     Create a new module skeleton\n";
+        echo "\n";
+        echo "Cache Commands:\n";
+        echo "  cache:clear              Clear all cache (application + views)\n";
+        echo "  cache:stats              Show cache statistics\n";
+        echo "  cache:forget <key>       Delete a specific cache key\n";
+        echo "\n";
+        echo "Queue Commands:\n";
+        echo "  queue:work [queue]       Start a queue worker\n";
+        echo "  queue:work default --max-jobs=10   Process 10 jobs then stop\n";
+        echo "  queue:failed             List all failed jobs\n";
+        echo "  queue:retry <id>         Retry a specific failed job\n";
+        echo "  queue:retry --all        Retry all failed jobs\n";
+        echo "  queue:flush [queue]      Clear all jobs from a queue\n";
+        echo "  queue:restart            Restart all workers gracefully\n";
+        echo "\n";
+        echo "Cron Commands:\n";
+        echo "  cron:run                 Run the scheduler (add to system cron)\n";
+        echo "  cron:list                List registered tasks\n";
+        echo "\n";
+        echo "Cache Helpers (PHP):\n";
+        echo "  cache('key')             Get/Set cache values in code\n";
+        echo "  cache_remember()         Get or set with callback\n";
+        echo "  cache_has('key')            Check existence of a key\n";
     }
 
     protected function seed(bool $truncate = false): void

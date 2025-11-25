@@ -72,4 +72,36 @@ class Database
     {
         return $this->pdo->lastInsertId();
     }
+
+    /**
+     * Start a database transaction.
+     */
+    public function beginTransaction(): bool
+    {
+        return $this->pdo->beginTransaction();
+    }
+
+    /**
+     * Commit the active database transaction.
+     */
+    public function commit(): bool
+    {
+        return $this->pdo->commit();
+    }
+
+    /**
+     * Rollback the active database transaction.
+     */
+    public function rollback(): bool
+    {
+        return $this->pdo->rollBack();
+    }
+
+    /**
+     * Check if inside a transaction.
+     */
+    public function inTransaction(): bool
+    {
+        return $this->pdo->inTransaction();
+    }
 }
