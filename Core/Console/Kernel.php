@@ -109,6 +109,8 @@ class Kernel
         $commands = [
             'cron:run' => \App\Core\Console\Command\CronRunCommand::class,
             'cron:list' => \App\Core\Console\Command\CronListCommand::class,
+            'cron:run-task' => \App\Core\Console\Command\CronRunTaskCommand::class,
+            'cron:stats' => \App\Core\Console\Command\CronStatsCommand::class,
         ];
 
         if (isset($commands[$commandName])) {
@@ -124,6 +126,8 @@ class Kernel
             echo "Available commands:\n";
             echo "  cron:run                 Run the scheduler\n";
             echo "  cron:list                List registered tasks\n";
+            echo "  cron:run-task <class>    Run specific task manually\n";
+            echo "  cron:stats               Show execution statistics\n";
         }
     }
 
@@ -240,6 +244,8 @@ class Kernel
         echo "Cron Commands:\n";
         echo "  cron:run                 Run the scheduler (add to system cron)\n";
         echo "  cron:list                List registered tasks\n";
+        echo "  cron:run-task <class>    Run specific task manually\n";
+        echo "  cron:stats               Show execution statistics\n";
         echo "\n";
         echo "Cache Helpers (PHP):\n";
         echo "  cache('key')             Get/Set cache values in code\n";

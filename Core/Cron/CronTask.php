@@ -43,7 +43,7 @@ abstract class CronTask implements CronTaskContract
      * - "0 0 * * *"      Daily at midnight
      * - "0 0 * * 0"      Weekly on Sunday
      * - "0 0 1 * *"      Monthly on the 1st
-     * - "*/5 * * * *"    Every 5 minutes
+     * - "* /5 * * * *"   Every 5 minutes (remove space)
      */
     abstract public function expression(): string;
 
