@@ -1,4 +1,4 @@
-@extends('admin.layout')
+@extends('backend.layouts.master')
 
 @section('content')
 @if ($msg = flash('success'))

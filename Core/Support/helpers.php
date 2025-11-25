@@ -149,16 +149,19 @@ if (!function_exists('url')) {
             if ($configUrl !== null) {
                 $baseUrl = rtrim($configUrl, '/');
             } else {
-                // Auto-detect base path
-                $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-                $detectedPath = str_replace('\\', '/', dirname($scriptName));
+                // Auto-detect base path from SCRIPT_NAME
+                $scriptName = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
 
-                // Remove '/public' if present (for subfolder installations redirecting to public)
-                if (substr($detectedPath, -7) === '/public') {
-                    $detectedPath = substr($detectedPath, 0, -7);
+                // Get directory of the script (e.g., /sunuframework2/public or /public)
+                $scriptDir = str_replace('\\', '/', dirname($scriptName));
+
+                // Remove '/public' suffix if present
+                if (substr($scriptDir, -7) === '/public') {
+                    $scriptDir = substr($scriptDir, 0, -7);
                 }
 
-                $baseUrl = rtrim($detectedPath, '/');
+                // Clean up: remove trailing slash, but keep root '/'
+                $baseUrl = ($scriptDir === '' || $scriptDir === '/') ? '' : rtrim($scriptDir, '/');
             }
         }
 

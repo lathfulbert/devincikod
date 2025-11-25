@@ -56,6 +56,23 @@ class AdminModule extends AbstractModule
             ['POST', '/admin/permissions/{id}/update', [\Modules\Admin\Controllers\PermissionController::class, 'update'], [$authMiddleware]],
             ['GET', '/admin/permissions/{id}/delete', [\Modules\Admin\Controllers\PermissionController::class, 'delete'], [$authMiddleware]],
             ['POST', '/admin/permissions/{id}/delete', [\Modules\Admin\Controllers\PermissionController::class, 'delete'], [$authMiddleware]],
+
+            // Queue Management
+            ['GET', '/admin/queue', [\Modules\Admin\Controllers\QueueController::class, 'index'], [$authMiddleware]],
+            ['GET', '/admin/queue/jobs', [\Modules\Admin\Controllers\QueueController::class, 'jobs'], [$authMiddleware]],
+            ['GET', '/admin/queue/failed', [\Modules\Admin\Controllers\QueueController::class, 'failed'], [$authMiddleware]],
+            ['POST', '/admin/queue/retry', [\Modules\Admin\Controllers\QueueController::class, 'retry'], [$authMiddleware]],
+            ['POST', '/admin/queue/retry-all', [\Modules\Admin\Controllers\QueueController::class, 'retryAll'], [$authMiddleware]],
+            ['POST', '/admin/queue/delete', [\Modules\Admin\Controllers\QueueController::class, 'delete'], [$authMiddleware]],
+            ['GET', '/admin/queue/stats', [\Modules\Admin\Controllers\QueueController::class, 'stats'], [$authMiddleware]],
+            ['GET', '/admin/queue/api/stats', [\Modules\Admin\Controllers\QueueController::class, 'apiStats'], [$authMiddleware]],
+
+            // Cron Management
+            ['GET', '/admin/cron', [\Modules\Admin\Controllers\CronController::class, 'index'], [$authMiddleware]],
+            ['POST', '/admin/cron/toggle', [\Modules\Admin\Controllers\CronController::class, 'toggle'], [$authMiddleware]],
+            ['POST', '/admin/cron/run', [\Modules\Admin\Controllers\CronController::class, 'runManually'], [$authMiddleware]],
+            ['GET', '/admin/cron/logs', [\Modules\Admin\Controllers\CronController::class, 'logs'], [$authMiddleware]],
+            ['GET', '/admin/cron/stats', [\Modules\Admin\Controllers\CronController::class, 'stats'], [$authMiddleware]],
         ];
     }
 
@@ -100,6 +117,27 @@ class AdminModule extends AbstractModule
                 'type' => 'separator',
                 'label' => 'Système',
                 'class' => 'badge-light-secondary'
+            ],
+            [
+                'type' => 'dropdown',
+                'title' => 'Queue & Jobs',
+                'icon' => 'activity',
+                'children' => [
+                    ['title' => 'Dashboard', 'url' => '/admin/queue'],
+                    ['title' => 'Active Jobs', 'url' => '/admin/queue/jobs'],
+                    ['title' => 'Failed Jobs', 'url' => '/admin/queue/failed'],
+                    ['title' => 'Statistics', 'url' => '/admin/queue/stats'],
+                ]
+            ],
+            [
+                'type' => 'dropdown',
+                'title' => 'Cron Tasks',
+                'icon' => 'clock',
+                'children' => [
+                    ['title' => 'Tasks List', 'url' => '/admin/cron'],
+                    ['title' => 'Execution Logs', 'url' => '/admin/cron/logs'],
+                    ['title' => 'Statistics', 'url' => '/admin/cron/stats'],
+                ]
             ],
             [
                 'type' => 'dropdown',
