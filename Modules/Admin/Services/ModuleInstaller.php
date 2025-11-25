@@ -3,50 +3,57 @@
 namespace Modules\Admin\Services;
 
 use App\Core\Application;
+use App\Core\Module\ModuleManager;
 use ZipArchive;
 use Exception;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 
+/**
+ * Service responsible for installing, uninstalling and managing modules.
+ */
 class ModuleInstaller
 {
     private string $modulesPath;
     private string $tempPath;
+    private ModuleManager $moduleManager;
 
     public function __construct()
     {
         $app = Application::getInstance();
         $this->modulesPath = $app->getBasePath() . '/Modules';
-        $this->tempPath = $app->getBasePath() . '/storage/temp';
+        $this->tempPath    = $app->getBasePath() . '/storage/temp';
+        $this->moduleManager = $app->moduleManager;
 
-        // Ensure temp directory exists
+        // Ensure temporary directory exists
         if (!is_dir($this->tempPath)) {
             mkdir($this->tempPath, 0755, true);
         }
     }
 
     /**
-     * Install a module from uploaded ZIP file
-     * 
-     * @param array $file $_FILES array element
-     * @return array ['success' => bool, 'message' => string, 'module' => string|null]
+     * Install a module from an uploaded ZIP file.
+     *
+     * @param array $file $_FILES entry
+     * @return array ['success' => bool, 'message' => string, 'module' => ?string]
      */
     public function installFromZip(array $file): array
     {
         try {
-            // Validate file
+            // 1. Validate upload
             $validation = $this->validateUpload($file);
             if (!$validation['success']) {
                 return $validation;
             }
 
-            // Extract to temp directory
+            // 2. Extract to a temporary folder
             $extractPath = $this->tempPath . '/' . uniqid('module_');
-            $extracted = $this->extractZip($file['tmp_name'], $extractPath);
-
+            $extracted   = $this->extractZip($file['tmp_name'], $extractPath);
             if (!$extracted['success']) {
                 return $extracted;
             }
 
-            // Validate module structure
+            // 3. Validate module structure (module.json)
             $moduleInfo = $this->validateModuleStructure($extractPath);
             if (!$moduleInfo['success']) {
                 $this->cleanup($extractPath);
@@ -54,10 +61,10 @@ class ModuleInstaller
             }
 
             $moduleName = $moduleInfo['name'];
-            $moduleDestination = $this->modulesPath . '/' . $moduleName;
+            $moduleDest = $this->modulesPath . '/' . $moduleName;
 
-            // Check if module already exists
-            if (is_dir($moduleDestination)) {
+            // 4. Prevent overwriting an existing module
+            if (is_dir($moduleDest)) {
                 $this->cleanup($extractPath);
                 return [
                     'success' => false,
@@ -65,8 +72,8 @@ class ModuleInstaller
                 ];
             }
 
-            // Move to Modules directory
-            if (!rename($extractPath, $moduleDestination)) {
+            // 5. Move extracted files to the Modules directory
+            if (!rename($extractPath, $moduleDest)) {
                 $this->cleanup($extractPath);
                 return [
                     'success' => false,
@@ -74,13 +81,13 @@ class ModuleInstaller
                 ];
             }
 
-            // Register in database
+            // 6. Register the module in the registry/database
             $this->registerModule($moduleName);
 
             return [
                 'success' => true,
                 'message' => "Module '$moduleName' installé avec succès.",
-                'module' => $moduleName
+                'module'  => $moduleName
             ];
         } catch (Exception $e) {
             return [
@@ -91,178 +98,14 @@ class ModuleInstaller
     }
 
     /**
-     * Validate uploaded file
-     */
-    private function validateUpload(array $file): array
-    {
-        if (!isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
-            return ['success' => false, 'message' => 'Aucun fichier uploadé.'];
-        }
-
-        if ($file['error'] !== UPLOAD_ERR_OK) {
-            return ['success' => false, 'message' => 'Erreur lors de l\'upload du fichier.'];
-        }
-
-        // Check file extension
-        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        if ($extension !== 'zip') {
-            return ['success' => false, 'message' => 'Le fichier doit être au format ZIP.'];
-        }
-
-        // Check file size (max 50MB)
-        if ($file['size'] > 50 * 1024 * 1024) {
-            return ['success' => false, 'message' => 'Le fichier est trop volumineux (max 50MB).'];
-        }
-
-        return ['success' => true];
-    }
-
-    /**
-     * Extract ZIP file
-     */
-    private function extractZip(string $zipPath, string $destination): array
-    {
-        $zip = new ZipArchive();
-
-        if ($zip->open($zipPath) !== true) {
-            return ['success' => false, 'message' => 'Impossible d\'ouvrir le fichier ZIP.'];
-        }
-
-        // Extract
-        if (!$zip->extractTo($destination)) {
-            $zip->close();
-            return ['success' => false, 'message' => 'Erreur lors de l\'extraction du ZIP.'];
-        }
-
-        $zip->close();
-        return ['success' => true];
-    }
-
-    /**
-     * Validate module structure and return module info
-     */
-    private function validateModuleStructure(string $path): array
-    {
-        // Find module.json (might be in subdirectory)
-        $moduleJsonPath = $this->findModuleJson($path);
-
-        if (!$moduleJsonPath) {
-            return [
-                'success' => false,
-                'message' => 'Fichier module.json introuvable. Structure de module invalide.'
-            ];
-        }
-
-        // Parse module.json
-        $moduleJson = json_decode(file_get_contents($moduleJsonPath), true);
-
-        if (!$moduleJson || !isset($moduleJson['name'])) {
-            return [
-                'success' => false,
-                'message' => 'Fichier module.json invalide ou champ "name" manquant.'
-            ];
-        }
-
-        // If module.json is in a subdirectory, move everything up
-        $moduleDir = dirname($moduleJsonPath);
-        if ($moduleDir !== $path) {
-            $this->flattenDirectory($moduleDir, $path);
-        }
-
-        return [
-            'success' => true,
-            'name' => $moduleJson['name'],
-            'version' => $moduleJson['version'] ?? '1.0.0'
-        ];
-    }
-
-    /**
-     * Find module.json in directory or subdirectories
-     */
-    private function findModuleJson(string $path): ?string
-    {
-        // Check directly
-        if (file_exists($path . '/module.json')) {
-            return $path . '/module.json';
-        }
-
-        // Check in first subdirectory (common case: module-name/module.json)
-        $items = scandir($path);
-        foreach ($items as $item) {
-            if ($item === '.' || $item === '..') continue;
-
-            $subPath = $path . '/' . $item;
-            if (is_dir($subPath) && file_exists($subPath . '/module.json')) {
-                return $subPath . '/module.json';
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Flatten directory structure (move contents up one level)
-     */
-    private function flattenDirectory(string $source, string $destination): void
-    {
-        $items = scandir($source);
-
-        foreach ($items as $item) {
-            if ($item === '.' || $item === '..') continue;
-
-            $sourcePath = $source . '/' . $item;
-            $destPath = $destination . '/' . $item;
-
-            rename($sourcePath, $destPath);
-        }
-
-        // Remove empty source directory
-        rmdir($source);
-    }
-
-    /**
-     * Register module in database
-     */
-    private function registerModule(string $moduleName): void
-    {
-        $app = Application::getInstance();
-        $moduleManager = $app->moduleManager;
-
-        // Discover and sync
-        $moduleManager->discover();
-        $moduleManager->syncToRegistry();
-    }
-
-    /**
-     * Cleanup temporary directory
-     */
-    private function cleanup(string $path): void
-    {
-        if (!is_dir($path)) return;
-
-        $items = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST
-        );
-
-        foreach ($items as $item) {
-            if ($item->isDir()) {
-                rmdir($item->getRealPath());
-            } else {
-                unlink($item->getRealPath());
-            }
-        }
-
-        rmdir($path);
-    }
-
-    /**
-     * Uninstall a module
+     * Uninstall a module completely.
+     *
+     * @param string $moduleName
+     * @return array ['success' => bool, 'message' => string]
      */
     public function uninstall(string $moduleName): array
     {
         $modulePath = $this->modulesPath . '/' . $moduleName;
-
         if (!is_dir($modulePath)) {
             return [
                 'success' => false,
@@ -271,17 +114,21 @@ class ModuleInstaller
         }
 
         try {
-            // Unregister from database
-            $app = Application::getInstance();
-            $registry = $app->moduleManager->getRegistry();
-            $registry->unregister($moduleName);
+            // Let the core ModuleManager handle deactivation, rollback and registry cleanup
+            $uninstalled = $this->moduleManager->uninstallModule($moduleName);
 
-            // Delete directory
-            $this->cleanup($modulePath);
+            if ($uninstalled) {
+                // Remove the physical folder
+                $this->cleanup($modulePath);
+                return [
+                    'success' => true,
+                    'message' => "Module '$moduleName' désinstallé avec succès (fichiers, tables et cache supprimés)."
+                ];
+            }
 
             return [
-                'success' => true,
-                'message' => "Module '$moduleName' désinstallé avec succès."
+                'success' => false,
+                'message' => "Impossible de désinstaller le module '$moduleName'."
             ];
         } catch (Exception $e) {
             return [
@@ -289,5 +136,103 @@ class ModuleInstaller
                 'message' => "Erreur lors de la désinstallation : " . $e->getMessage()
             ];
         }
+    }
+
+    // ---------------------------------------------------------------------
+    // Helper methods (validation, extraction, cleanup, registration, etc.)
+    // ---------------------------------------------------------------------
+
+    private function validateUpload(array $file): array
+    {
+        if (!isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
+            return ['success' => false, 'message' => 'Aucun fichier uploadé.'];
+        }
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            return ['success' => false, 'message' => "Erreur lors de l'upload du fichier."];
+        }
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if ($ext !== 'zip') {
+            return ['success' => false, 'message' => 'Le fichier doit être au format ZIP.'];
+        }
+        if ($file['size'] > 50 * 1024 * 1024) {
+            return ['success' => false, 'message' => 'Le fichier est trop volumineux (max 50 MB).'];
+        }
+        return ['success' => true];
+    }
+
+    private function extractZip(string $zipPath, string $dest): array
+    {
+        $zip = new ZipArchive();
+        if ($zip->open($zipPath) !== true) {
+            return ['success' => false, 'message' => "Impossible d'ouvrir le fichier ZIP."];
+        }
+        if (!$zip->extractTo($dest)) {
+            $zip->close();
+            return ['success' => false, 'message' => "Erreur lors de l'extraction du ZIP."];
+        }
+        $zip->close();
+        return ['success' => true];
+    }
+
+    private function validateModuleStructure(string $path): array
+    {
+        $jsonPath = $this->findModuleJson($path);
+        if (!$jsonPath) {
+            return ['success' => false, 'message' => 'Fichier module.json introuvable. Structure de module invalide.'];
+        }
+        $json = json_decode(file_get_contents($jsonPath), true);
+        if (!$json || !isset($json['name'])) {
+            return ['success' => false, 'message' => 'Fichier module.json invalide ou champ "name" manquant.'];
+        }
+        // If the json lives in a sub‑folder, flatten the structure
+        $dir = dirname($jsonPath);
+        if ($dir !== $path) {
+            $this->flattenDirectory($dir, $path);
+        }
+        return ['success' => true, 'name' => $json['name'], 'version' => $json['version'] ?? '1.0.0'];
+    }
+
+    private function findModuleJson(string $path): ?string
+    {
+        if (file_exists($path . '/module.json')) {
+            return $path . '/module.json';
+        }
+        foreach (scandir($path) as $item) {
+            if ($item === '.' || $item === '..') continue;
+            $sub = $path . '/' . $item;
+            if (is_dir($sub) && file_exists($sub . '/module.json')) {
+                return $sub . '/module.json';
+            }
+        }
+        return null;
+    }
+
+    private function flattenDirectory(string $src, string $dest): void
+    {
+        foreach (scandir($src) as $item) {
+            if ($item === '.' || $item === '..') continue;
+            rename($src . '/' . $item, $dest . '/' . $item);
+        }
+        rmdir($src);
+    }
+
+    private function cleanup(string $path): void
+    {
+        if (!is_dir($path)) return;
+        $it = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+        foreach ($it as $file) {
+            $file->isDir() ? rmdir($file->getRealPath()) : unlink($file->getRealPath());
+        }
+        rmdir($path);
+    }
+
+    private function registerModule(string $moduleName): void
+    {
+        // Refresh the module list and sync the registry – this is enough for a new module
+        $this->moduleManager->discover();
+        $this->moduleManager->syncToRegistry();
     }
 }

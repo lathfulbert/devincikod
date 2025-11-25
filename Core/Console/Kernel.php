@@ -29,25 +29,101 @@ class Kernel
             $this->seed($truncate);
         } elseif (str_starts_with($command ?? '', 'i18n:') || $command === 'i18n') {
             $this->handleI18nCommand($argv);
+        } elseif (str_starts_with($command ?? '', 'module:')) {
+            $this->handleModuleCommand($argv);
+        } elseif (str_starts_with($command ?? '', 'cache:')) {
+            $this->handleCacheCommand($argv);
+        } elseif ($command === 'list' || $command === '--list' || $command === '--help') {
+            $this->listCommands();
         } else {
-            echo "Usage: php sunu [command]\n";
-            echo "Commands:\n";
-            echo "  migrate              Run pending migrations\n";
-            echo "  migrate --down       Rollback the last batch of migrations\n";
-            echo "  migrate:reset        Rollback all migrations\n";
-            echo "  migrate:fresh        Drop all tables and re-run all migrations\n";
-            echo "  seed                 Run seeders\n";
-            echo "  seed --truncate      Truncate tables before seeding\n";
-            echo "\n";
-            echo "I18n Commands:\n";
-            echo "  i18n:list [locale]   List all translation keys\n";
-            echo "  i18n:missing [locale] Show missing translations\n";
-            echo "  i18n:sync            Synchronize translations\n";
-            echo "  i18n:export [locale] [file] Export translations\n";
-            echo "  i18n:import [locale] [file] Import translations\n";
-            echo "  i18n:cache:clear [locale] Clear translation cache\n";
-            echo "  i18n:cache:stats     Show cache statistics\n";
+            $this->listCommands();
         }
+    }
+
+    protected function handleModuleCommand(array $argv): void
+    {
+        $commandName = $argv[1] ?? '';
+        $args = array_slice($argv, 2);
+
+        $commands = [
+            'module:activate' => \App\Core\Console\Command\ModuleActivateCommand::class,
+            'module:deactivate' => \App\Core\Console\Command\ModuleDeactivateCommand::class,
+            'module:delete' => \App\Core\Console\Command\ModuleDeleteCommand::class,
+            'module:create' => \App\Core\Console\Command\ModuleCreateCommand::class,
+        ];
+
+        if (isset($commands[$commandName])) {
+            $class = $commands[$commandName];
+            if (class_exists($class)) {
+                $cmd = new $class();
+                $cmd->execute($this->app, $args);
+            } else {
+                echo "Command class $class not found.\n";
+            }
+        } else {
+            echo "Unknown module command: $commandName\n";
+        }
+    }
+
+    protected function handleCacheCommand(array $argv): void
+    {
+        $commandName = $argv[1] ?? '';
+        $args = array_slice($argv, 2);
+
+        $commands = [
+            'cache:clear' => \App\Core\Console\Command\CacheClearCommand::class,
+            'cache:stats' => \App\Core\Console\Command\CacheStatsCommand::class,
+            'cache:forget' => \App\Core\Console\Command\CacheForgetCommand::class,
+        ];
+
+        if (isset($commands[$commandName])) {
+            $class = $commands[$commandName];
+            if (class_exists($class)) {
+                $cmd = new $class();
+                $cmd->execute($this->app, $args);
+            } else {
+                echo "Command class $class not found.\n";
+            }
+        } else {
+            echo "Unknown cache command: $commandName\n";
+            echo "Available commands: cache:clear, cache:stats, cache:forget <key>\n";
+        }
+    }
+
+    protected function listCommands(): void
+    {
+        echo "Available commands:\n";
+        echo "  migrate              Run pending migrations\n";
+        echo "  migrate --down       Rollback the last batch of migrations\n";
+        echo "  migrate:reset        Rollback all migrations\n";
+        echo "  migrate:fresh        Drop all tables and re-run all migrations\n";
+        echo "  seed                 Run seeders\n";
+        echo "  seed --truncate      Truncate tables before seeding\n";
+        echo "\n";
+        echo "I18n Commands:\n";
+        echo "  i18n:list [locale]   List all translation keys\n";
+        echo "  i18n:missing [locale] Show missing translations\n";
+        echo "  i18n:sync            Synchronize translations\n";
+        echo "  i18n:export [locale] [file] Export translations\n";
+        echo "  i18n:import [locale] [file] Import translations\n";
+        echo "  i18n:cache:clear [locale] Clear translation cache\n";
+        echo "  i18n:cache:stats     Show cache statistics\n";
+        echo "\n";
+        echo "Module Commands:\n";
+        echo "  module:activate <name>   Activate a module\n";
+        echo "  module:deactivate <name> Deactivate a module\n";
+        echo "  module:delete <name>     Delete a module\n";
+        echo "  module:create <name>     Create a new module skeleton\n";
+        echo "\n";
+        echo "Cache Commands:\n";
+        echo "  cache:clear              Clear all cache (application + views)\n";
+        echo "  cache:stats              Show cache statistics\n";
+        echo "  cache:forget <key>       Delete a specific cache key\n";
+        echo "\n";
+        echo "Cache Helpers (PHP):\n";
+        echo "  cache('key')             Get/Set cache values in code\n";
+        echo "  cache_remember()         Get or set with callback\n";
+        echo "  cache_has('key')            Check existence of a key\n";
     }
 
     protected function handleI18nCommand(array $argv): void
