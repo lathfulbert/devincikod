@@ -602,6 +602,50 @@ if (!function_exists('method_field')) {
     }
 }
 
+/*
+|--------------------------------------------------------------------------
+| Event Helpers
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('event')) {
+    /**
+     * Dispatch an event or get the event dispatcher
+     * 
+     * @param object|string|null $event Event instance or class name
+     * @param mixed ...$args Event arguments
+     * @return object|\App\Core\Events\EventDispatcher
+     */
+    function event(object|string $event = null, ...$args)
+    {
+        $dispatcher = \App\Core\Events\EventDispatcher::getInstance();
+
+        if ($event === null) {
+            return $dispatcher;
+        }
+
+        // If string, create event instance
+        if (is_string($event)) {
+            $event = new $event(...$args);
+        }
+
+        return $dispatcher->dispatch($event);
+    }
+}
+
+if (!function_exists('listen')) {
+    /**
+     * Register an event listener
+     * 
+     * @param string $event Event class name
+     * @param string|callable $listener Listener class or callable
+     */
+    function listen(string $event, string|callable $listener): void
+    {
+        \App\Core\Events\EventDispatcher::getInstance()->listen($event, $listener);
+    }
+}
+
 if (!function_exists('sanitize')) {
     /**
      * Sanitize input data

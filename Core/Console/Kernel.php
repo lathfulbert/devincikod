@@ -37,6 +37,10 @@ class Kernel
             $this->handleQueueCommand($argv);
         } elseif (str_starts_with($command ?? '', 'cron:')) {
             $this->handleCronCommand($argv);
+        } elseif (str_starts_with($command ?? '', 'make:')) {
+            $this->handleMakeCommand($argv);
+        } elseif (str_starts_with($command ?? '', 'events:')) {
+            $this->handleEventsCommand($argv);
         } elseif ($command === 'list' || $command === '--list' || $command === '--help') {
             $this->listCommands();
         } else {
@@ -156,6 +160,55 @@ class Kernel
         }
     }
 
+    protected function handleMakeCommand(array $argv): void
+    {
+        $commandName = $argv[1] ?? '';
+        $args = array_slice($argv, 2);
+
+        $commands = [
+            'make:event' => \App\Console\Commands\MakeEventCommand::class,
+            'make:listener' => \App\Console\Commands\MakeListenerCommand::class,
+        ];
+
+        if (isset($commands[$commandName])) {
+            $class = $commands[$commandName];
+            if (class_exists($class)) {
+                $cmd = new $class();
+                $cmd->execute($this->app, $args);
+            } else {
+                echo "Command class $class not found.\n";
+            }
+        } else {
+            echo "Unknown make command: $commandName\n";
+            echo "Available commands:\n";
+            echo "  make:event EventName --module=ModuleName\n";
+            echo "  make:listener ListenerName --module=ModuleName [--event=EventName] [--queued]\n";
+        }
+    }
+
+    protected function handleEventsCommand(array $argv): void
+    {
+        $commandName = $argv[1] ?? '';
+        $args = array_slice($argv, 2);
+
+        $commands = [
+            'events:list' => \App\Console\Commands\ListEventsCommand::class,
+        ];
+
+        if (isset($commands[$commandName])) {
+            $class = $commands[$commandName];
+            if (class_exists($class)) {
+                $cmd = new $class();
+                $cmd->execute($this->app, $args);
+            } else {
+                echo "Command class $class not found.\n";
+            }
+        } else {
+            echo "Unknown events command: $commandName\n";
+            echo "Available commands: events:list\n";
+        }
+    }
+
     protected function handleI18nCommand(array $argv): void
     {
         $fullCommand = $argv[1] ?? '';
@@ -246,6 +299,14 @@ class Kernel
         echo "  cron:list                List registered tasks\n";
         echo "  cron:run-task <class>    Run specific task manually\n";
         echo "  cron:stats               Show execution statistics\n";
+        echo "\n";
+        echo "Make Commands:\n";
+        echo "  make:event EventName --module=ModuleName        Create a new event\n";
+        echo "  make:listener ListenerName --module=ModuleName  Create a new listener\n";
+        echo "  make:listener SendEmail --module=Auth --queued  Create queued listener\n";
+        echo "\n";
+        echo "Event Commands:\n";
+        echo "  events:list              List all registered events and listeners\n";
         echo "\n";
         echo "Cache Helpers (PHP):\n";
         echo "  cache('key')             Get/Set cache values in code\n";
