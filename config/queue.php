@@ -9,37 +9,35 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | Default Queue Driver
+    | Default Queue Connection
     |--------------------------------------------------------------------------
-    |
-    | Supported: "database", "redis", "file"
-    |
     */
-    'driver' => env('QUEUE_DRIVER', 'database'),
+    'default' => env('QUEUE_CONNECTION', 'database'),
 
     /*
     |--------------------------------------------------------------------------
     | Queue Connections
     |--------------------------------------------------------------------------
-    |
-    | Configuration for each queue driver.
-    |
     */
     'connections' => [
         'database' => [
+            'driver' => 'database',
             'table' => 'jobs',
             'failed_table' => 'failed_jobs',
         ],
 
         'redis' => [
+            'driver' => 'redis',
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'port' => env('REDIS_PORT', 6379),
             'password' => env('REDIS_PASSWORD', null),
             'database' => env('REDIS_QUEUE_DB', 0),
-            'queue' => 'default',
+            'prefix' => env('REDIS_QUEUE_PREFIX', 'queue:'),
+            'timeout' => 2.0,
         ],
 
         'file' => [
+            'driver' => 'file',
             'path' => 'storage/queue',
         ],
     ],
@@ -48,9 +46,6 @@ return [
     |--------------------------------------------------------------------------
     | Worker Settings
     |--------------------------------------------------------------------------
-    |
-    | Default settings for queue workers.
-    |
     */
     'worker' => [
         'sleep' => 3,            // Sleep seconds when queue is empty
@@ -63,9 +58,6 @@ return [
     |--------------------------------------------------------------------------
     | Failed Jobs
     |--------------------------------------------------------------------------
-    |
-    | Settings for failed job management.
-    |
     */
     'failed' => [
         'retention_days' => 30,  // Auto-delete failed jobs after X days
