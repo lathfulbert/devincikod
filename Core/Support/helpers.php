@@ -646,6 +646,24 @@ if (!function_exists('listen')) {
     }
 }
 
+/*
+|--------------------------------------------------------------------------
+| HTTP Client Helpers
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('Http')) {
+    /**
+     * Get a new HTTP client instance
+     * 
+     * @return \App\Core\Http\PendingRequest
+     */
+    function Http(): \App\Core\Http\PendingRequest
+    {
+        return new \App\Core\Http\PendingRequest();
+    }
+}
+
 if (!function_exists('sanitize')) {
     /**
      * Sanitize input data
