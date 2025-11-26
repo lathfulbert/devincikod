@@ -30,9 +30,9 @@ class CronService
         $tasks = $this->scheduler->getTasks();
         $result = [];
 
-        foreach ($tasks as $taskClass) {
+        foreach ($tasks as $task) {
             /** @var \App\Core\Cron\Contracts\CronTaskContract $task */
-            $task = new $taskClass();
+            $taskClass = get_class($task);
 
             // Get last execution from logs
             $lastRun = $this->db->query("
@@ -45,7 +45,7 @@ class CronService
 
             $result[] = [
                 'class' => $taskClass,
-                'name' => basename(str_replace('\\', '/', $taskClass)),
+                'name' => basename(str_replace('\\', '/', $taskClass)), //AI
                 'expression' => $task->expression(),
                 'description' => $task->description(),
                 'last_run' => $lastRun['started_at'] ?? null,
