@@ -47,7 +47,24 @@ class UserNotificationPreference extends Model
             $this->attributes['channels_enabled'] = json_encode($this->attributes['channels_enabled']);
         }
 
+        // Cast booleans to integers for MySQL
+        $boolFields = ['dnd_enabled', 'email_opt_in', 'sms_opt_in', 'push_opt_in'];
+        foreach ($boolFields as $field) {
+            if (isset($this->attributes[$field])) {
+                $this->attributes[$field] = (int) $this->attributes[$field];
+            }
+        }
+
         parent::save();
+    }
+
+    public function __get($key)
+    {
+        $value = parent::__get($key);
+        if ($key === 'channels_enabled' && is_string($value)) {
+            return json_decode($value, true);
+        }
+        return $value;
     }
 
     /**

@@ -116,8 +116,15 @@ class SendEmailNotification implements JobContract
         $app = app();
 
         // Re-queue with incremented attempt
-        $app->queue->push(
-            new self($this->recipientId, $this->template, $this->data, $this->attempt + 1),
+        // Re-queue with incremented attempt
+        $app->queue->pushDelayed(
+            self::class,
+            [
+                'recipientId' => $this->recipientId,
+                'template' => $this->template,
+                'data' => $this->data,
+                'attempt' => $this->attempt + 1
+            ],
             'default',
             $this->getRetryDelay()
         );

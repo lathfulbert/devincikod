@@ -14,6 +14,7 @@ class Application
     public Router $router;
     public ModuleManager $moduleManager;
     public View $view;
+    public \App\Core\Queue\QueueManager $queue;
 
     public function __construct(protected string $basePath)
     {
@@ -31,6 +32,9 @@ class Application
         $this->config = new Config();
         $this->router = new Router();
         $this->view = new View($basePath . '/templates');
+
+        // Initialize Queue Manager
+        $this->queue = \App\Core\Queue\QueueManager::getInstance();
 
         // Initialize Module System with dependencies (SOLID: Dependency Injection)
         $modulesPath = $basePath . '/Modules';

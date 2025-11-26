@@ -41,6 +41,15 @@ class Notification extends Model
         parent::save();
     }
 
+    public function __get($key)
+    {
+        $value = parent::__get($key);
+        if ($key === 'data' && is_string($value)) {
+            return json_decode($value, true);
+        }
+        return $value;
+    }
+
     /**
      * Get recipients for this notification
      */

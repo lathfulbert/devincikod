@@ -388,7 +388,7 @@ class QueryBuilder
     /**
      * Create a new record
      */
-    public function create(array $data): bool
+    public function create(array $data): mixed
     {
         $model = new ($this->model)();
 
@@ -397,7 +397,7 @@ class QueryBuilder
         }
 
         $model->save();
-        return true;
+        return $model;
     }
 
     /**

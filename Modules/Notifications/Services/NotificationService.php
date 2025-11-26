@@ -95,11 +95,12 @@ class NotificationService
         foreach ($recipient->channels as $channel) {
             if ($channel === 'email') {
                 // Enqueue email job
-                $this->app->queue->push(new SendEmailNotification(
-                    $recipient->id,
-                    $template,
-                    $data
-                ));
+                $this->app->queue->push(SendEmailNotification::class, [
+                    'recipientId' => $recipient->id,
+                    'template' => $template,
+                    'data' => $data,
+                    'attempt' => 1
+                ]);
             }
             // Add other channels (SMS, Push) in future
         }

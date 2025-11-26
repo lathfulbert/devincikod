@@ -47,6 +47,15 @@ class NotificationTemplate extends Model
         parent::save();
     }
 
+    public function __get($key)
+    {
+        $value = parent::__get($key);
+        if ($key === 'variables' && is_string($value)) {
+            return json_decode($value, true);
+        }
+        return $value;
+    }
+
     /**
      * Get active template by name and channel
      */

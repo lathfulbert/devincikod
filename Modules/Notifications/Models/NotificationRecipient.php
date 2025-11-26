@@ -40,6 +40,15 @@ class NotificationRecipient extends Model
         parent::save();
     }
 
+    public function __get($key)
+    {
+        $value = parent::__get($key);
+        if ($key === 'channels' && is_string($value)) {
+            return json_decode($value, true);
+        }
+        return $value;
+    }
+
     /**
      * Get the notification
      */

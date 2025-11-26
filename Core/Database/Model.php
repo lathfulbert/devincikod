@@ -64,41 +64,69 @@ abstract class Model
     {
         $db = Database::getInstance();
         $table = static::getTable();
+        $pk = static::$primaryKey ?? 'id';
 
-        if (isset($this->attributes['id']) && $this->attributes['id'] !== null) {
-            // Update
-            $set = [];
-            $params = [];
-            foreach ($this->attributes as $key => $value) {
-                if ($key === 'id') continue;
-                $set[] = "`{$key}` = ?";
-                $params[] = $value;
+        $isUpdate = false;
+        if (isset($this->attributes[$pk])) {
+            if ($pk === 'id') {
+                $isUpdate = true;
+            } else {
+                // Check DB for custom PK
+                $check = $db->query("SELECT 1 FROM `{$table}` WHERE `{$pk}` = ?", [$this->attributes[$pk]])->fetch();
+                if ($check) {
+                    $isUpdate = true;
+                }
             }
-            $params[] = $this->attributes['id'];
-            $sql = "UPDATE `{$table}` SET " . implode(', ', $set) . " WHERE id = ?";
-            $db->query($sql, $params);
+        }
+
+        if ($isUpdate) {
+            // Update
+            $sets = [];
+            $values = [];
+            foreach ($this->attributes as $key => $value) {
+                if ($key === $pk) continue;
+                $sets[] = "`{$key}` = ?";
+                $values[] = $value;
+            }
+            $values[] = $this->attributes[$pk];
+
+            $sql = "UPDATE `{$table}` SET " . implode(', ', $sets) . " WHERE `{$pk}` = ?";
+            $db->query($sql, $values);
         } else {
-            // Insert - exclude 'id' field for auto-increment
-            $insertData = $this->attributes;
-            unset($insertData['id']); // Remove id if it exists
+            // Insert
+            $columns = array_keys($this->attributes);
+            $placeholders = array_fill(0, count($columns), '?');
 
-            $keys = array_keys($insertData);
-            $placeholders = array_fill(0, count($keys), '?');
+            $sql = "INSERT INTO `{$table}` (`" . implode('`, `', $columns) . "`) VALUES (" . implode(', ', $placeholders) . ")";
+            $db->query($sql, array_values($this->attributes));
 
-            $columnNames = array_map(fn($k) => "`{$k}`", $keys);
-            $sql = "INSERT INTO `{$table}` (" . implode(', ', $columnNames) . ") VALUES (" . implode(', ', $placeholders) . ")";
-            $db->query($sql, array_values($insertData));
-            $this->attributes['id'] = $db->getPdo()->lastInsertId();
+            if ($pk === 'id' && !isset($this->attributes['id'])) {
+                $this->attributes['id'] = $db->getPdo()->lastInsertId();
+            }
         }
     }
 
     public function delete(): void
     {
-        if (isset($this->attributes['id'])) {
+        $pk = static::$primaryKey ?? 'id';
+        if (isset($this->attributes[$pk])) {
             $db = Database::getInstance();
             $table = static::getTable();
-            $db->query("DELETE FROM {$table} WHERE id = ?", [$this->attributes['id']]);
+            $db->query("DELETE FROM {$table} WHERE `{$pk}` = ?", [$this->attributes[$pk]]);
         }
+    }
+
+    /**
+     * Update the model attributes
+     */
+    public function update(array $data): bool
+    {
+        foreach ($data as $key => $value) {
+            $this->attributes[$key] = $value;
+        }
+
+        $this->save();
+        return true;
     }
 
     public function __get($key)
