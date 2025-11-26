@@ -1,0 +1,22 @@
+{
+    "name": "Backup",
+    "description": "Module de sauvegarde, restauration et monitoring système",
+    "version": "1.0.0",
+    "author": "SunuFramework",
+    "enabled": true,
+    "dependencies": [],
+    "providers": [],
+    "routes": {
+        "api": "Routes/api_v1.php",
+        "web": "Routes/admin.php"
+    },
+    "migrations": "Database/Migrations",
+    "config": "config/backup.php",
+    "permissions": [
+        "backup.view",
+        "backup.create",
+        "backup.restore",
+        "backup.delete",
+        "backup.view_health"
+    ]
+}
