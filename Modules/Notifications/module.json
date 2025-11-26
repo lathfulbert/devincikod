@@ -1,0 +1,17 @@
+{
+    "name": "Notifications",
+    "description": "Multi-channel notification system with Email, SMS, Push, and In-app notifications",
+    "version": "1.0.0",
+    "author": "SunuFramework",
+    "enabled": true,
+    "dependencies": [],
+    "providers": [
+        "Modules\\Notifications\\Providers\\NotificationServiceProvider"
+    ],
+    "routes": {
+        "api": "routes/api.php",
+        "web": "routes/web.php"
+    },
+    "migrations": "Database/Migrations",
+    "config": "config/notifications.php"
+}

@@ -664,6 +664,26 @@ if (!function_exists('Http')) {
     }
 }
 
+if (!function_exists('Notification')) {
+    /**
+     * Get notification service instance or send notification
+     * 
+     * @param array|null $payload If provided, sends notification
+     * @return \Modules\Notifications\Services\NotificationService|mixed
+     */
+    function Notification(?array $payload = null)
+    {
+        $app = app();
+        $service = new \Modules\Notifications\Services\NotificationService($app);
+
+        if ($payload !== null) {
+            return $service->send($payload);
+        }
+
+        return $service;
+    }
+}
+
 if (!function_exists('sanitize')) {
     /**
      * Sanitize input data

@@ -1,0 +1,473 @@
+Notification System - Plan d'Implémentation Complet
+Système de notification centralisé multi-canal (Email, SMS, Push, In-app) pour SunuFramework.
+
+🎯 Objectif
+Un service centralisé qui :
+
+✅ Expose une API unique pour envoyer des notifications
+✅ Gère plusieurs canaux : Email, SMS, Push (FCM/APNs), In-app, Webhooks
+✅ Templates paramétrables avec variables
+✅ User preferences (opt-in/opt-out, DND, canaux préférés)
+✅ Planification & retry automatique
+✅ Provider abstraction (SendGrid, Mailgun, Twilio, etc.)
+✅ Monitoring & analytics
+📐 Architecture Globale
+API Request
+NotificationService
+Router/Orchestrator
+Template Renderer
+Queue Manager
+Email Worker
+SMS Worker
+Push Worker
+InApp Worker
+Provider: SendGrid/SMTP
+Provider: Twilio/SMS
+Provider: FCM/APNs
+WebSocket/Database
+Composants Principaux
+NotificationService - Point d'entrée, validation, business logic
+NotificationRouter - Décide canaux & providers selon préférences user
+TemplateEngine - Render templates avec variables
+ProviderManager - Abstraction providers (Email, SMS, Push)
+QueueWorkers - Workers par canal (async)
+DeliveryTracker - Logs, status, retries
+UserPreferences - Gestion préférences utilisateur
+Scheduler - Envois programmés/récurrents
+🗄️ Modèle de Données
+Tables Principales
+-- Notifications principales
+CREATE TABLE notifications (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    event_type VARCHAR(100) NOT NULL,
+    data JSON NOT NULL,
+    status ENUM('pending', 'processing', 'completed', 'failed') DEFAULT 'pending',
+    priority TINYINT DEFAULT 5,
+    scheduled_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_status_scheduled (status, scheduled_at)
+);
+-- Destinataires
+CREATE TABLE notification_recipients (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    notification_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    channels JSON NOT NULL, -- ['email', 'sms', 'push']
+    status ENUM('pending', 'sent', 'failed', 'cancelled') DEFAULT 'pending',
+    attempts TINYINT DEFAULT 0,
+    FOREIGN KEY (notification_id) REFERENCES notifications(id),
+    INDEX idx_user_status (user_id, status)
+);
+-- Logs de delivery
+CREATE TABLE delivery_logs (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    recipient_id BIGINT NOT NULL,
+    channel VARCHAR(20) NOT NULL,
+    provider VARCHAR(50) NOT NULL,
+    provider_message_id VARCHAR(255),
+    status ENUM('sent', 'delivered', 'failed', 'bounced', 'complained') DEFAULT 'sent',
+    error_message TEXT,
+    metadata JSON,
+    attempt TINYINT DEFAULT 1,
+    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (recipient_id) REFERENCES notification_recipients(id),
+    INDEX idx_provider_status (provider, status, sent_at)
+);
+-- Templates
+CREATE TABLE notification_templates (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    channel VARCHAR(20) NOT NULL,
+    version INT DEFAULT 1,
+    subject VARCHAR(255),
+    body_html TEXT,
+    body_text TEXT,
+    body_sms VARCHAR(160),
+    push_title VARCHAR(100),
+    push_body VARCHAR(200),
+    variables JSON,
+    active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_name_channel (name, channel)
+);
+-- Préférences utilisateur
+CREATE TABLE user_notification_preferences (
+    user_id BIGINT PRIMARY KEY,
+    channels_enabled JSON DEFAULT '["email", "push", "sms"]',
+    dnd_enabled BOOLEAN DEFAULT FALSE,
+    dnd_from TIME,
+    dnd_to TIME,
+    timezone VARCHAR(50) DEFAULT 'UTC',
+    email_opt_in BOOLEAN DEFAULT TRUE,
+    sms_opt_in BOOLEAN DEFAULT TRUE,
+    push_opt_in BOOLEAN DEFAULT TRUE,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+-- Providers configuration
+CREATE TABLE notification_providers (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    type VARCHAR(20) NOT NULL, -- 'email', 'sms', 'push'
+    name VARCHAR(50) NOT NULL,
+    driver VARCHAR(50) NOT NULL, -- 'sendgrid', 'mailgun', 'twilio', etc.
+    config JSON NOT NULL, -- credentials, endpoints
+    weight TINYINT DEFAULT 10,
+    enabled BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_type_name (type, name)
+);
+-- Provider metrics
+CREATE TABLE provider_metrics (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    provider_id INT NOT NULL,
+    success_count INT DEFAULT 0,
+    fail_count INT DEFAULT 0,
+    avg_latency_ms INT DEFAULT 0,
+    last_success_at TIMESTAMP NULL,
+    last_failure_at TIMESTAMP NULL,
+    date DATE NOT NULL,
+    FOREIGN KEY (provider_id) REFERENCES notification_providers(id),
+    UNIQUE KEY uk_provider_date (provider_id, date)
+);
+-- Notifications in-app
+CREATE TABLE inapp_notifications (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    notification_id BIGINT,
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    type VARCHAR(50) DEFAULT 'info',
+    read_at TIMESTAMP NULL,
+    clicked_at TIMESTAMP NULL,
+    data JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_user_unread (user_id, read_at),
+    FOREIGN KEY (notification_id) REFERENCES notifications(id)
+);
+🏗️ Structure de Fichiers
+Core/
+  Notifications/
+    NotificationService.php
+    NotificationRouter.php
+    TemplateEngine.php
+    ProviderManager.php
+    Channels/
+      EmailChannel.php
+      SmsChannel.php
+      PushChannel.php
+      InAppChannel.php
+    Providers/
+      Email/
+        SendGridProvider.php
+        MailgunProvider.php
+        SMTPProvider.php
+        SESProvider.php
+      SMS/
+        TwilioProvider.php
+        VonageProvider.php
+        AfricaSMSProvider.php
+      Push/
+        FCMProvider.php
+        APNsProvider.php
+    Jobs/
+      SendEmailNotification.php
+      SendSMSNotification.php
+      SendPushNotification.php
+      SendInAppNotification.php
+  Contracts/
+    NotificationChannelInterface.php
+    NotificationProviderInterface.php
+Modules/
+  Notifications/
+    Controllers/
+      NotificationController.php
+      TemplateController.php
+      PreferenceController.php
+    Models/
+      Notification.php
+      NotificationRecipient.php
+      DeliveryLog.php
+      NotificationTemplate.php
+      UserNotificationPreference.php
+    Services/
+      NotificationService.php
+      DeliveryTracker.php
+    Database/
+      Migrations/
+        001_create_notifications_tables.php
+🔌 Interfaces & Contrats
+NotificationChannelInterface
+interface NotificationChannelInterface
+{
+    public function send(NotificationRecipient $recipient, array $payload): bool;
+    public function supports(string $channel): bool;
+}
+NotificationProviderInterface
+interface NotificationProviderInterface
+{
+    public function send(array $payload): ProviderResponse;
+    public function healthCheck(): bool;
+    public function getType(): string; // 'email', 'sms', 'push'
+}
+ProviderResponse
+class ProviderResponse
+{
+    public function __construct(
+        public bool $success,
+        public ?string $messageId = null,
+        public ?string $error = null,
+        public array $metadata = []
+    ) {}
+}
+📨 API Endpoints
+Core API
+POST /api/v1/notifications
+{
+  "event": "order_shipped",
+  "recipients": [
+    {
+      "user_id": 123,
+      "channels": ["email", "push"],
+      "data": {"order_id": "ORD-001"}
+    }
+  ],
+  "template": "order_shipped",
+  "data": {
+    "order_number": "ORD-001",
+    "tracking_url": "https://..."
+  },
+  "scheduled_at": "2024-12-01T10:00:00Z" // optional
+}
+GET /api/v1/notifications/{id}
+GET /api/v1/notifications/{id}/logs
+POST /api/v1/templates
+GET /api/v1/templates
+PUT /api/v1/templates/{id}
+GET /api/v1/users/{id}/preferences
+PUT /api/v1/users/{id}/preferences
+GET /api/v1/providers
+PUT /api/v1/providers/{id}/toggle
+🎨 Template Engine
+Syntaxe (Blade-like)
+<!-- Email Template -->
+<html>
+<body>
+  <h1>Bonjour {{ $user->name }} !</h1>
+  
+  <p>Votre commande #{{ $order->number }} a été expédiée.</p>
+  
+  @if($tracking_url)
+    <a href="{{ $tracking_url }}">Suivre votre colis</a>
+  @endif
+  
+  <p>Livraison estimée : {{ $delivery_date }}</p>
+</body>
+</html>
+<!-- SMS Template -->
+Bonjour {{ $user->name }}, votre commande #{{ $order->number }} a été expédiée. Suivez-la: {{ $tracking_url }}
+<!-- Push Template -->
+{
+  "title": "Commande expédiée",
+  "body": "Votre commande #{{ $order->number }} est en route !",
+  "data": {
+    "order_id": "{{ $order->id }}",
+    "action": "view_order"
+  }
+}
+🔄 Flux de Traitement
+1. Création de Notification
+NotificationService::send([
+    'event' => 'welcome',
+    'user_id' => 123,
+    'template' => 'welcome_email',
+    'data' => ['name' => 'John'],
+]);
+2. Orchestration
+// NotificationRouter
+1. Récupérer préférences utilisateur
+2. Filtrer canaux (opt-out, DND)
+3. Sélectionner template par canal
+4. Render template avec data
+5. Choisir provider (weight, health, cost)
+6. Enqueue jobs par canal
+3. Worker Processing
+// SendEmailNotification Job
+1. Récupérer notification details
+2. Vérifier retry count < max
+3. Appeler provider->send()
+4. Logger résultat
+5. Si échec: retry avec backoff
+6. Si succès: marquer delivered
+⚙️ Configuration
+config/notifications.php
+return [
+    'default_channel' => 'email',
+    
+    'channels' => [
+        'email' => [
+            'default_provider' => 'sendgrid',
+            'from' => [
+                'address' => 'noreply@sunuframework.com',
+                'name' => 'SunuFramework',
+            ],
+        ],
+        'sms' => [
+            'default_provider' => 'twilio',
+        ],
+        'push' => [
+            'default_provider' => 'fcm',
+        ],
+    ],
+    
+    'providers' => [
+        'sendgrid' => [
+            'driver' => 'sendgrid',
+            'api_key' => env('SENDGRID_API_KEY'),
+        ],
+        'mailgun' => [
+            'driver' => 'mailgun',
+            'domain' => env('MAILGUN_DOMAIN'),
+            'secret' => env('MAILGUN_SECRET'),
+        ],
+        'twilio' => [
+            'driver' => 'twilio',
+            'account_sid' => env('TWILIO_ACCOUNT_SID'),
+            'auth_token' => env('TWILIO_AUTH_TOKEN'),
+            'from' => env('TWILIO_FROM'),
+        ],
+        'fcm' => [
+            'driver' => 'fcm',
+            'server_key' => env('FCM_SERVER_KEY'),
+        ],
+    ],
+    
+    'retry' => [
+        'max_attempts' => 3,
+        'backoff' => [30, 300, 1800], // 30s, 5m, 30m
+    ],
+    
+    'throttle' => [
+        'email' => ['rate' => 100, 'per' => 'minute'],
+        'sms' => ['rate' => 10, 'per' => 'minute'],
+    ],
+];
+🔐 Sécurité & Conformité
+1. Authentication
+API keys avec rate limiting
+OAuth2 pour backoffice
+RBAC pour gestion templates
+2. Data Protection
+Encrypt credentials (KMS/Vault)
+PII minimization en logs
+Audit trail complet
+3. Conformité RGPD
+Double opt-in
+Unsubscribe global
+Data retention policies
+Right to be forgotten
+4. Anti-Spam
+Suppression list
+Bounce handling
+Complaint tracking
+DND windows
+📊 Monitoring & KPIs
+Métriques Clés
+- notifications.created (count, by event_type)
+- notifications.sent (count, by channel, by provider)
+- notifications.delivered (count, rate)
+- notifications.failed (count, by provider, by error_type)
+- notifications.latency (avg, p95, p99)
+- provider.health (up/down)
+- provider.cost (per message)
+- queue.depth (by channel)
+Dashboards
+Throughput par canal
+Success rate par provider
+Latency distribution
+Error rate & types
+Cost tracking
+🚀 Roadmap d'Implémentation
+Phase 1 - MVP (2-3 semaines) ✅ PRIORITÉ
+ Database schema & migrations
+ NotificationService core
+ Email channel + SMTP provider
+ Template engine (Blade-based)
+ Basic queue integration
+ Delivery logging
+ Simple API (POST /notifications)
+Phase 2 - Multi-Provider (2 semaines)
+ Provider abstraction
+ SendGrid, Mailgun providers
+ Provider selection logic
+ Health checks
+ Retry mechanism + DLQ
+Phase 3 - Multi-Canal (2-3 semaines)
+ SMS channel + Twilio
+ Push channel + FCM
+ In-app notifications
+ User preferences
+ Opt-out management
+Phase 4 - Advanced Features (3-4 semaines)
+ Scheduled notifications
+ Template versioning
+ A/B testing
+ Analytics & tracking
+ Backoffice UI (templates, monitoring)
+Phase 5 - Scale & Optimize (continu)
+ Throttling & rate limiting
+ Cost-based routing
+ Deliverability tools (DKIM/SPF)
+ Advanced monitoring
+ Multi-tenant support
+💡 Recommandations Techniques
+Stack Adapté à SunuFramework
+Backend: PHP 8.2+ (existant)
+Queue: Redis + votre Queue system actuel
+Templates: Blade engine (existant)
+DB: MySQL/PostgreSQL
+Cache: Redis
+Monitoring: Prometheus + Grafana
+Workers: CLI workers avec supervisor
+Providers Recommandés (Afrique)
+Email:
+
+SendGrid (international)
+Mailgun (backup)
+SMTP (fallback)
+SMS:
+
+Priorité Afrique: Providers locaux (moins cher, meilleur taux)
+Twilio (international)
+Vonage (backup)
+Providers par pays (Sénégal, Côte d'Ivoire, etc.)
+Push:
+
+FCM (Android)
+APNs (iOS)
+⚠️ Pièges à Éviter
+Credentials en clair → Utiliser encryption
+Spam → Rate limiting + suppression list
+HTML email → Toujours fallback text
+Provider limits → Throttling intelligent
+Bounces ignorés → Gérer webhooks rapidement
+Logs PII → Minimiser données sensibles
+Retry infini → Max attempts + DLQ
+Templates non testés → Preview + test send
+📝 Exemple d'Utilisation
+// Simple notification
+Notification::send([
+    'event' => 'welcome',
+    'user_id' => 123,
+    'template' => 'welcome',
+]);
+// Multi-canal avec scheduling
+Notification::send([
+    'event' => 'promo_campaign',
+    'users' => [123, 456, 789],
+    'channels' => ['email', 'sms', 'push'],
+    'template' => 'black_friday',
+    'data' => ['discount' => '50%'],
+    'scheduled_at' => '2024-11-29 00:00:00',
+]);
+// Via événement
+event(new OrderShipped($order));
+// → Listener auto-envoi notification
