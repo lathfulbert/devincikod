@@ -5,6 +5,7 @@ namespace App\Core\Database;
 abstract class Model
 {
     protected static string $table;
+    protected static string $primaryKey = 'id';
     protected array $attributes = [];
 
     public function __construct(array $attributes = [])
@@ -44,14 +45,15 @@ abstract class Model
     {
         $db = Database::getInstance();
         $table = static::getTable();
+        $pk = static::$primaryKey ?? 'id';
 
         // Check if model uses SoftDeletes trait
         $usesSoftDeletes = in_array('App\Core\Database\Traits\SoftDeletes', class_uses(static::class));
 
         if ($usesSoftDeletes) {
-            $stmt = $db->query("SELECT * FROM `{$table}` WHERE id = ? AND `deleted_at` IS NULL", [$id]);
+            $stmt = $db->query("SELECT * FROM `{$table}` WHERE `{$pk}` = ? AND `deleted_at` IS NULL", [$id]);
         } else {
-            $stmt = $db->query("SELECT * FROM `{$table}` WHERE id = ?", [$id]);
+            $stmt = $db->query("SELECT * FROM `{$table}` WHERE `{$pk}` = ?", [$id]);
         }
 
         $result = $stmt->fetchObject(static::class);
