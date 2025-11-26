@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Console\Command;
+use App\Core\Application;
 
 /**
  * Make Listener Command
@@ -10,22 +10,39 @@ use App\Console\Command;
  * Generates a new event listener class.
  * Usage: php sunu make:listener ListenerName --module=ModuleName [--event=EventName] [--queued]
  */
-class MakeListenerCommand extends Command
+class MakeListenerCommand
 {
-    protected string $signature = 'make:listener {name} {--module=} {--event=} {--queued}';
-    protected string $description = 'Create a new event listener class';
-
-    public function handle(): int
+    public function execute(Application $app, array $args): void
     {
-        $name = $this->argument('name');
-        $module = $this->option('module');
-        $event = $this->option('event');
-        $queued = $this->option('queued');
+        // Parse arguments
+        $name = null;
+        $module = null;
+        $event = null;
+        $queued = false;
 
-        // If no module specified, ask user
+        foreach ($args as $arg) {
+            if (str_starts_with($arg, '--module=')) {
+                $module = substr($arg, 9);
+            } elseif (str_starts_with($arg, '--event=')) {
+                $event = substr($arg, 8);
+            } elseif ($arg === '--queued') {
+                $queued = true;
+            } elseif (!str_starts_with($arg, '--')) {
+                $name = $arg;
+            }
+        }
+
+        // Validation
+        if (!$name) {
+            echo "❌ Error: Listener name is required\n";
+            echo "Usage: php sunu make:listener ListenerName --module=ModuleName [--event=EventName] [--queued]\n";
+            return;
+        }
+
         if (!$module) {
-            $this->error('Please specify a module using --module=ModuleName');
-            return 1;
+            echo "❌ Error: Module name is required\n";
+            echo "Usage: php sunu make:listener ListenerName --module=ModuleName [--event=EventName] [--queued]\n";
+            return;
         }
 
         // Build paths
@@ -39,7 +56,7 @@ class MakeListenerCommand extends Command
             $namespace .= '\\' . implode('\\', $parts);
         }
 
-        $directory = dirname(__DIR__, 3) . "/Modules/{$module}/Listeners";
+        $directory = $app->getBasePath() . "/Modules/{$module}/Listeners";
 
         // Create directory if not exists
         if (!is_dir($directory)) {
@@ -50,8 +67,8 @@ class MakeListenerCommand extends Command
 
         // Check if file exists
         if (file_exists($filePath)) {
-            $this->error("Listener already exists: {$filePath}");
-            return 1;
+            echo "❌ Error: Listener already exists: {$filePath}\n";
+            return;
         }
 
         // Get stub content
@@ -69,20 +86,20 @@ class MakeListenerCommand extends Command
         // Write file
         file_put_contents($filePath, $content);
 
-        $this->success("Listener created successfully!");
-        $this->info("Location: {$filePath}");
-        $this->info("Class: {$namespace}\\" . basename($fileName, '.php'));
+        echo "\n";
+        echo "✅ Listener created successfully!\n";
+        echo "📁 Location: {$filePath}\n";
+        echo "📦 Class: {$namespace}\\" . basename($fileName, '.php') . "\n";
 
         if ($queued) {
-            $this->info("Type: Queued Listener (async)");
+            echo "⚡ Type: Queued Listener (async)\n";
         }
 
         // Remind about events.php
-        $this->line('');
-        $this->warn("Don't forget to register this listener in:");
-        $this->info("Modules/{$module}/events.php");
-
-        return 0;
+        echo "\n";
+        echo "⚠️  Don't forget to register this listener in:\n";
+        echo "   Modules/{$module}/events.php\n";
+        echo "\n";
     }
 
     protected function getStub(): string

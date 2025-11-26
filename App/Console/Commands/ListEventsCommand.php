@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Console\Command;
+use App\Core\Application;
 use App\Core\Events\EventDispatcher;
 
 /**
@@ -11,33 +11,34 @@ use App\Core\Events\EventDispatcher;
  * Lists all registered events and their listeners.
  * Usage: php sunu events:list
  */
-class ListEventsCommand extends Command
+class ListEventsCommand
 {
-    protected string $signature = 'events:list';
-    protected string $description = 'List all registered events and listeners';
-
-    public function handle(): int
+    public function execute(Application $app, array $args): void
     {
-        $dispatcher = EventDispatcher::getInstance();
         $provider = new \App\Core\Events\ListenerProvider();
 
         $allListeners = $provider->getAllListeners();
 
         if (empty($allListeners)) {
-            $this->warn('No events registered.');
-            $this->info('Events are registered in module events.php files.');
-            return 0;
+            echo "\n";
+            echo "⚠️  No events registered.\n";
+            echo "💡 Events are registered in module events.php files.\n";
+            echo "\n";
+            return;
         }
 
-        $this->success('Registered Events:');
-        $this->line('');
+        echo "\n";
+        echo "╔════════════════════════════════════════╗\n";
+        echo "║      Registered Events & Listeners     ║\n";
+        echo "╚════════════════════════════════════════╝\n";
+        echo "\n";
 
         foreach ($allListeners as $event => $listeners) {
             // Display event name
-            $this->line("📢 <fg=cyan>{$event}</fg=cyan>");
+            echo "📢 {$event}\n";
 
             if (empty($listeners)) {
-                $this->line('   <fg=yellow>No listeners</fg=yellow>');
+                echo "   ⚠️  No listeners\n";
             } else {
                 foreach ($listeners as $listener) {
                     // Check if listener is queued
@@ -47,19 +48,19 @@ class ListEventsCommand extends Command
                         $isQueued = isset($interfaces['App\Core\Contracts\ShouldQueue']);
                     }
 
-                    $queueBadge = $isQueued ? ' <fg=green>[QUEUED]</fg=green>' : ' <fg=blue>[SYNC]</fg=blue>';
-                    $this->line("   ↳ {$listener}{$queueBadge}");
+                    $queueBadge = $isQueued ? ' [⚡ QUEUED]' : ' [✓ SYNC]';
+                    echo "   ↳ {$listener}{$queueBadge}\n";
                 }
             }
 
-            $this->line('');
+            echo "\n";
         }
 
         $totalEvents = count($allListeners);
         $totalListeners = array_sum(array_map('count', $allListeners));
 
-        $this->info("Total: {$totalEvents} event(s), {$totalListeners} listener(s)");
-
-        return 0;
+        echo "───────────────────────────────────────────\n";
+        echo "📊 Total: {$totalEvents} event(s), {$totalListeners} listener(s)\n";
+        echo "\n";
     }
 }

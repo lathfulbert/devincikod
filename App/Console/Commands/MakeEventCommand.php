@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Console\Command;
+use App\Core\Application;
 
 /**
  * Make Event Command
@@ -10,20 +10,33 @@ use App\Console\Command;
  * Generates a new event class.
  * Usage: php sunu make:event EventName --module=ModuleName
  */
-class MakeEventCommand extends Command
+class MakeEventCommand
 {
-    protected string $signature = 'make:event {name} {--module=}';
-    protected string $description = 'Create a new event class';
-
-    public function handle(): int
+    public function execute(Application $app, array $args): void
     {
-        $name = $this->argument('name');
-        $module = $this->option('module');
+        // Parse arguments
+        $name = null;
+        $module = null;
 
-        // If no module specified, ask user
+        foreach ($args as $arg) {
+            if (str_starts_with($arg, '--module=')) {
+                $module = substr($arg, 9);
+            } elseif (!str_starts_with($arg, '--')) {
+                $name = $arg;
+            }
+        }
+
+        // Validation
+        if (!$name) {
+            echo "❌ Error: Event name is required\n";
+            echo "Usage: php sunu make:event EventName --module=ModuleName\n";
+            return;
+        }
+
         if (!$module) {
-            $this->error('Please specify a module using --module=ModuleName');
-            return 1;
+            echo "❌ Error: Module name is required\n";
+            echo "Usage: php sunu make:event EventName --module=ModuleName\n";
+            return;
         }
 
         // Build paths
@@ -37,7 +50,7 @@ class MakeEventCommand extends Command
             $namespace .= '\\' . implode('\\', $parts);
         }
 
-        $directory = dirname(__DIR__, 3) . "/Modules/{$module}/Events";
+        $directory = $app->getBasePath() . "/Modules/{$module}/Events";
 
         // Create directory if not exists
         if (!is_dir($directory)) {
@@ -48,8 +61,8 @@ class MakeEventCommand extends Command
 
         // Check if file exists
         if (file_exists($filePath)) {
-            $this->error("Event already exists: {$filePath}");
-            return 1;
+            echo "❌ Error: Event already exists: {$filePath}\n";
+            return;
         }
 
         // Get stub content
@@ -65,11 +78,11 @@ class MakeEventCommand extends Command
         // Write file
         file_put_contents($filePath, $content);
 
-        $this->success("Event created successfully!");
-        $this->info("Location: {$filePath}");
-        $this->info("Class: {$namespace}\\" . basename($fileName, '.php'));
-
-        return 0;
+        echo "\n";
+        echo "✅ Event created successfully!\n";
+        echo "📁 Location: {$filePath}\n";
+        echo "📦 Class: {$namespace}\\" . basename($fileName, '.php') . "\n";
+        echo "\n";
     }
 
     protected function getStub(): string
