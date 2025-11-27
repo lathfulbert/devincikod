@@ -1,5 +1,7 @@
 @extends('backend.layouts.master')
 
+@section('title', $title ?? 'Admin')
+
 @section('content')
 
 <div class="container-fluid">

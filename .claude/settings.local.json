@@ -3,7 +3,8 @@
     "allow": [
       "Bash(mkdir:*)",
       "Bash(php -r:*)",
-      "Bash(php:*)"
+      "Bash(php:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

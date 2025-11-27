@@ -1,5 +1,7 @@
 @extends('backend.layouts.master')
 
+@section('title', $title ?? 'Monitoring')
+
 @section('content')
 @if ($msg = flash('success'))
 <div class="alert alert-success" role="alert">

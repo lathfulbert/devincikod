@@ -1,4 +1,6 @@
-@extends('admin.layout')
+@extends('backend.layouts.master')
+
+@section('title', $title ?? 'Cache')
 
 @section('styles')
 <!-- Styles additionnels si nécessaires pour cette page -->

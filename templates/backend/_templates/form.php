@@ -17,7 +17,9 @@ $form_action = $is_edit
     ? url('/admin/' . ($module_name ?? 'module') . '/update/' . $item->id)
     : url('/admin/' . ($module_name ?? 'module') . '/store');
 ?>
-@extends('admin.layout')
+@extends('backend.layouts.master')
+
+@section('title', $title ?? 'Admin')
 
 @section('content')
 

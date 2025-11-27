@@ -1,4 +1,6 @@
-@extends('admin.layout')
+@extends('backend.layouts.master')
+
+@section('title', $title ?? 'Admin')
 
 @section('content')
 
