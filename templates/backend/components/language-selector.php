@@ -1,6 +1,3 @@
-<!-- Language Selector Component -->
-<!-- Usage: <?php component('language-selector') ?> -->
-
 <?php
 // Charger la configuration des langues depuis le fichier centralisé
 $localeConfig = config('languages');
@@ -28,10 +25,10 @@ $currentConfig = $localeConfig[$currentLocale] ?? [
 ];
 ?>
 
-<div class="translate_wrapper">
+<div class="translate_wrapper" style="position: relative; z-index: 1000;">
     <div class="current_lang">
         <div class="lang">
-            <i class="<?= $currentConfig['flag'] ?>"></i>
+            <i class="flag-icon <?= $currentConfig['flag'] ?>"></i>
             <span class="lang-txt"><?= $currentConfig['short'] ?></span>
         </div>
     </div>
@@ -46,7 +43,7 @@ $currentConfig = $localeConfig[$currentLocale] ?? [
             $isSelected = ($locale === $currentLocale) ? 'selected' : '';
             ?>
             <div class="lang <?= $isSelected ?>" data-value="<?= $locale ?>" data-url="<?= url('?lang=' . $locale) ?>">
-                <i class="<?= $config['flag'] ?>"></i>
+                <i class="flag-icon <?= $config['flag'] ?>"></i>
                 <span class="lang-txt"><?= $config['name'] ?><?php if (isset($config['suffix'])): ?><span> <?= $config['suffix'] ?></span><?php endif; ?></span>
             </div>
         <?php endforeach; ?>
