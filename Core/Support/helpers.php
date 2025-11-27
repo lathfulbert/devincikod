@@ -121,11 +121,28 @@ if (!function_exists('component')) {
      */
     function component(string $name, array $data = [])
     {
-        extract($data);
-        $componentPath = dirname(__DIR__, 2) . '/templates/admin/components/' . $name . '.php';
-        if (file_exists($componentPath)) {
-            include $componentPath;
+        // Protection contre la récursion infinie
+        static $depth = 0;
+        if ($depth > 10) {
+            error_log("Component recursion detected for: $name");
+            return;
         }
+
+        $depth++;
+
+        // Essayer d'abord dans backend, puis admin pour rétrocompatibilité
+        $backendPath = dirname(__DIR__, 2) . '/templates/backend/components/' . $name . '.php';
+        $adminPath = dirname(__DIR__, 2) . '/templates/admin/components/' . $name . '.php';
+
+        if (file_exists($backendPath)) {
+            extract($data, EXTR_SKIP);
+            include $backendPath;
+        } elseif (file_exists($adminPath)) {
+            extract($data, EXTR_SKIP);
+            include $adminPath;
+        }
+
+        $depth--;
     }
 }
 
@@ -588,9 +605,7 @@ if (!function_exists('csrf_field')) {
      */
     function csrf_field(): string
     {
-        $tokenField = \App\Core\Security\CSRF::getInstance()->getTokenField();
-        file_put_contents(__DIR__ . '/../../storage/logs/debug_csrf.log', "csrf_field called. Result: " . $tokenField . "\n", FILE_APPEND);
-        return $tokenField;
+        return \App\Core\Security\CSRF::getInstance()->getTokenField();
     }
 }
 

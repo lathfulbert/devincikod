@@ -32,7 +32,7 @@ $currentConfig = $localeConfig[$currentLocale] ?? [
     <div class="current_lang">
         <div class="lang">
             <i class="<?= $currentConfig['flag'] ?>"></i>
-            <span class="lang-txt"><?= $currentConfig['short'] ?> </span>
+            <span class="lang-txt"><?= $currentConfig['short'] ?></span>
         </div>
     </div>
     <div class="more_lang">
@@ -47,12 +47,7 @@ $currentConfig = $localeConfig[$currentLocale] ?? [
             ?>
             <div class="lang <?= $isSelected ?>" data-value="<?= $locale ?>" data-url="<?= url('?lang=' . $locale) ?>">
                 <i class="<?= $config['flag'] ?>"></i>
-                <span class="lang-txt">
-                    <?= $config['name'] ?>
-                    <?php if (isset($config['suffix'])): ?>
-                        <span> <?= $config['suffix'] ?></span>
-                    <?php endif; ?>
-                </span>
+                <span class="lang-txt"><?= $config['name'] ?><?php if (isset($config['suffix'])): ?><span> <?= $config['suffix'] ?></span><?php endif; ?></span>
             </div>
         <?php endforeach; ?>
     </div>
