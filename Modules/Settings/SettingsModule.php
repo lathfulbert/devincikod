@@ -37,6 +37,14 @@ class SettingsModule extends AbstractModule
             ['POST', '/admin/settings/mail/update', [\Modules\Settings\Controllers\MailSettingsController::class, 'update'], [$authMiddleware]],
             ['POST', '/admin/settings/mail/test', [\Modules\Settings\Controllers\MailSettingsController::class, 'sendTest'], [$authMiddleware]],
 
+            // Language Management
+            ['GET', '/admin/settings/languages', [\Modules\Settings\Controllers\LanguageController::class, 'index'], [$authMiddleware]],
+            ['POST', '/admin/settings/languages/activate', [\Modules\Settings\Controllers\LanguageController::class, 'activate'], [$authMiddleware]],
+            ['POST', '/admin/settings/languages/deactivate', [\Modules\Settings\Controllers\LanguageController::class, 'deactivate'], [$authMiddleware]],
+            ['POST', '/admin/settings/languages/set-default', [\Modules\Settings\Controllers\LanguageController::class, 'setDefault'], [$authMiddleware]],
+            ['POST', '/admin/settings/languages/set-fallback', [\Modules\Settings\Controllers\LanguageController::class, 'setFallback'], [$authMiddleware]],
+            ['POST', '/admin/settings/languages/create-file', [\Modules\Settings\Controllers\LanguageController::class, 'createFile'], [$authMiddleware]],
+
             // Translation Management
             ['GET', '/admin/settings/translations', [\Modules\Settings\Controllers\TranslationController::class, 'index'], [$authMiddleware]],
             ['GET', '/admin/settings/translations/create', [\Modules\Settings\Controllers\TranslationController::class, 'create'], [$authMiddleware]],
@@ -83,6 +91,7 @@ class SettingsModule extends AbstractModule
                     ['title' => 'Thème & Apparence', 'url' => '/admin/settings/theme', 'icon' => 'droplet'],
                     ['title' => 'API & Services', 'url' => '/admin/settings/api', 'icon' => 'key'],
                     ['title' => 'Configuration Mail', 'url' => '/admin/settings/mail', 'icon' => 'mail'],
+                    ['title' => 'Langues', 'url' => '/admin/settings/languages', 'icon' => 'globe'],
                     ['title' => 'Traductions', 'url' => '/admin/settings/translations', 'icon' => 'flag'],
                     ['title' => 'Webhooks', 'url' => '/admin/settings/webhooks', 'icon' => 'link'],
                 ]

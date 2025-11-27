@@ -1,32 +1,51 @@
 <!-- Language Selector Component -->
 <!-- Usage: <?php component('language-selector') ?> -->
 
-<div class="dropdown">
-    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-        <i data-feather="globe"></i> <?= strtoupper(app_locale()) ?>
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="languageDropdown">
-        <?php foreach (supported_locales() as $locale): ?>
-            <li>
-                <a class="dropdown-item <?= app_locale() === $locale ? 'active' : '' ?>"
-                    href="?lang=<?= $locale ?>">
-                    <?php
-                    $localeNames = [
-                        'fr' => '🇫🇷 Français',
-                        'en' => '🇬🇧 English',
-                        'ar' => '🇸🇦 العربية'
-                    ];
-                    echo $localeNames[$locale] ?? strtoupper($locale);
-                    ?>
-                </a>
-            </li>
+<?php
+// Charger la configuration des langues depuis le fichier centralisé
+$localeConfig = config('languages', []);
+
+$currentLocale = app_locale();
+$supportedLocales = supported_locales();
+
+// Configuration de la langue courante avec fallback
+$currentConfig = $localeConfig[$currentLocale] ?? [
+    'name' => strtoupper($currentLocale),
+    'native_name' => strtoupper($currentLocale),
+    'flag' => 'flag-icon-us',
+    'short' => strtoupper($currentLocale)
+];
+?>
+
+<div class="translate_wrapper">
+    <div class="current_lang">
+        <div class="lang">
+            <i class="<?= $currentConfig['flag'] ?>"></i>
+            <span class="lang-txt"><?= $currentConfig['short'] ?> </span>
+        </div>
+    </div>
+    <div class="more_lang">
+        <?php foreach ($supportedLocales as $locale): ?>
+            <?php
+            $config = $localeConfig[$locale] ?? [
+                'name' => strtoupper($locale),
+                'flag' => 'flag-icon-us',
+                'short' => strtoupper($locale)
+            ];
+            $isSelected = ($locale === $currentLocale) ? 'selected' : '';
+            ?>
+            <div class="lang <?= $isSelected ?>" data-value="<?= $locale ?>" data-url="<?= url('?lang=' . $locale) ?>">
+                <i class="<?= $config['flag'] ?>"></i>
+                <span class="lang-txt">
+                    <?= $config['name'] ?>
+                    <?php if (isset($config['suffix'])): ?>
+                        <span> <?= $config['suffix'] ?></span>
+                    <?php endif; ?>
+                </span>
+            </div>
         <?php endforeach; ?>
-    </ul>
+    </div>
 </div>
 
-<script>
-    // Initialize Feather icons
-    if (typeof feather !== 'undefined') {
-        feather.replace();
-    }
-</script>
+<!-- Le script JavaScript est chargé dans le layout principal -->
+<!-- Voir: public/assets/js/i18n-language-selector.js -->

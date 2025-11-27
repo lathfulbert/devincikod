@@ -11,7 +11,7 @@ class TranslationController
     public function index()
     {
         $app = Application::getInstance();
-        $language = $app->request->get('language', 'fr');
+        $language = $_GET['language'] ?? 'fr';
 
         $translations = Translation::where('language', $language)
             ->orderBy('key', 'ASC')
@@ -46,22 +46,21 @@ class TranslationController
     public function store()
     {
         $app = Application::getInstance();
-        $request = $app->request;
 
-        $key = $request->post('key');
-        $value = $request->post('value');
-        $language = $request->post('language', 'fr');
-        $module = $request->post('module', 'general');
+        $key = $_POST['key'] ?? null;
+        $value = $_POST['value'] ?? null;
+        $language = $_POST['language'] ?? 'fr';
+        $module = $_POST['module'] ?? 'general';
 
         if (empty($key) || empty($value)) {
-            $app->session->setFlash('error', 'La clé et la valeur sont requises.');
-            return $app->redirect('/admin/settings/translations/create');
+            $_SESSION['flash']['error'] = 'La clé et la valeur sont requises.';
+            redirect('/admin/settings/translations/create');
         }
 
         Translation::setTranslation($key, $value, $language, $module);
 
-        $app->session->setFlash('success', 'Traduction créée avec succès.');
-        return $app->redirect('/admin/settings/translations');
+        $_SESSION['flash']['success'] = 'Traduction créée avec succès.';
+        redirect('/admin/settings/translations');
     }
 
     public function edit($params)
@@ -72,8 +71,8 @@ class TranslationController
         $translation = Translation::find($id);
 
         if (!$translation) {
-            $app->session->setFlash('error', 'Traduction introuvable.');
-            return $app->redirect('/admin/settings/translations');
+            $_SESSION['flash']['error'] = 'Traduction introuvable.';
+            redirect('/admin/settings/translations');
         }
 
         $languages = ['fr' => 'Français', 'en' => 'English', 'ar' => 'العربية'];
@@ -90,36 +89,35 @@ class TranslationController
     public function update($params)
     {
         $app = Application::getInstance();
-        $request = $app->request;
         $id = $params['id'] ?? null;
 
         $translation = Translation::find($id);
 
         if (!$translation) {
-            $app->session->setFlash('error', 'Traduction introuvable.');
-            return $app->redirect('/admin/settings/translations');
+            $_SESSION['flash']['error'] = 'Traduction introuvable.';
+            redirect('/admin/settings/translations');
         }
 
         // Save to history
-        $userId = $app->session->get('user_id');
+        $userId = $_SESSION['user_id'] ?? null;
         if ($userId) {
             TranslationHistory::create([
                 'translation_id' => $id,
                 'old_value' => $translation['value'],
-                'new_value' => $request->post('value'),
+                'new_value' => $_POST['value'] ?? '',
                 'changed_by' => $userId,
                 'created_at' => date('Y-m-d H:i:s')
             ]);
         }
 
         Translation::where('id', $id)->update([
-            'value' => $request->post('value'),
-            'module' => $request->post('module', 'general'),
+            'value' => $_POST['value'] ?? '',
+            'module' => $_POST['module'] ?? 'general',
             'updated_at' => date('Y-m-d H:i:s')
         ]);
 
-        $app->session->setFlash('success', 'Traduction mise à jour avec succès.');
-        return $app->redirect('/admin/settings/translations');
+        $_SESSION['flash']['success'] = 'Traduction mise à jour avec succès.';
+        redirect('/admin/settings/translations');
     }
 
     public function delete($params)
@@ -129,8 +127,8 @@ class TranslationController
 
         Translation::where('id', $id)->delete();
 
-        $app->session->setFlash('success', 'Traduction supprimée avec succès.');
-        return $app->redirect('/admin/settings/translations');
+        $_SESSION['flash']['success'] = 'Traduction supprimée avec succès.';
+        redirect('/admin/settings/translations');
     }
 
     public function import()
@@ -138,8 +136,8 @@ class TranslationController
         $app = Application::getInstance();
 
         if (!isset($_FILES['translation_file'])) {
-            $app->session->setFlash('error', 'Aucun fichier sélectionné.');
-            return $app->redirect('/admin/settings/translations');
+            $_SESSION['flash']['error'] = 'Aucun fichier sélectionné.';
+            redirect('/admin/settings/translations');
         }
 
         $file = $_FILES['translation_file'];
@@ -147,8 +145,8 @@ class TranslationController
         $data = json_decode($json, true);
 
         if (!$data) {
-            $app->session->setFlash('error', 'Fichier JSON invalide.');
-            return $app->redirect('/admin/settings/translations');
+            $_SESSION['flash']['error'] = 'Fichier JSON invalide.';
+            redirect('/admin/settings/translations');
         }
 
         $count = 0;
@@ -162,14 +160,14 @@ class TranslationController
             $count++;
         }
 
-        $app->session->setFlash('success', "$count traductions importées avec succès.");
-        return $app->redirect('/admin/settings/translations');
+        $_SESSION['flash']['success'] = "$count traductions importées avec succès.";
+        redirect('/admin/settings/translations');
     }
 
     public function export()
     {
         $app = Application::getInstance();
-        $language = $app->request->get('language', 'fr');
+        $language = $_GET['language'] ?? 'fr';
 
         $translations = Translation::where('language', $language)->get();
 
