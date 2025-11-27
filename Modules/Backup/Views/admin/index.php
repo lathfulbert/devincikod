@@ -1,4 +1,8 @@
-<?php $this->layout('backend.layouts.master', ['title' => 'Backups']); ?>
+@extends('backend.layouts.master')
+
+@section('title', $title ?? 'Backups')
+
+@section('content')
 
 <div class="container-fluid">
     <div class="row mb-4">
@@ -30,18 +34,20 @@
         </div>
     </div>
 
-    <?php if (session()->has('success')): ?>
+    <?php if (isset($_SESSION['flash_success'])): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <?= session()->get('success') ?>
+            <i data-feather="check-circle"></i> <?= htmlspecialchars($_SESSION['flash_success']) ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+        <?php unset($_SESSION['flash_success']); ?>
     <?php endif; ?>
 
-    <?php if (session()->has('error')): ?>
+    <?php if (isset($_SESSION['flash_error'])): ?>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <?= session()->get('error') ?>
+            <i data-feather="alert-circle"></i> <?= htmlspecialchars($_SESSION['flash_error']) ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+        <?php unset($_SESSION['flash_error']); ?>
     <?php endif; ?>
 
     <div class="card shadow mb-4">
@@ -115,3 +121,5 @@
         </div>
     </div>
 </div>
+
+@endsection

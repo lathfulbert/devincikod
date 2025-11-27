@@ -113,13 +113,22 @@ class Application
         foreach ($this->moduleManager->getModules() as $module) {
             $routes = $module->getRoutes();
 
-            // New format: routes is an associative array like ['admin' => 'path/to/file']
             if (!empty($routes) && is_array($routes)) {
-                foreach ($routes as $key => $routePath) {
-                    if (is_string($routePath) && file_exists($routePath)) {
-                        // Load route file
-                        $router = $this->router;
-                        require $routePath;
+                // Check if it's a direct route array (indexed array format)
+                // or a file path array (associative array like ['admin' => 'path/to/file'])
+                $firstElement = reset($routes);
+
+                if (is_array($firstElement) && isset($firstElement[0]) && isset($firstElement[1])) {
+                    // Direct route array format: ['GET', '/path', handler, middleware]
+                    $this->router->loadModuleRoutes($routes);
+                } else {
+                    // File path format: ['admin' => 'path/to/file']
+                    foreach ($routes as $key => $routePath) {
+                        if (is_string($routePath) && file_exists($routePath)) {
+                            // Load route file
+                            $router = $this->router;
+                            require $routePath;
+                        }
                     }
                 }
             }

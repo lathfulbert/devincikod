@@ -1,10 +1,10 @@
 /*! -----------------------------------------------------------------------------------
 
-    Template Name: Cuba Admin
-    Template URI: http://admin.pixelstrap.com/cuba/template
-    Description: This is Admin theme
-    Author: Pixelstrap
-    Author URI: https://themeforest.net/user/pixelstrap
+    Template Name: DavinciKod Admin
+    Template URI: https://github.com/lathfulbert/devincikod
+    Description: Responsive Template Dashboard
+    Author: LathDevinci
+    Author URI: https://github.com/lathfulbert/
 
 -----------------------------------------------------------------------------------
 

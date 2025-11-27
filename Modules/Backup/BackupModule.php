@@ -13,9 +13,19 @@ class BackupModule extends AbstractModule
 
     public function getRoutes(): array
     {
+        $authMiddleware = [new \App\Core\Middleware\AuthMiddleware(), 'handle'];
+
         return [
-            'admin' => __DIR__ . '/Routes/admin.php',
-            'api' => __DIR__ . '/Routes/api_v1.php',
+            // Admin Backup Routes
+            ['GET', '/admin/backups', [\Modules\Backup\Controllers\Admin\BackupController::class, 'index'], [$authMiddleware]],
+            ['POST', '/admin/backups/create', [\Modules\Backup\Controllers\Admin\BackupController::class, 'create'], [$authMiddleware]],
+            ['GET', '/admin/backups/download/{id}', [\Modules\Backup\Controllers\Admin\BackupController::class, 'download'], [$authMiddleware]],
+            ['POST', '/admin/backups/restore/{id}', [\Modules\Backup\Controllers\Admin\BackupController::class, 'restore'], [$authMiddleware]],
+            ['DELETE', '/admin/backups/delete/{id}', [\Modules\Backup\Controllers\Admin\BackupController::class, 'delete'], [$authMiddleware]],
+
+            // Monitoring Routes
+            ['GET', '/admin/backups/health', [\Modules\Backup\Controllers\Admin\MonitoringController::class, 'index'], [$authMiddleware]],
+            ['GET', '/admin/backups/stats', [\Modules\Backup\Controllers\Admin\MonitoringController::class, 'stats'], [$authMiddleware]],
         ];
     }
 
@@ -32,20 +42,20 @@ class BackupModule extends AbstractModule
     {
         return [
             [
+                'type' => 'dropdown',
                 'title' => 'Backups',
-                'icon' => 'fas fa-database',
-                'route' => 'admin.backups.index',
-                'permission' => 'backup.view',
+                'icon' => 'database',
+                'badge' => null,
                 'children' => [
                     [
                         'title' => 'Liste des backups',
-                        'route' => 'admin.backups.index',
-                        'permission' => 'backup.view',
+                        'url' => '/admin/backups',
+                        'icon' => 'list',
                     ],
                     [
                         'title' => 'Santé du système',
-                        'route' => 'admin.backups.health',
-                        'permission' => 'backup.view_health',
+                        'url' => '/admin/backups/health',
+                        'icon' => 'activity',
                     ],
                 ]
             ]

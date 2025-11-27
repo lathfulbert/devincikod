@@ -11,7 +11,7 @@ Cette session a accompli **3 objectifs majeurs** avec **28 tâches** complétée
 
 ### 1️⃣ Queue & Cron UI Enhancement (7/7 ✅)
 
-- Appliqué le style Cuba Admin Template à toutes les pages
+- Appliqué le style DavinciKod Admin Template à toutes les pages
 - Ajouté structure `container-fluid` + `page-title` pour cohérence
 - Utilisé badges light, tables borderless, cards gradients, boutons groupés
 

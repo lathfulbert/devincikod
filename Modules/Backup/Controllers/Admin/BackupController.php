@@ -2,15 +2,13 @@
 
 namespace Modules\Backup\Controllers\Admin;
 
-use App\Core\Http\Controller;
-use App\Core\Http\Request;
-use App\Core\Http\Response;
+use App\Core\Application;
 use Modules\Backup\Models\Backup;
 use Modules\Backup\Services\BackupService;
 use Modules\Backup\Services\RestoreService;
 use Modules\Backup\Services\Storage\LocalDriver;
 
-class BackupController extends Controller
+class BackupController
 {
     protected BackupService $backupService;
     protected RestoreService $restoreService;
@@ -23,69 +21,98 @@ class BackupController extends Controller
 
     public function index()
     {
+        $app = Application::getInstance();
         $backups = Backup::query()->orderBy('created_at', 'DESC')->get();
-        return $this->view('Backup::admin.index', ['backups' => $backups]);
+
+        echo $app->view->render('backup/admin/index', [
+            'title' => 'Backups',
+            'backups' => $backups
+        ]);
     }
 
-    public function create(Request $request)
+    public function create()
     {
-        $type = $request->input('type', 'full');
+        $type = $_POST['type'] ?? 'full';
 
         try {
-            $this->backupService->runBackup($type, 'user:' . auth()->id());
-            return Response::redirect(route('admin.backups.index'))->with('success', 'Backup started successfully.');
+            // TODO: Implement auth system - for now use user ID 1
+            $this->backupService->runBackup($type, 'user:1');
+            $_SESSION['flash_success'] = 'Backup démarré avec succès.';
         } catch (\Exception $e) {
-            return Response::redirect(route('admin.backups.index'))->with('error', 'Backup failed: ' . $e->getMessage());
+            $_SESSION['flash_error'] = 'Échec du backup: ' . $e->getMessage();
         }
+
+        redirect('/admin/backups');
     }
 
-    public function download($id)
+    public function download($params)
     {
+        $id = $params['id'] ?? null;
         $backup = Backup::find($id);
-        if (!$backup || !$backup->isSuccessful()) {
-            return Response::redirect(route('admin.backups.index'))->with('error', 'Backup not found.');
+
+        if (!$backup || $backup->status !== 'completed') {
+            $_SESSION['flash_error'] = 'Backup introuvable.';
+            redirect('/admin/backups');
+            return;
         }
 
-        $config = require __DIR__ . '/../../config/backup.php';
+        $config = require __DIR__ . '/../../Config/backup.php';
         $storage = new LocalDriver($config['storage']['drivers']['local']);
 
         if (!$storage->exists($backup->path)) {
-            return Response::redirect(route('admin.backups.index'))->with('error', 'File not found.');
+            $_SESSION['flash_error'] = 'Fichier introuvable.';
+            redirect('/admin/backups');
+            return;
         }
 
-        $path = $storage->getFullPath($backup->path); // This is a hack, should use stream response
+        $stream = $storage->getStream($backup->path);
+        if (!$stream) {
+            $_SESSION['flash_error'] = 'Impossible de lire le fichier.';
+            redirect('/admin/backups');
+            return;
+        }
 
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . basename($path) . '"');
+        header('Content-Disposition: attachment; filename="' . $backup->filename . '"');
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
-        header('Content-Length: ' . filesize($path));
-        readfile($path);
+        header('Content-Length: ' . $backup->size);
+        fpassthru($stream);
+        fclose($stream);
         exit;
     }
 
-    public function restore($id)
+    public function restore($params)
     {
+        $id = $params['id'] ?? null;
+
         try {
             $this->restoreService->restore($id);
-            return Response::redirect(route('admin.backups.index'))->with('success', 'System restored successfully.');
+            $_SESSION['flash_success'] = 'Système restauré avec succès.';
         } catch (\Exception $e) {
-            return Response::redirect(route('admin.backups.index'))->with('error', 'Restore failed: ' . $e->getMessage());
+            $_SESSION['flash_error'] = 'Échec de la restauration: ' . $e->getMessage();
         }
+
+        redirect('/admin/backups');
     }
 
-    public function delete($id)
+    public function delete($params)
     {
+        $id = $params['id'] ?? null;
         $backup = Backup::find($id);
+
         if ($backup) {
-            $config = require __DIR__ . '/../../config/backup.php';
+            $config = require __DIR__ . '/../../Config/backup.php';
             $storage = new LocalDriver($config['storage']['drivers']['local']);
             $storage->delete($backup->path);
             $backup->delete();
+            $_SESSION['flash_success'] = 'Backup supprimé.';
+        } else {
+            $_SESSION['flash_error'] = 'Backup introuvable.';
         }
 
-        return Response::redirect(route('admin.backups.index'))->with('success', 'Backup deleted.');
+        redirect('/admin/backups');
     }
 }

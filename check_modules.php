@@ -1,10 +1,9 @@
 <?php
 require 'vendor/autoload.php';
-
-$app = new \App\Core\Application(__DIR__);
-$modules = $app->moduleManager->getAllModules();
-
-echo "Modules found: " . count($modules) . "\n";
-foreach ($modules as $name => $module) {
-    echo "- $name\n";
+use App\Core\Database\Database;
+$db = Database::getInstance();
+$modules = $db->query('SELECT name, enabled FROM modules ORDER BY name');
+echo "Modules in database:\n";
+foreach ($modules as $m) {
+    echo $m->name . ' - enabled: ' . $m->enabled . "\n";
 }

@@ -1,11 +1,11 @@
 @charset "UTF-8";
 /*! -----------------------------------------------------------------------------------
 
-    Template Name: Cuba Admin
-    Template URI: http://admin.pixelstrap.com/cuba/template
-    Description: This is Admin theme
-    Author: Pixelstrap
-    Author URI: https://themeforest.net/user/pixelstrap
+    Template Name: DavinciKod Admin
+    Template URI: https://github.com/lathfulbert/devincikod
+    Description: Responsive Template Dashboard
+    Author: LathDevinci
+    Author URI: https://github.com/lathfulbert/
 
 -----------------------------------------------------------------------------------
 
@@ -62538,7 +62538,7 @@ html[dir=rtl] body.dark-only .contacts-tabs .nav-pills {
   html[dir=rtl] .float-xl-end {
     float: left !important;
   }
-  html[dir=rtl] .pixelstrap ul a:hover .sub-arrow, html[dir=rtl] .pixelstrap ul a:focus .sub-arrow, html[dir=rtl] .pixelstrap ul a:active .sub-arrow, html[dir=rtl] .pixelstrap ul a.highlighted .sub-arrow {
+  html[dir=rtl] .LathDevinci ul a:hover .sub-arrow, html[dir=rtl] .LathDevinci ul a:focus .sub-arrow, html[dir=rtl] .LathDevinci ul a:active .sub-arrow, html[dir=rtl] .LathDevinci ul a.highlighted .sub-arrow {
     left: 3px;
     right: unset;
   }
