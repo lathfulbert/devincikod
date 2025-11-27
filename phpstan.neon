@@ -1,0 +1,24 @@
+parameters:
+    level: 9
+    paths:
+        - Core
+        - Modules
+    excludePaths:
+        - */vendor/*
+        - */node_modules/*
+        - */storage/*
+        - */cache/*
+    
+    # PHP 8.3 features
+    checkMissingCallableSignature: true
+    checkUninitializedProperties: true
+    checkDynamicProperties: true
+    
+    # Strictness
+    strictRules:
+        allRules: true
+        
+    # Ignore patterns
+    ignoreErrors:
+        # Allow dynamic properties in legacy code
+        - '#Access to an undefined property#'

@@ -24,6 +24,7 @@ class Application
         // Load Helpers
         require_once __DIR__ . '/Support/helpers.php';
         require_once __DIR__ . '/Support/authorization_helpers.php';
+        require_once __DIR__ . '/Support/security_helpers.php';
         require_once __DIR__ . '/Files/Helpers/file_helpers.php';
 
         // Load .env
@@ -71,6 +72,9 @@ class Application
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+
+        // Apply Security Headers
+        \App\Core\Http\SecurityHeaders::apply();
 
         // Initialize CSRF Protection
         \App\Core\Security\CSRF::getInstance();

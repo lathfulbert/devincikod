@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Core\Routing;
 
 class Router
@@ -15,25 +17,25 @@ class Router
         $this->middlewareAliases[$alias] = $class;
     }
 
-    public function get(string $path, $handler, array $middleware = []): self
+    public function get(string $path, callable|array|string $handler, array $middleware = []): self
     {
         $this->addRoute('GET', $path, $handler, $middleware);
         return $this;
     }
 
-    public function post(string $path, $handler, array $middleware = []): self
+    public function post(string $path, callable|array|string $handler, array $middleware = []): self
     {
         $this->addRoute('POST', $path, $handler, $middleware);
         return $this;
     }
 
-    public function put(string $path, $handler, array $middleware = []): self
+    public function put(string $path, callable|array|string $handler, array $middleware = []): self
     {
         $this->addRoute('PUT', $path, $handler, $middleware);
         return $this;
     }
 
-    public function delete(string $path, $handler, array $middleware = []): self
+    public function delete(string $path, callable|array|string $handler, array $middleware = []): self
     {
         $this->addRoute('DELETE', $path, $handler, $middleware);
         return $this;

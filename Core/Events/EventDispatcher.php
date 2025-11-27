@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Core\Events;
 
 use App\Core\Queue\QueueManager;
@@ -81,7 +83,7 @@ class EventDispatcher
      * @param string $event Event class name
      * @param string|callable $listener Listener class or callable
      */
-    public function listen(string $event, $listener): void
+    public function listen(string $event, string|array|callable $listener): void
     {
         if (!isset($this->listeners[$event])) {
             $this->listeners[$event] = [];
@@ -109,7 +111,7 @@ class EventDispatcher
     /**
      * Clear all listeners
      */
-    public function clearListeners(string $event = null): void
+    public function clearListeners(?string $event = null): void
     {
         if ($event === null) {
             $this->listeners = [];
@@ -124,7 +126,7 @@ class EventDispatcher
      * @param string|callable $listener
      * @param object $event
      */
-    protected function callListener($listener, object $event): mixed
+    protected function callListener(string|array|callable $listener, object $event): mixed
     {
         // If listener is a callable, call it directly
         if (is_callable($listener)) {

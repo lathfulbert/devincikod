@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Core\Database;
 
 use PDO;
 use PDOException;
 use App\Core\Config\Config;
+use App\Core\Database\Enums\ConnectionType;
 
 class Database
 {
@@ -37,18 +40,15 @@ class Database
                 PDO::ATTR_EMULATE_PREPARES => false,
             ];
 
-            switch ($this->driver) {
-                case 'sqlite':
-                    $dsn = "sqlite:{$config['database']}";
-                    break;
-                case 'pgsql':
-                    $dsn = "pgsql:host={$config['host']};port={$config['port']};dbname={$config['database']}";
-                    break;
-                case 'mysql':
-                default:
-                    $dsn = "mysql:host={$config['host']};dbname={$config['database']};charset={$config['charset']}";
-                    break;
-            }
+            // Convert string driver to enum
+            $connectionType = ConnectionType::tryFrom($this->driver) ?? ConnectionType::MySQL;
+
+            // Build DSN using match expression
+            $dsn = match ($connectionType) {
+                ConnectionType::SQLite => "sqlite:{$config['database']}",
+                ConnectionType::PostgreSQL => "pgsql:host={$config['host']};port={$config['port']};dbname={$config['database']}",
+                ConnectionType::MySQL => "mysql:host={$config['host']};dbname={$config['database']};charset={$config['charset']}",
+            };
 
             $this->pdo = new PDO($dsn, $config['username'] ?? null, $config['password'] ?? null, $options);
         } catch (PDOException $e) {
