@@ -15,24 +15,28 @@ class Router
         $this->middlewareAliases[$alias] = $class;
     }
 
-    public function get(string $path, callable|array $handler, array $middleware = []): void
+    public function get(string $path, $handler, array $middleware = []): self
     {
         $this->addRoute('GET', $path, $handler, $middleware);
+        return $this;
     }
 
-    public function post(string $path, callable|array $handler, array $middleware = []): void
+    public function post(string $path, $handler, array $middleware = []): self
     {
         $this->addRoute('POST', $path, $handler, $middleware);
+        return $this;
     }
 
-    public function put(string $path, callable|array $handler, array $middleware = []): void
+    public function put(string $path, $handler, array $middleware = []): self
     {
         $this->addRoute('PUT', $path, $handler, $middleware);
+        return $this;
     }
 
-    public function delete(string $path, callable|array $handler, array $middleware = []): void
+    public function delete(string $path, $handler, array $middleware = []): self
     {
         $this->addRoute('DELETE', $path, $handler, $middleware);
+        return $this;
     }
 
     public function dispatch(string $method, string $uri)
@@ -167,8 +171,13 @@ class Router
     /**
      * Add a route to the collection.
      */
-    protected function addRoute(string $method, string $path, callable|array $handler, array $middleware = []): void
+    protected function addRoute(string $method, string $path, $handler, array $middleware = []): void
     {
+        // Support "Controller@method" string syntax
+        if (is_string($handler) && strpos($handler, '@') !== false) {
+            $handler = explode('@', $handler);
+        }
+
         $path = $this->currentPrefix . $path;
         $middleware = array_merge($this->currentMiddleware, $middleware);
 

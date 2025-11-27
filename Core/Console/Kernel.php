@@ -24,9 +24,18 @@ class Kernel
             $this->reset();
         } elseif ($command === 'migrate:fresh') {
             $this->fresh();
-        } elseif ($command === 'seed') {
+        } elseif ($command === 'seed' || $command === 'db:seed') {
             $truncate = ($flag === '--truncate');
-            $this->seed($truncate);
+            $class = null;
+
+            // Parse --class argument
+            foreach ($argv as $arg) {
+                if (str_starts_with($arg, '--class=')) {
+                    $class = substr($arg, 8);
+                }
+            }
+
+            $this->seed($truncate, $class);
         } elseif (str_starts_with($command ?? '', 'i18n:') || $command === 'i18n') {
             $this->handleI18nCommand($argv);
         } elseif (str_starts_with($command ?? '', 'module:')) {
@@ -314,7 +323,7 @@ class Kernel
         echo "  cache_has('key')            Check existence of a key\n";
     }
 
-    protected function seed(bool $truncate = false): void
+    protected function seed(bool $truncate = false, ?string $specificClass = null): void
     {
         if ($truncate) {
             echo "Truncating tables...\n";
@@ -359,6 +368,11 @@ class Kernel
                 foreach ($files as $file) {
                     $className = basename($file, '.php');
                     $fullClassName = "\\Modules\\{$moduleName}\\Database\\Seeders\\{$className}";
+
+                    // If specific class requested, skip others
+                    if ($specificClass && $fullClassName !== $specificClass && $className !== $specificClass) {
+                        continue;
+                    }
 
                     if (class_exists($fullClassName)) {
                         $seeder = new $fullClassName();

@@ -13,7 +13,7 @@ class BackupService
 
     public function __construct()
     {
-        $this->config = require __DIR__ . '/../../config/backup.php';
+        $this->config = require __DIR__ . '/../config/backup.php';
         // For now, we only support local driver or we need a factory
         // In a real app, we would use a StorageManager to get the driver
         $this->storage = new LocalDriver($this->config['storage']['drivers']['local']);

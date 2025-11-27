@@ -107,7 +107,18 @@ class Application
 
         // Load Module Routes
         foreach ($this->moduleManager->getModules() as $module) {
-            $this->router->loadModuleRoutes($module->getRoutes());
+            $routes = $module->getRoutes();
+
+            // New format: routes is an associative array like ['admin' => 'path/to/file']
+            if (!empty($routes) && is_array($routes)) {
+                foreach ($routes as $key => $routePath) {
+                    if (is_string($routePath) && file_exists($routePath)) {
+                        // Load route file
+                        $router = $this->router;
+                        require $routePath;
+                    }
+                }
+            }
 
             // Load API Routes with /api prefix
             $apiRoutes = $module->getApiRoutes();

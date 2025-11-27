@@ -28,7 +28,7 @@ class SendBackupNotification
         $this->notificationService->send([
             'event' => 'backup.successful',
             'user_id' => 1,
-            'template' => 'backup_success', // Assumes this template exists or will be created
+            'template' => 'backup_success_email', // Email template
             'channels' => ['email', 'database'],
             'data' => [
                 'backup_id' => $event->backup->id,
@@ -48,7 +48,7 @@ class SendBackupNotification
         $this->notificationService->send([
             'event' => 'backup.failed',
             'user_id' => 1,
-            'template' => 'backup_failed',
+            'template' => 'backup_failed_email',
             'channels' => ['email', 'database'],
             'data' => [
                 'backup_id' => $event->backup->id,

@@ -81,7 +81,7 @@ class EventDispatcher
      * @param string $event Event class name
      * @param string|callable $listener Listener class or callable
      */
-    public function listen(string $event, string|callable $listener): void
+    public function listen(string $event, $listener): void
     {
         if (!isset($this->listeners[$event])) {
             $this->listeners[$event] = [];
@@ -124,7 +124,7 @@ class EventDispatcher
      * @param string|callable $listener
      * @param object $event
      */
-    protected function callListener(string|callable $listener, object $event): mixed
+    protected function callListener($listener, object $event): mixed
     {
         // If listener is a callable, call it directly
         if (is_callable($listener)) {
