@@ -17,7 +17,7 @@
                                 alt="looginpage"></a></div>
                     <div class="login-main">
                         <form class="theme-form" method="POST" action="<?= url('/login') ?>">
-                            <?= csrf_field() ?>
+                            @csrf
                             <h4>Sign in to account</h4>
                             <p>Enter your email & password to login</p>
                             <div class="form-group">

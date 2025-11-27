@@ -53,6 +53,7 @@ class TemplateEngine
         $result = $this->compileSection($result);
         $result = $this->compileYield($result);
         $result = $this->compileInclude($result);
+        $result = $this->compileCsrf($result); // Add CSRF directive
 
         // Control structures
         $result = $this->compileIf($result);
@@ -127,6 +128,14 @@ class TemplateEngine
 
             return "<?php echo \$__view->make('$view', \$__view->getTemplateVars()); ?>";
         }, $value);
+    }
+
+    /**
+     * Compile @csrf directive.
+     */
+    protected function compileCsrf(string $value): string
+    {
+        return preg_replace('/@csrf/', '<?= csrf_field() ?>', $value);
     }
 
     /**

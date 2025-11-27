@@ -79,11 +79,13 @@ class Application
         // Initialize CSRF Protection
         \App\Core\Security\CSRF::getInstance();
 
-        // Load Config
-        $this->config->load($this->basePath . '/config/app.php');
+        // Load All Configuration Files
+        $this->config->loadDirectory($this->basePath . '/config');
 
         // Initialize Database
-        \App\Core\Database\Database::getInstance()->connect($this->config->get('database', []));
+        $defaultConnection = $this->config->get('database.default', 'mysql');
+        $dbConfig = $this->config->get("database.connections.{$defaultConnection}", []);
+        \App\Core\Database\Database::getInstance()->connect($dbConfig);
 
         // Initialize I18n (Internationalization)
         \App\Core\I18n\Middleware\SetLocaleMiddleware::run();
