@@ -588,7 +588,9 @@ if (!function_exists('csrf_field')) {
      */
     function csrf_field(): string
     {
-        return \App\Core\Security\CSRF::getInstance()->getTokenField();
+        $tokenField = \App\Core\Security\CSRF::getInstance()->getTokenField();
+        file_put_contents(__DIR__ . '/../../storage/logs/debug_csrf.log', "csrf_field called. Result: " . $tokenField . "\n", FILE_APPEND);
+        return $tokenField;
     }
 }
 

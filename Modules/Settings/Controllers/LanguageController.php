@@ -11,7 +11,19 @@ class LanguageController
      */
     private function getAvailableLanguages(): array
     {
-        return config('languages', []);
+        $languages = config('languages');
+
+        // Si le fichier n'a pas été chargé, le charger manuellement
+        if (empty($languages)) {
+            $configFile = app()->getBasePath() . '/config/languages.php';
+            if (file_exists($configFile)) {
+                $languages = require $configFile;
+                // Sauvegarder dans la config pour les prochains appels
+                app()->config->set('languages', $languages);
+            }
+        }
+
+        return $languages ?? [];
     }
 
     /**

@@ -3,7 +3,18 @@
 
 <?php
 // Charger la configuration des langues depuis le fichier centralisé
-$localeConfig = config('languages', []);
+$localeConfig = config('languages');
+
+// Si le fichier n'a pas été chargé, le charger manuellement
+if (empty($localeConfig)) {
+    $configFile = app()->getBasePath() . '/config/languages.php';
+    if (file_exists($configFile)) {
+        $localeConfig = require $configFile;
+        app()->config->set('languages', $localeConfig);
+    } else {
+        $localeConfig = [];
+    }
+}
 
 $currentLocale = app_locale();
 $supportedLocales = supported_locales();

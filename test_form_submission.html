@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSRF Test Form</title>
+</head>
+<body>
+    <h1>Test CSRF Form Submission</h1>
+
+    <h2>Instructions:</h2>
+    <ol>
+        <li>First, visit: <a href="http://localhost/sunuframework2/admin/settings/languages" target="_blank">http://localhost/sunuframework2/admin/settings/languages</a></li>
+        <li>Open browser DevTools (F12) and go to Network tab</li>
+        <li>Click on any button (e.g., "Activer" for a language)</li>
+        <li>In the Network tab, click on the POST request</li>
+        <li>Look at the "Payload" or "Form Data" section to see if _csrf_token is being sent</li>
+        <li>Check storage/logs/csrf_debug.log to see what the server received</li>
+    </ol>
+
+    <h2>Direct Test Form:</h2>
+    <p>This form will attempt to activate English language. Make sure you're logged in first.</p>
+
+    <form method="POST" action="http://localhost/sunuframework2/admin/settings/languages/activate">
+        <input type="hidden" name="_csrf_token" value="<?php
+            require_once 'vendor/autoload.php';
+            session_start();
+            echo \App\Core\Security\CSRF::getInstance()->getToken();
+        ?>">
+        <input type="hidden" name="code" value="en">
+        <button type="submit">Test: Activate English</button>
+    </form>
+
+    <p><strong>Current CSRF Token:</strong>
+        <?php
+            require_once 'vendor/autoload.php';
+            session_start();
+            echo \App\Core\Security\CSRF::getInstance()->getToken();
+        ?>
+    </p>
+
+    <p><strong>Session ID:</strong> <?php echo session_id(); ?></p>
+</body>
+</html>

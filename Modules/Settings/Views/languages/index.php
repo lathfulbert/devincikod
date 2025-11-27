@@ -173,6 +173,7 @@
                                             <?php if ($lang['is_active']): ?>
                                                 <?php if (!$lang['is_default'] && !$lang['is_fallback']): ?>
                                                     <form method="POST" action="<?= url('admin/settings/languages/deactivate') ?>" style="display: inline;">
+                                                        <?= csrf_field() ?>
                                                         <input type="hidden" name="code" value="<?= $code ?>">
                                                         <button type="submit" class="btn btn-warning" title="Désactiver">
                                                             <i data-feather="toggle-left"></i>
@@ -182,6 +183,7 @@
 
                                                 <?php if (!$lang['is_default']): ?>
                                                     <form method="POST" action="<?= url('admin/settings/languages/set-default') ?>" style="display: inline;">
+                                                        <?= csrf_field() ?>
                                                         <input type="hidden" name="code" value="<?= $code ?>">
                                                         <button type="submit" class="btn btn-primary" title="Définir par défaut">
                                                             <i data-feather="star"></i>
@@ -191,6 +193,7 @@
 
                                                 <?php if (!$lang['is_fallback']): ?>
                                                     <form method="POST" action="<?= url('admin/settings/languages/set-fallback') ?>" style="display: inline;">
+                                                        <?= csrf_field() ?>
                                                         <input type="hidden" name="code" value="<?= $code ?>">
                                                         <button type="submit" class="btn btn-info" title="Définir comme fallback">
                                                             <i data-feather="shield"></i>
@@ -199,6 +202,7 @@
                                                 <?php endif; ?>
                                             <?php else: ?>
                                                 <form method="POST" action="<?= url('admin/settings/languages/activate') ?>" style="display: inline;">
+                                                    <?= csrf_field() ?>
                                                     <input type="hidden" name="code" value="<?= $code ?>">
                                                     <button type="submit" class="btn btn-success" title="Activer">
                                                         <i data-feather="toggle-right"></i> Activer
@@ -208,6 +212,7 @@
 
                                             <?php if (!$lang['has_file']): ?>
                                                 <form method="POST" action="<?= url('admin/settings/languages/create-file') ?>" style="display: inline;">
+                                                    <?= csrf_field() ?>
                                                     <input type="hidden" name="code" value="<?= $code ?>">
                                                     <button type="submit" class="btn btn-secondary" title="Créer le fichier">
                                                         <i data-feather="file-plus"></i>
