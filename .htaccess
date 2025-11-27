@@ -1,4 +1,13 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # If the request is for the public folder, don't rewrite
+    RewriteRule ^public/ - [L]
+
+    # If the file exists in root (like test_root.php), serve it
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    # Otherwise rewrite to public folder
     RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
