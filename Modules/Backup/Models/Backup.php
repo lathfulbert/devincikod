@@ -1,9 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Backup\Models;
 
 use App\Core\Database\Model;
 
+/**
+ * Backup Model
+ * 
+ * @property int $id
+ * @property string $type
+ * @property string $path
+ * @property string $filename
+ * @property string $disk
+ * @property int $size
+ * @property string $status
+ * @property string $initiated_by
+ * @property string|null $error_message
+ * @property string|null $completed_at
+ * @property string $created_at
+ * @property string|null $updated_at
+ * 
+ * @method void save()
+ * @method bool update(array $data)
+ * @method void delete()
+ */
 class Backup extends Model
 {
     protected static string $table = 'backups';

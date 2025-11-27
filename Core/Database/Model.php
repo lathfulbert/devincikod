@@ -1,6 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Core\Database;
+
+use PDO;
+use App\Core\Database\QueryBuilder;
 
 abstract class Model
 {
@@ -38,7 +43,7 @@ abstract class Model
             $stmt = $db->query("SELECT * FROM `{$table}`");
         }
 
-        return $stmt->fetchAll(\PDO::FETCH_CLASS, static::class);
+        return $stmt->fetchAll(PDO::FETCH_CLASS, static::class);
     }
 
     public static function find(int $id): ?static

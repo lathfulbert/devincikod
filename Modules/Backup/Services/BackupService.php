@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Backup\Services;
 
 use Modules\Backup\Models\Backup;
 use Modules\Backup\Services\Storage\LocalDriver;
 use Modules\Backup\Services\Storage\StorageDriverInterface;
+use Modules\Backup\Enums\BackupType;
+use Modules\Backup\Enums\BackupStatus;
 
 class BackupService
 {
@@ -19,11 +23,14 @@ class BackupService
         $this->storage = new LocalDriver($this->config['storage']['drivers']['local']);
     }
 
-    public function runBackup(string $type = 'full', string $initiatedBy = 'system'): Backup
+    public function runBackup(BackupType|string $type = 'full', string $initiatedBy = 'system'): Backup
     {
+        // Convert string to enum if needed
+        $backupType = $type instanceof BackupType ? $type : BackupType::from($type);
+
         $backup = new Backup([
-            'type' => $type,
-            'status' => 'processing',
+            'type' => $backupType->value,
+            'status' => BackupStatus::Processing->value,
             'initiated_by' => $initiatedBy,
             'disk' => 'local',
             'created_at' => date('Y-m-d H:i:s'),
@@ -33,20 +40,20 @@ class BackupService
         try {
             $files = [];
 
-            if ($type === 'database' || $type === 'full') {
+            if ($backupType->includesDatabase()) {
                 $files['database'] = $this->backupDatabase();
             }
 
-            if ($type === 'files' || $type === 'full') {
+            if ($backupType->includesFiles()) {
                 $files['files'] = $this->backupFiles();
             }
 
             // If full backup, maybe zip everything together?
             // For now, let's keep them as separate files or zip them into one archive
 
-            $finalPath = $this->packageBackup($files, $type);
+            $finalPath = $this->packageBackup($files, $backupType->value);
 
-            $backup->status = 'completed';
+            $backup->status = BackupStatus::Completed->value;
             $backup->path = $finalPath;
             $backup->filename = basename($finalPath);
             $backup->size = $this->storage->size($finalPath);
@@ -57,7 +64,7 @@ class BackupService
 
             return $backup;
         } catch (\Exception $e) {
-            $backup->status = 'failed';
+            $backup->status = BackupStatus::Failed->value;
             $backup->error_message = $e->getMessage();
             $backup->save();
 

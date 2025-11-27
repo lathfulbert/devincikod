@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Backup\Services\Storage;
 
 class LocalDriver implements StorageDriverInterface
 {
-    protected string $root;
+    protected readonly string $root;
 
     public function __construct(array $config)
     {
