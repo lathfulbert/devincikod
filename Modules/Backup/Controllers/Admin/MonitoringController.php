@@ -2,10 +2,10 @@
 
 namespace Modules\Backup\Controllers\Admin;
 
-use App\Core\Http\Controller;
+use App\Core\Application;
 use Modules\Backup\Services\MonitoringService;
 
-class MonitoringController extends Controller
+class MonitoringController
 {
     protected MonitoringService $monitoringService;
 
@@ -16,14 +16,21 @@ class MonitoringController extends Controller
 
     public function index()
     {
+        $app = Application::getInstance();
         $health = $this->monitoringService->getSystemHealth();
-        return $this->view('Backup::admin.health', ['health' => $health]);
+
+        echo $app->view->render('backup/admin/health', [
+            'title' => 'Santé du système',
+            'health' => $health
+        ]);
     }
 
     public function stats()
     {
-        // Return JSON for charts if needed, or render a stats view
         $health = $this->monitoringService->getSystemHealth();
-        return Response::json($health);
+
+        header('Content-Type: application/json');
+        echo json_encode($health);
+        exit;
     }
 }

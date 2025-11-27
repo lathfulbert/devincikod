@@ -2,15 +2,12 @@
 
 namespace Modules\Backup\Controllers\Api;
 
-use App\Core\Http\Controller;
-use App\Core\Http\Request;
-use App\Core\Http\Response;
 use Modules\Backup\Models\Backup;
 use Modules\Backup\Services\BackupService;
 use Modules\Backup\Services\RestoreService;
 use Modules\Backup\Services\Storage\LocalDriver;
 
-class BackupController extends Controller
+class BackupController
 {
     protected BackupService $backupService;
     protected RestoreService $restoreService;
@@ -24,35 +21,55 @@ class BackupController extends Controller
     public function index()
     {
         $backups = Backup::query()->orderBy('created_at', 'DESC')->get();
-        return Response::json(['status' => 'success', 'data' => $backups]);
+
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'success', 'data' => $backups]);
+        exit;
     }
 
-    public function run(Request $request)
+    public function run()
     {
-        $type = $request->input('type', 'full');
+        $type = $_POST['type'] ?? 'full';
 
         try {
-            $backup = $this->backupService->runBackup($type, 'api_user:' . auth()->id());
-            return Response::json(['status' => 'success', 'message' => 'Backup completed', 'data' => $backup]);
+            $backup = $this->backupService->runBackup($type, 'api_user:1');
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'success', 'message' => 'Backup completed', 'data' => $backup]);
         } catch (\Exception $e) {
-            return Response::json(['status' => 'error', 'message' => $e->getMessage()], 500);
+            http_response_code(500);
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
+        exit;
     }
 
-    public function show($id)
+    public function show($params)
     {
+        $id = $params['id'] ?? null;
         $backup = Backup::find($id);
+
         if (!$backup) {
-            return Response::json(['status' => 'error', 'message' => 'Backup not found'], 404);
+            http_response_code(404);
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'error', 'message' => 'Backup not found']);
+            exit;
         }
-        return Response::json(['status' => 'success', 'data' => $backup]);
+
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'success', 'data' => $backup]);
+        exit;
     }
 
-    public function delete($id)
+    public function delete($params)
     {
+        $id = $params['id'] ?? null;
         $backup = Backup::find($id);
+
         if (!$backup) {
-            return Response::json(['status' => 'error', 'message' => 'Backup not found'], 404);
+            http_response_code(404);
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'error', 'message' => 'Backup not found']);
+            exit;
         }
 
         $config = require __DIR__ . '/../../config/backup.php';
@@ -60,6 +77,8 @@ class BackupController extends Controller
         $storage->delete($backup->path);
         $backup->delete();
 
-        return Response::json(['status' => 'success', 'message' => 'Backup deleted']);
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'success', 'message' => 'Backup deleted']);
+        exit;
     }
 }

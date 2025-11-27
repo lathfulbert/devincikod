@@ -56,7 +56,7 @@ class BackupController
             return;
         }
 
-        $config = require __DIR__ . '/../../Config/backup.php';
+        $config = require __DIR__ . '/../../config/backup.php';
         $storage = new LocalDriver($config['storage']['drivers']['local']);
 
         if (!$storage->exists($backup->path)) {
@@ -104,7 +104,7 @@ class BackupController
         $backup = Backup::find($id);
 
         if ($backup) {
-            $config = require __DIR__ . '/../../Config/backup.php';
+            $config = require __DIR__ . '/../../config/backup.php';
             $storage = new LocalDriver($config['storage']['drivers']['local']);
             $storage->delete($backup->path);
             $backup->delete();

@@ -1,4 +1,8 @@
-<?php $this->layout('backend.layouts.master', ['title' => 'Santé du Système']); ?>
+@extends('backend.layouts.master')
+
+@section('title', $title ?? 'Santé du Système')
+
+@section('content')
 
 <div class="container-fluid">
     <h1 class="h3 mb-4 text-gray-800">Santé du Système</h1>
@@ -89,3 +93,5 @@
         </div>
     </div>
 </div>
+
+@endsection

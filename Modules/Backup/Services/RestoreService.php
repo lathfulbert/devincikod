@@ -13,7 +13,7 @@ class RestoreService
 
     public function __construct()
     {
-        $this->config = require __DIR__ . '/../../config/backup.php';
+        $this->config = require __DIR__ . '/../config/backup.php';
         $this->storage = new LocalDriver($this->config['storage']['drivers']['local']);
     }
 
