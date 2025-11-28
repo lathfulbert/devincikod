@@ -2,9 +2,9 @@
 
 namespace Modules\SmsCore\Migrations;
 
-use Core\Database\Migration;
-use Core\Database\Schema;
-use Core\Database\Blueprint;
+use App\Core\Database\Migration;
+use App\Core\Database\Schema;
+use App\Core\Database\Blueprint;
 
 class CreateSmsMessagesTable extends Migration
 {

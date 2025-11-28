@@ -2,35 +2,38 @@
 
 namespace Modules\Wallet;
 
-use Core\Modules\ModuleContract;
-use Core\Modules\ModuleManifest;
-use Core\Router\Router;
+use App\Core\Module\AbstractModule;
 
-class WalletModule implements ModuleContract
+class WalletModule extends AbstractModule
 {
-    public function register(): void
+    protected function getModulePath(): string
     {
-        // Register services here
+        return __DIR__;
     }
 
-    public function boot(): void
+    public function getRoutes(): array
     {
-        // Boot logic here
+        $authMiddleware = [new \App\Core\Middleware\AuthMiddleware(), 'handle'];
+
+        return [
+            // Wallet Management
+            ['GET', '/admin/wallet', [\Modules\Wallet\Controllers\WalletController::class, 'index'], [$authMiddleware]],
+            ['GET', '/admin/wallet/history', [\Modules\Wallet\Controllers\WalletController::class, 'history'], [$authMiddleware]],
+            ['GET', '/admin/wallet/topup', [\Modules\Wallet\Controllers\WalletController::class, 'topup'], [$authMiddleware]],
+            ['POST', '/admin/wallet/topup', [\Modules\Wallet\Controllers\WalletController::class, 'topup'], [$authMiddleware]],
+        ];
     }
 
-    public function getManifest(): ModuleManifest
+    public function getMenuItems(): array
     {
-        return new ModuleManifest(
-            name: 'Wallet',
-            description: 'Wallet system for managing credits, transactions, and billing.',
-            version: '1.0.0',
-            author: 'LathDevinci',
-            dependencies: []
-        );
-    }
-
-    public function registerRoutes(Router $router): void
-    {
-        // Register routes here
+        return [
+            [
+                'type' => 'link',
+                'title' => 'Wallet',
+                'icon' => 'dollar-sign',
+                'url' => '/admin/wallet',
+                'class' => 'link-nav'
+            ]
+        ];
     }
 }

@@ -8,13 +8,7 @@ use App\Core\Console\Kernel;
 $app = new Application(__DIR__);
 $app->boot();
 
-// Ensure DB is connected for CLI
-// We need to load config first, which boot() does.
-// Now connect DB
-$dbConfig = $app->config->get('database');
-if ($dbConfig) {
-    \App\Core\Database\Database::getInstance()->connect($dbConfig);
-}
+// DB is connected in boot()
 
 $kernel = new Kernel($app);
 $kernel->handle($argv);

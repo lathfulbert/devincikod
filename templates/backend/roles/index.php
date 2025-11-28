@@ -4,91 +4,97 @@
 
 @section('content')
 
-<?php
-// Breadcrumb
-$breadcrumb = [
-    ['label' => 'Dashboard', 'url' => '/admin/dashboard'],
-    ['label' => 'Rôles']
-];
-component('breadcrumb');
-?>
-
-<!-- Messages Flash -->
-<?php component('alerts'); ?>
-
-<!-- Actions-->
-<div class="row mb-3">
-    <div class="col-12 text-end">
-        <a href="<?= url('/admin/roles/create') ?>" class="btn btn-primary">
-            <i data-feather="plus"></i> Nouveau rôle
-        </a>
-    </div>
+<div class="container-fluid">
+    <?php
+    // Breadcrumb
+    $breadcrumb = [
+        ['label' => 'Dashboard', 'url' => '/admin/dashboard'],
+        ['label' => 'Rôles']
+    ];
+    component('breadcrumb');
+    ?>
 </div>
 
-<div class="row">
-    <div class="col-12">
-        <?php
-        $card_title = "Liste des Rôles";
-        component('card-start');
-        ?>
+<div class="container-fluid">
+    <!-- Messages Flash -->
+    <?php component('alerts'); ?>
+</div>
 
-        <table id="rolesTable" class="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nom</th>
-                    <th>Description</th>
-                    <th>Permissions</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (!empty($roles)): ?>
-                    <?php foreach ($roles as $role): ?>
+<div class="container-fluid">
+    <!--Actions-->
+    <div class="row mb-3">
+        <div class="col-12 text-end">
+            <a href="<?= url('/admin/roles/create') ?>" class="btn btn-primary">
+                <i data-feather="plus"></i> Nouveau rôle
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <?php
+            $card_title = "Liste des Rôles";
+            component('card-start');
+            ?>
+
+            <table id="rolesTable" class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Description</th>
+                        <th>Permissions</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($roles)): ?>
+                        <?php foreach ($roles as $role): ?>
+                            <tr>
+                                <td><?= $role->id ?></td>
+                                <td><strong><?= htmlspecialchars($role->name ?? '') ?></strong></td>
+                                <td><?= htmlspecialchars($role->description ?? '') ?: '<span class="text-muted">-</span>' ?></td>
+                                <td>
+                                    <?php
+                                    $permissions = $role->permissions()->getResults();
+                                    if (!empty($permissions)) {
+                                        echo '<span class="badge bg-info">' . count($permissions) . ' permission(s)</span>';
+                                    } else {
+                                        echo '<span class="text-muted">-</span>';
+                                    }
+                                    ?>
+                                </td>
+                                <td class="text-end">
+                                    <a href="<?= url('/admin/roles/' . $role->id . '/edit') ?>"
+                                        class="btn btn-sm btn-warning" title="Éditer">
+                                        <i data-feather="edit" style="width: 14px; height: 14px;"></i>
+                                    </a>
+                                    <form action="<?= url('/admin/roles/' . $role->id . '/delete') ?>"
+                                        method="POST" style="display:inline;"
+                                        onsubmit="return confirm('Supprimer ce rôle ?');">
+                                        <input type="hidden" name="_csrf_token" value="<?= csrf_token() ?>">
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
+                                            <i data-feather="trash-2" style="width: 14px; height: 14px;"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
                         <tr>
-                            <td><?= $role->id ?></td>
-                            <td><strong><?= htmlspecialchars($role->name ?? '') ?></strong></td>
-                            <td><?= htmlspecialchars($role->description ?? '') ?: '<span class="text-muted">-</span>' ?></td>
-                            <td>
-                                <?php
-                                $permissions = $role->permissions()->getResults();
-                                if (!empty($permissions)) {
-                                    echo '<span class="badge bg-info">' . count($permissions) . ' permission(s)</span>';
-                                } else {
-                                    echo '<span class="text-muted">-</span>';
-                                }
-                                ?>
-                            </td>
-                            <td class="text-end">
-                                <a href="<?= url('/admin/roles/' . $role->id . '/edit') ?>"
-                                    class="btn btn-sm btn-warning" title="Éditer">
-                                    <i data-feather="edit" style="width: 14px; height: 14px;"></i>
-                                </a>
-                                <form action="<?= url('/admin/roles/' . $role->id . '/delete') ?>"
-                                    method="POST" style="display:inline;"
-                                    onsubmit="return confirm('Supprimer ce rôle ?');">
-                                    <input type="hidden" name="_csrf_token" value="<?= csrf_token() ?>">
-                                    <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
-                                        <i data-feather="trash-2" style="width: 14px; height: 14px;"></i>
-                                    </button>
-                                </form>
+                            <td colspan="5" class="text-center text-muted">
+                                <i data-feather="inbox"></i> Aucun rôle trouvé
                             </td>
                         </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="5" class="text-center text-muted">
-                            <i data-feather="inbox"></i> Aucun rôle trouvé
-                        </td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                    <?php endif; ?>
+                </tbody>
+            </table>
 
-        <?php
-        $card_footer = "Total : " . count($roles ?? []) . " rôle(s)";
-        component('card-end');
-        ?>
+            <?php
+            $card_footer = "Total : " . count($roles ?? []) . " rôle(s)";
+            component('card-end');
+            ?>
+        </div>
     </div>
 </div>
 

@@ -32,6 +32,7 @@
 <div class="container-fluid">
     <!-- Stats Cards Row - Cuba Style -->
     <div class="row">
+
         <div class="col-md-6 col-xl-3">
             <div class="card o-hidden">
                 <div class="bg-primary b-r-4 card-body">

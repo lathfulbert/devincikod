@@ -2,35 +2,48 @@
 
 namespace Modules\SmsCore;
 
-use Core\Modules\ModuleContract;
-use Core\Modules\ModuleManifest;
-use Core\Router\Router;
+use App\Core\Module\AbstractModule;
 
-class SmsCoreModule implements ModuleContract
+class SmsCoreModule extends AbstractModule
 {
-    public function register(): void
+    protected function getModulePath(): string
     {
-        // Register services here
+        return __DIR__;
     }
 
-    public function boot(): void
+    public function getRoutes(): array
     {
-        // Boot logic here
+        $authMiddleware = [new \App\Core\Middleware\AuthMiddleware(), 'handle'];
+
+        return [
+            // Dashboard
+            ['GET', '/admin/sms', [\Modules\SmsCore\Controllers\DashboardController::class, 'index'], [$authMiddleware]],
+            ['GET', '/admin/sms/statistics', [\Modules\SmsCore\Controllers\DashboardController::class, 'statistics'], [$authMiddleware]],
+
+            // SMS Management
+            ['GET', '/admin/sms/send', [\Modules\SmsCore\Controllers\SmsController::class, 'send'], [$authMiddleware]],
+            ['POST', '/admin/sms/send', [\Modules\SmsCore\Controllers\SmsController::class, 'send'], [$authMiddleware]],
+            ['GET', '/admin/sms/history', [\Modules\SmsCore\Controllers\SmsController::class, 'history'], [$authMiddleware]],
+            ['GET', '/admin/sms/bulk', [\Modules\SmsCore\Controllers\SmsController::class, 'bulk'], [$authMiddleware]],
+            ['POST', '/admin/sms/bulk', [\Modules\SmsCore\Controllers\SmsController::class, 'bulk'], [$authMiddleware]],
+        ];
     }
 
-    public function getManifest(): ModuleManifest
+    public function getMenuItems(): array
     {
-        return new ModuleManifest(
-            name: 'SmsCore',
-            description: 'Core SMS functionality including sending, routing, and queuing.',
-            version: '1.0.0',
-            author: 'LathDevinci',
-            dependencies: []
-        );
-    }
-
-    public function registerRoutes(Router $router): void
-    {
-        // Register routes here
+        return [
+            [
+                'type' => 'dropdown',
+                'title' => 'SMS',
+                'icon' => 'message-circle',
+                'children' => [
+                    ['title' => 'Dashboard', 'url' => '/admin/sms'],
+                    ['title' => 'Send SMS', 'url' => '/admin/sms/send'],
+                    ['title' => 'Bulk SMS', 'url' => '/admin/sms/bulk'],
+                    ['title' => 'History', 'url' => '/admin/sms/history'],
+                    ['title' => 'Statistics', 'url' => '/admin/sms/statistics'],
+                ]
+            ]
+        ];
     }
 }

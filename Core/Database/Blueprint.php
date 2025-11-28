@@ -21,7 +21,7 @@ class Blueprint
     }
 
     // ==================== ID & PRIMARY KEYS ====================
-    
+
     /**
      * Create BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY column
      */
@@ -49,7 +49,7 @@ class Blueprint
     }
 
     // ==================== TEXT FIELDS ====================
-    
+
     public function string(string $column, int $length = 255): Column
     {
         return $this->addColumn($column, "VARCHAR($length)");
@@ -86,7 +86,7 @@ class Blueprint
     }
 
     // ==================== NUMERIC FIELDS ====================
-    
+
     public function tinyInteger(string $column): Column
     {
         return $this->addColumn($column, 'TINYINT');
@@ -160,7 +160,7 @@ class Blueprint
     }
 
     // ==================== DATE & TIME ====================
-    
+
     public function date(string $column): Column
     {
         return $this->addColumn($column, 'DATE');
@@ -192,7 +192,7 @@ class Blueprint
     public function timestamps(): void
     {
         $driver = $this->db->getDriver();
-        
+
         if ($driver === 'sqlite') {
             $this->addColumn('created_at', 'TIMESTAMP')->useCurrent();
             $this->addColumn('updated_at', 'TIMESTAMP')->useCurrent();
@@ -214,7 +214,7 @@ class Blueprint
     }
 
     // ==================== BOOLEAN & ENUM ====================
-    
+
     public function boolean(string $column): Column
     {
         $driver = $this->db->getDriver();
@@ -231,7 +231,7 @@ class Blueprint
     }
 
     // ==================== BINARY & JSON ====================
-    
+
     public function binary(string $column): Column
     {
         return $this->addColumn($column, 'BLOB');
@@ -254,7 +254,7 @@ class Blueprint
     }
 
     // ==================== SPECIALIZED ====================
-    
+
     public function uuid(string $column = 'id'): Column
     {
         return $this->addColumn($column, 'CHAR(36)');
@@ -276,7 +276,7 @@ class Blueprint
     }
 
     // ==================== INDEXES & CONSTRAINTS ====================
-    
+
     /**
      * Add a multi-column index
      */
@@ -303,8 +303,22 @@ class Blueprint
         ];
     }
 
+    /**
+     * Add a single column index
+     */
+    public function index(string $column, string $name = null): void
+    {
+        $name = $name ?? $this->table . '_' . $column . '_index';
+        $this->indexes[] = [
+            'type' => 'INDEX',
+            'name' => $name,
+            'columns' => [$column]
+        ];
+    }
+
+
     // ==================== HELPER METHODS ====================
-    
+
     protected function addColumn(string $name, string $type, bool $isPrimary = false): Column
     {
         $column = new Column($name, $type, $this->db->getDriver());
@@ -347,7 +361,7 @@ class Blueprint
     {
         $driver = $this->db->getDriver();
         $cols = array_map(fn($col) => $col->toSql(), $this->columns);
-        
+
         // Add indexes
         foreach ($this->indexes as $index) {
             $columns = implode(', ', $index['columns']);
@@ -357,18 +371,18 @@ class Blueprint
                 $cols[] = "KEY {$index['name']} ($columns)";
             }
         }
-        
+
         // Add foreign keys
         foreach ($this->foreigns as $foreign) {
             $cols[] = $foreign['sql'];
         }
-        
+
         $colsSql = implode(', ', $cols);
-        
+
         if ($driver === 'sqlite') {
             return "CREATE TABLE {$this->table} ($colsSql)";
         }
-        
+
         return "CREATE TABLE {$this->table} ($colsSql) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
     }
 }
