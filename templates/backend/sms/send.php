@@ -1,4 +1,8 @@
-<?php view('backend.layouts.master', ['title' => $title]); ?>
+@extends('backend.layouts.master')
+
+@section('title', 'Send SMS')
+
+@section('content')
 
 <div class="container-fluid">
     <div class="page-title">
@@ -78,8 +82,13 @@
     </div>
 </div>
 
+@endsection
+
+@section('scripts')
 <script>
     document.getElementById('message').addEventListener('input', function() {
         document.getElementById('char-count').textContent = this.value.length;
     });
+    feather.replace();
 </script>
+@endsection

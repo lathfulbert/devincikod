@@ -1,4 +1,8 @@
-<?php view('backend.layouts.master', ['title' => $title]); ?>
+@extends('backend.layouts.master')
+
+@section('title', 'Wallet')
+
+@section('content')
 
 <div class="container-fluid">
     <div class="page-title">
@@ -97,3 +101,11 @@
         </div>
     </div>
 </div>
+
+@endsection
+
+@section('scripts')
+<script>
+    feather.replace();
+</script>
+@endsection

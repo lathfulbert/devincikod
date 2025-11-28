@@ -1,4 +1,8 @@
-<?php view('backend.layouts.master', ['title' => $title ?? 'SMS History']); ?>
+@extends('backend.layouts.master')
+
+@section('title', 'SMS History')
+
+@section('content')
 
 <div class="container-fluid">
     <div class="page-title">
@@ -77,3 +81,11 @@
         </div>
     </div>
 </div>
+
+@endsection
+
+@section('scripts')
+<script>
+    feather.replace();
+</script>
+@endsection

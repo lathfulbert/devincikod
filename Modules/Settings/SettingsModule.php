@@ -69,6 +69,22 @@ class SettingsModule extends AbstractModule
             // Backup & Export
             ['GET', '/admin/settings/backup', [\Modules\Settings\Controllers\SettingsController::class, 'backup'], [$authMiddleware]],
             ['POST', '/admin/settings/import', [\Modules\Settings\Controllers\SettingsController::class, 'import'], [$authMiddleware]],
+
+            // SMS Settings
+            ['GET', '/admin/settings/sms', [\Modules\Settings\Controllers\SmsSettingsController::class, 'index'], [$authMiddleware]],
+            ['GET', '/admin/settings/sms/gateways/create', [\Modules\Settings\Controllers\SmsSettingsController::class, 'createGateway'], [$authMiddleware]],
+            ['POST', '/admin/settings/sms/gateways/store', [\Modules\Settings\Controllers\SmsSettingsController::class, 'storeGateway'], [$authMiddleware]],
+            ['GET', '/admin/settings/sms/gateways/{id}/edit', [\Modules\Settings\Controllers\SmsSettingsController::class, 'editGateway'], [$authMiddleware]],
+            ['POST', '/admin/settings/sms/gateways/{id}/update', [\Modules\Settings\Controllers\SmsSettingsController::class, 'updateGateway'], [$authMiddleware]],
+            ['POST', '/admin/settings/sms/gateways/{id}/delete', [\Modules\Settings\Controllers\SmsSettingsController::class, 'deleteGateway'], [$authMiddleware]],
+            ['GET', '/admin/settings/sms/gateways/{id}/test', [\Modules\Settings\Controllers\SmsSettingsController::class, 'testGateway'], [$authMiddleware]],
+            ['GET', '/admin/settings/sms/gateways/{id}/set-default', [\Modules\Settings\Controllers\SmsSettingsController::class, 'setDefault'], [$authMiddleware]],
+            ['GET', '/admin/settings/sms/gateways/{id}/toggle', [\Modules\Settings\Controllers\SmsSettingsController::class, 'toggleStatus'], [$authMiddleware]],
+
+            // Wallet Settings
+            ['GET', '/admin/settings/wallet', [\Modules\Settings\Controllers\WalletSettingsController::class, 'index'], [$authMiddleware]],
+            ['POST', '/admin/settings/wallet/update', [\Modules\Settings\Controllers\WalletSettingsController::class, 'update'], [$authMiddleware]],
+            ['GET', '/admin/settings/wallet/gateways/{id}/set-default', [\Modules\Settings\Controllers\WalletSettingsController::class, 'setDefault'], [$authMiddleware]],
         ];
     }
 
@@ -91,6 +107,8 @@ class SettingsModule extends AbstractModule
                     ['title' => 'Thème & Apparence', 'url' => '/admin/settings/theme', 'icon' => 'droplet'],
                     ['title' => 'API & Services', 'url' => '/admin/settings/api', 'icon' => 'key'],
                     ['title' => 'Configuration Mail', 'url' => '/admin/settings/mail', 'icon' => 'mail'],
+                    ['title' => 'Configuration SMS', 'url' => '/admin/settings/sms', 'icon' => 'message-circle'],
+                    ['title' => 'Configuration Wallet', 'url' => '/admin/settings/wallet', 'icon' => 'credit-card'],
                     ['title' => 'Langues', 'url' => '/admin/settings/languages', 'icon' => 'globe'],
                     ['title' => 'Traductions', 'url' => '/admin/settings/translations', 'icon' => 'flag'],
                     ['title' => 'Webhooks', 'url' => '/admin/settings/webhooks', 'icon' => 'link'],

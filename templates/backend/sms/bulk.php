@@ -1,4 +1,8 @@
-<?php view('backend.layouts.master', ['title' => $title ?? 'Send Bulk SMS']); ?>
+@extends('backend.layouts.master')
+
+@section('title', 'Send Bulk SMS')
+
+@section('content')
 
 <div class="container-fluid">
     <div class="page-title">
@@ -76,6 +80,9 @@
     </div>
 </div>
 
+@endsection
+
+@section('scripts')
 <script>
     document.getElementById('recipientSource').addEventListener('change', function() {
         const source = this.value;
@@ -88,4 +95,6 @@
             document.getElementById('manualInput').classList.remove('d-none');
         }
     });
+    feather.replace();
 </script>
+@endsection

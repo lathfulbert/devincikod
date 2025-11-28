@@ -1,4 +1,8 @@
-<?php view('backend.layouts.master', ['title' => $title]); ?>
+@extends('backend.layouts.master')
+
+@section('title', 'SMS Dashboard')
+
+@section('content')
 
 <!-- Container-fluid starts-->
 <div class="container-fluid">
@@ -164,3 +168,11 @@
         </div>
     </div>
 </div>
+
+@endsection
+
+@section('scripts')
+<script>
+    feather.replace();
+</script>
+@endsection
