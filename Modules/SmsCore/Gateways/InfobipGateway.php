@@ -3,61 +3,78 @@
 namespace Modules\SmsCore\Gateways;
 
 use Modules\SmsCore\Interfaces\SmsGatewayInterface;
+use Modules\Settings\Models\SmsGateway;
 
 class InfobipGateway implements SmsGatewayInterface
 {
-    protected string $apiKey;
-    protected string $baseUrl;
-    protected string $senderId;
+    private SmsGateway $config;
 
-    public function __construct(array $config = [])
+    public function __construct(SmsGateway $config)
     {
-        $this->apiKey = $config['api_key'] ?? '';
-        $this->baseUrl = $config['base_url'] ?? 'https://api.infobip.com';
-        $this->senderId = $config['sender_id'] ?? 'InfoSMS';
+        $this->config = $config;
     }
 
     public function send(string $to, string $message, string $senderId, array $options = []): array
     {
-        $url = $this->baseUrl . '/sms/2/text/advanced';
-
-        $payload = [
-            'messages' => [
-                [
-                    'from' => $senderId ?: $this->senderId,
-                    'destinations' => [
-                        ['to' => $this->formatPhoneNumber($to)]
-                    ],
-                    'text' => $message
-                ]
-            ]
-        ];
-
-        // Add optional parameters
-        if (isset($options['notify_url'])) {
-            $payload['messages'][0]['notifyUrl'] = $options['notify_url'];
-        }
-
-        if (isset($options['validity_period'])) {
-            $payload['messages'][0]['validityPeriod'] = $options['validity_period'];
-        }
-
         try {
-            $response = $this->makeRequest('POST', $url, $payload);
+            $payload = [
+                'messages' => [
+                    [
+                        'from' => $senderId,
+                        'destinations' => [
+                            ['to' => $to]
+                        ],
+                        'text' => $message
+                    ]
+                ]
+            ];
+
+            $ch = curl_init($this->config->api_url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Authorization: App ' . $this->config->api_key,
+                'Content-Type: application/json',
+                'Accept: application/json'
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            $responseData = json_decode($response, true);
+
+            if ($httpCode === 200) {
+                $messageResult = $responseData['messages'][0] ?? [];
+                $status = $messageResult['status'] ?? [];
+
+                return [
+                    'success' => true,
+                    'message' => 'SMS sent successfully',
+                    'gateway_message_id' => $messageResult['messageId'] ?? null,
+                    'gateway_response' => $responseData,
+                    'status_code' => $status['groupId'] ?? null,
+                    'status_description' => $status['description'] ?? null,
+                    'sent_at' => date('Y-m-d H:i:s')
+                ];
+            }
 
             return [
-                'status' => 'success',
-                'message_id' => $response['messages'][0]['messageId'] ?? null,
-                'to' => $to,
-                'gateway' => 'Infobip',
-                'raw_response' => $response
+                'success' => false,
+                'message' => 'Failed to send SMS',
+                'error' => $responseData['requestError']['serviceException']['text'] ?? 'Unknown error',
+                'gateway_response' => $responseData,
+                'http_code' => $httpCode,
+                'sent_at' => date('Y-m-d H:i:s')
             ];
-        } catch (\Throwable $e) {
+
+        } catch (\Exception $e) {
             return [
-                'status' => 'failed',
-                'error' => $e->getMessage(),
-                'to' => $to,
-                'gateway' => 'Infobip'
+                'success' => false,
+                'message' => 'Exception: ' . $e->getMessage(),
+                'gateway_response' => null,
+                'sent_at' => date('Y-m-d H:i:s')
             ];
         }
     }
@@ -65,66 +82,30 @@ class InfobipGateway implements SmsGatewayInterface
     public function getBalance(): float
     {
         try {
-            $url = $this->baseUrl . '/account/1/balance';
-            $response = $this->makeRequest('GET', $url);
+            $ch = curl_init('https://api.infobip.com/account/1/balance');
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Authorization: App ' . $this->config->api_key,
+                'Accept: application/json'
+            ]);
 
-            return (float) ($response['balance'] ?? 0.0);
-        } catch (\Throwable $e) {
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200) {
+                $data = json_decode($response, true);
+                return (float)($data['balance'] ?? 0);
+            }
+
+            return 0.0;
+        } catch (\Exception $e) {
             return 0.0;
         }
     }
 
     public function getName(): string
     {
-        return 'InfobipGateway';
-    }
-
-    protected function makeRequest(string $method, string $url, array $data = []): array
-    {
-        $ch = curl_init();
-
-        $headers = [
-            'Authorization: App ' . $this->apiKey,
-            'Content-Type: application/json',
-            'Accept: application/json'
-        ];
-
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-        if ($method === 'POST') {
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        }
-
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $error = curl_error($ch);
-
-        curl_close($ch);
-
-        if ($error) {
-            throw new \RuntimeException("cURL Error: " . $error);
-        }
-
-        if ($httpCode >= 400) {
-            throw new \RuntimeException("HTTP Error $httpCode: " . $response);
-        }
-
-        return json_decode($response, true) ?? [];
-    }
-
-    protected function formatPhoneNumber(string $phone): string
-    {
-        // Remove common formatting
-        $phone = preg_replace('/[^0-9+]/', '', $phone);
-
-        // Ensure + prefix
-        if (!str_starts_with($phone, '+')) {
-            $phone = '+' . $phone;
-        }
-
-        return $phone;
+        return $this->config->name;
     }
 }

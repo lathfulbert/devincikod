@@ -50,6 +50,7 @@
                                     <th>Nom</th>
                                     <th>Provider</th>
                                     <th>Sender ID</th>
+                                    <th>Mode</th>
                                     <th>Priorité</th>
                                     <th>Statut</th>
                                     <th>Par défaut</th>
@@ -57,11 +58,26 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($gateways as $gateway): ?>
+                                <?php foreach ($gateways as $gateway):
+                                    // Détection du mode (Mock ou Production)
+                                    $isMock = $gateway->isMockMode();
+                                    $mode = $gateway->getMode();
+                                ?>
                                     <tr>
                                         <td><strong><?= htmlspecialchars($gateway->name) ?></strong></td>
                                         <td><code><?= htmlspecialchars($gateway->provider_code) ?></code></td>
                                         <td><?= htmlspecialchars($gateway->sender_id ?? '-') ?></td>
+                                        <td>
+                                            <?php if ($isMock): ?>
+                                                <span class="badge badge-warning" title="Mode simulation - Les SMS ne sont pas réellement envoyés">
+                                                    <i data-feather="info"></i> MOCK
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="badge badge-success" title="Mode production - Les SMS sont réellement envoyés">
+                                                    <i data-feather="check-circle"></i> PROD
+                                                </span>
+                                            <?php endif; ?>
+                                        </td>
                                         <td><?= $gateway->priority ?></td>
                                         <td>
                                             <?php if ($gateway->is_active): ?>
@@ -82,6 +98,17 @@
                                         </td>
                                         <td>
                                             <div class="btn-group btn-group-sm">
+                                                <?php if ($isMock): ?>
+                                                    <button onclick="switchToProduction(<?= $gateway->id ?>)"
+                                                        class="btn btn-success" title="Passer en mode PRODUCTION (nécessite des credentials)">
+                                                        <i data-feather="zap"></i> PROD
+                                                    </button>
+                                                <?php else: ?>
+                                                    <button onclick="switchToMock(<?= $gateway->id ?>)"
+                                                        class="btn btn-warning" title="Passer en mode MOCK (simulation)">
+                                                        <i data-feather="shield-off"></i> MOCK
+                                                    </button>
+                                                <?php endif; ?>
                                                 <button onclick="testGateway(<?= $gateway->id ?>)"
                                                     class="btn btn-info" title="Tester">
                                                     <i data-feather="activity"></i>
@@ -126,10 +153,27 @@
 
 @section('scripts')
 <script>
+    // CSRF Token for AJAX requests
+    const csrfToken = '<?= csrf_token() ?>';
+
     function testGateway(id) {
-        fetch(`<?= url('/admin/settings/sms/gateways/') ?>/${id}/test`)
-            .then(response => response.json())
+        const btn = event.target.closest('button');
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+        fetch(`<?= url('/admin/settings/sms/gateways') ?>/${id}/test`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+                feather.replace();
+
                 if (data.success) {
                     alert('✓ Test réussi: ' + data.message);
                 } else {
@@ -137,7 +181,88 @@
                 }
             })
             .catch(error => {
-                alert('Erreur lors du test: ' + error);
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+                feather.replace();
+
+                alert('Erreur lors du test: ' + error.message);
+                console.error('Test gateway error:', error);
+            });
+    }
+
+    function switchToProduction(id) {
+        if (!confirm('⚠️ ATTENTION!\n\nPasser en mode PRODUCTION signifie que:\n• Les SMS seront RÉELLEMENT envoyés\n• Votre compte sera FACTURÉ\n• Vous devez avoir des credentials valides\n\nVoulez-vous continuer?')) {
+            return;
+        }
+
+        const btn = event.target.closest('button');
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+        fetch(`<?= url('/admin/settings/sms/gateways') ?>/${id}/switch-mode`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken
+            },
+            body: JSON.stringify({ mode: 'production' })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ ' + data.message);
+                    location.reload(); // Reload to update the UI
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    feather.replace();
+                    alert('✗ ' + data.message);
+                }
+            })
+            .catch(error => {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+                feather.replace();
+                alert('Erreur: ' + error.message);
+            });
+    }
+
+    function switchToMock(id) {
+        if (!confirm('Passer en mode MOCK (simulation)?\n\nLes SMS ne seront PAS réellement envoyés.\nUtile pour les tests.')) {
+            return;
+        }
+
+        const btn = event.target.closest('button');
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+        fetch(`<?= url('/admin/settings/sms/gateways') ?>/${id}/switch-mode`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken
+            },
+            body: JSON.stringify({ mode: 'mock' })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ ' + data.message);
+                    location.reload(); // Reload to update the UI
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    feather.replace();
+                    alert('✗ ' + data.message);
+                }
+            })
+            .catch(error => {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+                feather.replace();
+                alert('Erreur: ' + error.message);
             });
     }
 

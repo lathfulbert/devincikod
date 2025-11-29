@@ -8,7 +8,7 @@ class CreateSmsGatewaysTable extends Migration
 {
     public function up(): void
     {
-        $this->createTable('sms_gateways', function ($table) {
+        $this->create('sms_gateways', function ($table) {
             $table->id();
             $table->string('name', 100); // Orange CI, Infobip, etc.
             $table->string('provider_code', 50)->unique(); // orange_ci, infobip
@@ -32,6 +32,6 @@ class CreateSmsGatewaysTable extends Migration
 
     public function down(): void
     {
-        $this->dropTable('sms_gateways');
+        $this->dropIfExists('sms_gateways');
     }
 }

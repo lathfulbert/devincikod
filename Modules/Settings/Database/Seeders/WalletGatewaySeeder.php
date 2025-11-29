@@ -16,8 +16,8 @@ class WalletGatewaySeeder
                 'api_key' => '', // To be configured
                 'api_secret' => '',
                 'merchant_id' => '',
-                'is_active' => false,
-                'is_default' => false,
+                'is_active' => 0,
+                'is_default' => 0,
                 'currency' => 'XOF',
                 'transaction_fee' => 2.5,
                 'configuration' => json_encode([
@@ -32,8 +32,8 @@ class WalletGatewaySeeder
                 'api_key' => '', // To be configured
                 'api_secret' => '',
                 'merchant_id' => '',
-                'is_active' => false,
-                'is_default' => false,
+                'is_active' => 0,
+                'is_default' => 0,
                 'currency' => 'XOF',
                 'transaction_fee' => 3.0,
                 'configuration' => json_encode([
@@ -48,8 +48,8 @@ class WalletGatewaySeeder
                 'api_key' => '', // To be configured
                 'api_secret' => '',
                 'merchant_id' => '',
-                'is_active' => false,
-                'is_default' => false,
+                'is_active' => 0,
+                'is_default' => 0,
                 'currency' => 'XOF',
                 'transaction_fee' => 1.5,
                 'configuration' => json_encode([
@@ -64,8 +64,8 @@ class WalletGatewaySeeder
                 'api_key' => '', // To be configured
                 'api_secret' => '',
                 'merchant_id' => '',
-                'is_active' => false,
-                'is_default' => false,
+                'is_active' => 0,
+                'is_default' => 0,
                 'currency' => 'XOF',
                 'transaction_fee' => 1.0,
                 'configuration' => json_encode([

@@ -1,0 +1,23 @@
+L'erreur "Expired contract" signifie que votre contrat Orange est expiré! Ce n'est pas un problème technique de notre côté. Message d'Orange:
+"Expired contract. You can buy a new bundle on https://developer.orange.com to reactivate it or contact Orange local team via https://developer.orange.com/sms-api-queries/ to renew it."
+
+
+CIV - 3319 units to consume before November, 5th 2025 12:00 AM
+
+CIV - 3319 units to consume before November, 5th 2025 12:00 AM
+
+August, 6th 2025 4:16 PM - 13774 units added by customercare valid until November, 5th 2025 12:00 AM
+
+Purchase history
+August, 6th 2025 4:16 PM - 13774 units added by customercare valid until November, 5th 2025 12:00 AM
+
+
+Sender name
+Default sender name: SMS 483497
+Custom sender names: AKADI, ALU ALCHE, BtySuccess, CARREFOUR
+
+
+Default sender name: SMS 483497
+Custom sender names: AKADI, ALU ALCHE, BtySuccess, CARREFOUR, 
+FOANI, FONTAINE G, GrandeRecre, JULES, KELYSTOURS, LACOSTE, PIGIER CI, PLAYCE, SIGMA P, 
+SubSaharian, SUPECO, SURFIN OPTQ, TICAFRIQUE, UIPA, UNIABIDJAN, VISEO, VIVO ENERGY

@@ -59,8 +59,13 @@
                             <label for="gateway">Gateway</label>
                             <select class="form-control" id="gateway" name="gateway">
                                 <option value="auto">Auto (Best Available)</option>
-                                <option value="infobip">Infobip</option>
-                                <option value="orange">Orange SMS</option>
+                                <?php if (isset($gateways) && count($gateways) > 0): ?>
+                                    <?php foreach ($gateways as $gw): ?>
+                                        <option value="<?= htmlspecialchars($gw->provider_code) ?>">
+                                            <?= htmlspecialchars($gw->name) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                         </div>
 

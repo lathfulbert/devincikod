@@ -78,13 +78,21 @@ class SettingsModule extends AbstractModule
             ['POST', '/admin/settings/sms/gateways/{id}/update', [\Modules\Settings\Controllers\SmsSettingsController::class, 'updateGateway'], [$authMiddleware]],
             ['POST', '/admin/settings/sms/gateways/{id}/delete', [\Modules\Settings\Controllers\SmsSettingsController::class, 'deleteGateway'], [$authMiddleware]],
             ['GET', '/admin/settings/sms/gateways/{id}/test', [\Modules\Settings\Controllers\SmsSettingsController::class, 'testGateway'], [$authMiddleware]],
+            ['POST', '/admin/settings/sms/gateways/{id}/switch-mode', [\Modules\Settings\Controllers\SmsSettingsController::class, 'switchMode'], [$authMiddleware]],
             ['GET', '/admin/settings/sms/gateways/{id}/set-default', [\Modules\Settings\Controllers\SmsSettingsController::class, 'setDefault'], [$authMiddleware]],
             ['GET', '/admin/settings/sms/gateways/{id}/toggle', [\Modules\Settings\Controllers\SmsSettingsController::class, 'toggleStatus'], [$authMiddleware]],
 
             // Wallet Settings
             ['GET', '/admin/settings/wallet', [\Modules\Settings\Controllers\WalletSettingsController::class, 'index'], [$authMiddleware]],
             ['POST', '/admin/settings/wallet/update', [\Modules\Settings\Controllers\WalletSettingsController::class, 'update'], [$authMiddleware]],
+            ['GET', '/admin/settings/wallet/gateways/create', [\Modules\Settings\Controllers\WalletSettingsController::class, 'createGateway'], [$authMiddleware]],
+            ['POST', '/admin/settings/wallet/gateways/store', [\Modules\Settings\Controllers\WalletSettingsController::class, 'storeGateway'], [$authMiddleware]],
+            ['GET', '/admin/settings/wallet/gateways/{id}/edit', [\Modules\Settings\Controllers\WalletSettingsController::class, 'editGateway'], [$authMiddleware]],
+            ['POST', '/admin/settings/wallet/gateways/{id}/update', [\Modules\Settings\Controllers\WalletSettingsController::class, 'updateGateway'], [$authMiddleware]],
+            ['POST', '/admin/settings/wallet/gateways/{id}/delete', [\Modules\Settings\Controllers\WalletSettingsController::class, 'deleteGateway'], [$authMiddleware]],
+            ['GET', '/admin/settings/wallet/gateways/{id}/test', [\Modules\Settings\Controllers\WalletSettingsController::class, 'testGateway'], [$authMiddleware]],
             ['GET', '/admin/settings/wallet/gateways/{id}/set-default', [\Modules\Settings\Controllers\WalletSettingsController::class, 'setDefault'], [$authMiddleware]],
+            ['GET', '/admin/settings/wallet/gateways/{id}/toggle', [\Modules\Settings\Controllers\WalletSettingsController::class, 'toggleStatus'], [$authMiddleware]],
         ];
     }
 

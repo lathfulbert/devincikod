@@ -35,6 +35,71 @@ class SmsGateway extends Model
     }
 
     /**
+     * Override __get to call accessors
+     */
+    public function __get($key)
+    {
+        // First check if there's an accessor method
+        $method = 'get' . str_replace('_', '', ucwords($key, '_')) . 'Attribute';
+
+        if (method_exists($this, $method)) {
+            // Get raw value from attributes array or object property using reflection
+            if (isset($this->attributes[$key])) {
+                $value = $this->attributes[$key];
+            } else {
+                // Use reflection to get property without triggering __get recursion
+                $reflection = new \ReflectionClass($this);
+                if ($reflection->hasProperty($key)) {
+                    $property = $reflection->getProperty($key);
+                    $property->setAccessible(true);
+                    $value = $property->getValue($this);
+                } else {
+                    $value = null;
+                }
+            }
+            return $this->$method($value);
+        }
+
+        // Fallback to attributes
+        return $this->attributes[$key] ?? parent::__get($key);
+    }
+
+    /**
+     * Override __set to call mutators
+     */
+    public function __set($key, $value)
+    {
+        $method = 'set' . str_replace('_', '', ucwords($key, '_')) . 'Attribute';
+
+        if (method_exists($this, $method)) {
+            $this->$method($value);
+        } else {
+            $this->attributes[$key] = $value;
+        }
+    }
+
+    /**
+     * Override __isset to check if property exists
+     */
+    public function __isset($key): bool
+    {
+        // Check in attributes first
+        if (isset($this->attributes[$key])) {
+            return true;
+        }
+
+        // Check if property exists using reflection (for fetchObject properties)
+        $reflection = new \ReflectionClass($this);
+        if ($reflection->hasProperty($key)) {
+            $property = $reflection->getProperty($key);
+            $property->setAccessible(true);
+            return $property->isInitialized($this) && $property->getValue($this) !== null;
+        }
+
+        return false;
+    }
+
+    /**
      * Encrypt sensitive data before saving
      */
     public function setApiKeyAttribute($value): void
@@ -86,6 +151,26 @@ class SmsGateway extends Model
     }
 
     /**
+     * Check if this gateway is in Mock mode
+     */
+    public function isMockMode(): bool
+    {
+        // If no credentials or invalid credentials, it's in mock mode
+        $hasValidApiKey = !empty($this->api_key) && strlen(trim($this->api_key)) > 10;
+        $hasValidApiSecret = !empty($this->api_secret) && strlen(trim($this->api_secret)) > 10;
+
+        return !$hasValidApiKey || !$hasValidApiSecret;
+    }
+
+    /**
+     * Get the current mode (mock or production)
+     */
+    public function getMode(): string
+    {
+        return $this->isMockMode() ? 'mock' : 'production';
+    }
+
+    /**
      * Get all active gateways ordered by priority
      */
     public static function getActive(): array
@@ -111,11 +196,12 @@ class SmsGateway extends Model
     public function setAsDefault(): bool
     {
         // Unset all other defaults
-        static::where('is_default', true)->update(['is_default' => false]);
+        static::where('is_default', 1)->update(['is_default' => 0]);
 
         // Set this one as default
-        $this->is_default = true;
-        return $this->save();
+        $this->is_default = 1;
+        $this->save();
+        return true;
     }
 
     /**

@@ -8,7 +8,7 @@ class CreateWalletGatewaysTable extends Migration
 {
     public function up(): void
     {
-        $this->createTable('wallet_gateways', function ($table) {
+        $this->create('wallet_gateways', function ($table) {
             $table->id();
             $table->string('name', 100); // PayDunya, CinetPay, Orange Money, Wave
             $table->string('provider_code', 50)->unique(); // paydunya, cinetpay, orange_money, wave
@@ -32,6 +32,6 @@ class CreateWalletGatewaysTable extends Migration
 
     public function down(): void
     {
-        $this->dropTable('wallet_gateways');
+        $this->dropIfExists('wallet_gateways');
     }
 }

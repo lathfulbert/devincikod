@@ -16,8 +16,8 @@ class SmsGatewaySeeder
                 'api_key' => '', // To be configured by user
                 'api_secret' => '',
                 'sender_id' => '',
-                'is_active' => false,
-                'is_default' => false,
+                'is_active' => 0,
+                'is_default' => 0,
                 'priority' => 10,
                 'configuration' => json_encode([
                     'auth_type' => 'oauth2',
@@ -32,8 +32,8 @@ class SmsGatewaySeeder
                 'api_key' => '', // To be configured by user
                 'api_secret' => '',
                 'sender_id' => '',
-                'is_active' => false,
-                'is_default' => false,
+                'is_active' => 0,
+                'is_default' => 0,
                 'priority' => 5,
                 'configuration' => json_encode([
                     'auth_type' => 'api_key',

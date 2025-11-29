@@ -145,6 +145,13 @@ class SmsSettingsController
      */
     public function testGateway($id)
     {
+        // Clean any previous output buffer
+        if (ob_get_level()) {
+            ob_clean();
+        }
+
+        header('Content-Type: application/json');
+
         $gateway = SmsGateway::find($id);
 
         if (!$gateway) {
@@ -153,8 +160,6 @@ class SmsSettingsController
         }
 
         $result = $gateway->testConnection();
-
-        header('Content-Type: application/json');
         echo json_encode($result);
         exit;
     }
@@ -201,5 +206,64 @@ class SmsSettingsController
         }
 
         redirect('/admin/settings/sms');
+    }
+
+    /**
+     * Switch gateway mode (Mock <-> Production)
+     */
+    public function switchMode($id)
+    {
+        // Disable CSRF check for JSON API endpoint
+        $_POST['_csrf_disable'] = true;
+
+        // Clean any previous output buffer
+        if (ob_get_level()) {
+            ob_clean();
+        }
+
+        header('Content-Type: application/json');
+
+        $gateway = SmsGateway::find($id);
+
+        if (!$gateway) {
+            echo json_encode(['success' => false, 'message' => 'Gateway introuvable']);
+            exit;
+        }
+
+        // Get JSON body
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        $mode = $data['mode'] ?? 'mock';
+
+        if ($mode === 'production') {
+            // Vérifier si des credentials sont déjà présentes
+            $hasCredentials = !empty($gateway->api_key) && !empty($gateway->api_secret);
+
+            if (!$hasCredentials) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Impossible de passer en mode PRODUCTION: Aucune credential configurée. Veuillez d\'abord éditer le gateway et entrer vos API Key et API Secret.'
+                ]);
+                exit;
+            }
+
+            // Les credentials existent, le système basculera automatiquement en PROD
+            echo json_encode([
+                'success' => true,
+                'message' => 'Mode PRODUCTION activé. Les SMS seront réellement envoyés et facturés.'
+            ]);
+        } else {
+            // Switch to Mock: Clear credentials
+            $pdo = \App\Core\Database\Database::getInstance()->getPdo();
+            $stmt = $pdo->prepare("UPDATE sms_gateways SET api_key = NULL, api_secret = NULL WHERE id = ?");
+            $stmt->execute([$id]);
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Mode MOCK (simulation) activé. Les SMS ne seront pas réellement envoyés.'
+            ]);
+        }
+
+        exit;
     }
 }

@@ -49,30 +49,42 @@
                                     <th>Status</th>
                                     <th>Cost</th>
                                     <th>Date</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($messages as $msg): ?>
+                                <?php if (empty($messages) || count($messages) === 0): ?>
                                     <tr>
-                                        <td><?= $msg['id'] ?></td>
-                                        <td><?= htmlspecialchars($msg['to']) ?></td>
-                                        <td><?= htmlspecialchars(substr($msg['message'], 0, 50)) ?>...</td>
-                                        <td><span class="badge badge-info"><?= $msg['gateway'] ?></span></td>
-                                        <td>
-                                            <?php if ($msg['status'] === 'delivered'): ?>
-                                                <span class="badge badge-success">Delivered</span>
-                                            <?php elseif ($msg['status'] === 'sent'): ?>
-                                                <span class="badge badge-warning">Sent</span>
-                                            <?php elseif ($msg['status'] === 'failed'): ?>
-                                                <span class="badge badge-danger">Failed</span>
-                                            <?php else: ?>
-                                                <span class="badge badge-secondary"><?= ucfirst($msg['status']) ?></span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td>$<?= number_format($msg['cost'], 2) ?></td>
-                                        <td><?= date('M d, H:i', strtotime($msg['created_at'])) ?></td>
+                                        <td colspan="8" class="text-center">Aucun message SMS pour le moment</td>
                                     </tr>
-                                <?php endforeach; ?>
+                                <?php else: ?>
+                                    <?php foreach ($messages as $msg): ?>
+                                        <tr>
+                                            <td><?= $msg->id ?></td>
+                                            <td><?= htmlspecialchars($msg->to) ?></td>
+                                            <td><?= htmlspecialchars(substr($msg->message, 0, 50)) ?><?= strlen($msg->message) > 50 ? '...' : '' ?></td>
+                                            <td><span class="badge badge-info"><?= $msg->gateway ?></span></td>
+                                            <td>
+                                                <?php if ($msg->status === 'delivered'): ?>
+                                                    <span class="badge badge-success">Delivered</span>
+                                                <?php elseif ($msg->status === 'sent'): ?>
+                                                    <span class="badge badge-warning">Sent</span>
+                                                <?php elseif ($msg->status === 'failed'): ?>
+                                                    <span class="badge badge-danger">Failed</span>
+                                                <?php else: ?>
+                                                    <span class="badge badge-secondary"><?= ucfirst($msg->status) ?></span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td>$<?= number_format($msg->cost ?? 0, 2) ?></td>
+                                            <td><?= date('M d, H:i', strtotime($msg->created_at)) ?></td>
+                                            <td>
+                                                <a href="<?= url('/admin/sms/details/' . $msg->id) ?>" class="btn btn-sm btn-outline-primary">
+                                                    <i data-feather="eye"></i> Détails
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>

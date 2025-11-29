@@ -24,6 +24,7 @@ class SmsCoreModule extends AbstractModule
             ['GET', '/admin/sms/send', [\Modules\SmsCore\Controllers\SmsController::class, 'send'], [$authMiddleware]],
             ['POST', '/admin/sms/send', [\Modules\SmsCore\Controllers\SmsController::class, 'send'], [$authMiddleware]],
             ['GET', '/admin/sms/history', [\Modules\SmsCore\Controllers\SmsController::class, 'history'], [$authMiddleware]],
+            ['GET', '/admin/sms/details/{id}', [\Modules\SmsCore\Controllers\SmsController::class, 'details'], [$authMiddleware]],
             ['GET', '/admin/sms/bulk', [\Modules\SmsCore\Controllers\SmsController::class, 'bulk'], [$authMiddleware]],
             ['POST', '/admin/sms/bulk', [\Modules\SmsCore\Controllers\SmsController::class, 'bulk'], [$authMiddleware]],
         ];

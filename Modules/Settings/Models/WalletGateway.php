@@ -122,10 +122,11 @@ class WalletGateway extends Model
     public function setAsDefault(): bool
     {
         // Unset all other defaults
-        static::where('is_default', true)->update(['is_default' => false]);
+        static::where('is_default', 1)->update(['is_default' => 0]);
 
         // Set this one as default
-        $this->is_default = true;
-        return $this->save();
+        $this->is_default = 1;
+        $this->save();
+        return true;
     }
 }
