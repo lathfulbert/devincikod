@@ -49,7 +49,8 @@ class Setting extends Model
             return static::where('key', $key)->update($data);
         } else {
             $data['created_at'] = date('Y-m-d H:i:s');
-            return static::create($data);
+            static::create($data);
+            return true;
         }
     }
 

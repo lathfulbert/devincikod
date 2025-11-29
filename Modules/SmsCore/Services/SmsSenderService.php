@@ -20,10 +20,13 @@ class SmsSenderService
         $this->billingService = $billingService;
     }
 
-    public function send(string $to, string $message, string $senderId, array $options = []): array
+    public function send(string $to, string $message, ?string $senderId = null, array $options = []): array
     {
         $userId = $options['user_id'] ?? null;
         $gatewayName = $options['gateway_name'] ?? 'unknown';
+
+        // Use default sender ID if not provided
+        $senderId = $senderId ?? 'SMS';
 
         // If no user ID, skip billing (system message) or handle as admin
         if (!$userId) {
@@ -75,6 +78,11 @@ class SmsSenderService
                 // Update log with success info if needed
                 // $log->update(['status' => 'paid']); // Already set in processBilling
             }
+
+            // Add cost and segments info to result
+            $result['cost'] = $totalCost;
+            $result['segments'] = $segments;
+            $result['currency'] = $pricing['currency'];
 
             return $result;
         } catch (\Exception $e) {

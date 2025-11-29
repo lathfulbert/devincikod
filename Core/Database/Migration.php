@@ -72,4 +72,12 @@ abstract class Migration
     {
         return Schema::hasColumn($table, $column);
     }
+
+    /**
+     * Execute raw SQL
+     */
+    protected function raw(string $sql): void
+    {
+        $this->db->query($sql);
+    }
 }

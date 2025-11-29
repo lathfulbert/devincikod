@@ -159,6 +159,32 @@
             </ul>
           </div>
         </li>
+        <li class="onhover-dropdown">
+          <?php
+          // Get current user's wallet balance
+          $userId = $_SESSION['user']['id'] ?? null;
+          $balance = 0;
+          $currency = 'XOF';
+          if ($userId) {
+            $walletService = new \Modules\Wallet\Services\WalletService();
+            $balance = $walletService->getBalance($userId);
+            $wallet = $walletService->getWallet($userId);
+            if ($wallet) {
+              $currency = $wallet->currency;
+            }
+          }
+          ?>
+          <div class="wallet-badge">
+            <a href="<?= url('/admin/wallet') ?>" class="d-flex align-items-center text-decoration-none">
+              <svg class="me-2" width="20" height="20">
+                <use href="<?= url() ?>/assets/svg/icon-sprite.svg#dollar-sign"></use>
+              </svg>
+              <span class="badge badge-light-success" style="font-size: 14px; padding: 8px 12px;">
+                <?= number_format($balance, 0) ?> <?= $currency ?>
+              </span>
+            </a>
+          </div>
+        </li>
         <li class="profile-nav onhover-dropdown pe-0 py-0">
           <div class="media profile-media"><img class="b-r-10" src="<?= url() ?>/assets/images/dashboard/profile.png" alt="">
             <div class="media-body"><span>Emay Walter</span>

@@ -4,7 +4,9 @@
       "Bash(mkdir:*)",
       "Bash(php -r:*)",
       "Bash(php:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(echo:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

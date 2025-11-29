@@ -3,73 +3,120 @@
 namespace Modules\Wallet\Controllers;
 
 use App\Core\Application;
+use Modules\Wallet\Services\WalletService;
+use Modules\Wallet\Models\Wallet;
 
 class WalletController
 {
+    protected WalletService $walletService;
+
+    public function __construct()
+    {
+        $this->walletService = new WalletService();
+    }
+
+    /**
+     * List all user wallets (Admin)
+     */
     public function index()
     {
         $app = Application::getInstance();
-
-        // Mock wallet data
-        $wallet = [
-            'balance' => 500.00,
-            'currency' => 'USD',
-            'status' => 'active'
-        ];
-
-        $recentTransactions = [
-            [
-                'id' => 1,
-                'type' => 'credit',
-                'amount' => 100.00,
-                'description' => 'Top-up via PayPal',
-                'created_at' => date('Y-m-d H:i:s', strtotime('-2 days'))
-            ],
-            [
-                'id' => 2,
-                'type' => 'debit',
-                'amount' => 15.75,
-                'description' => 'SMS charges',
-                'created_at' => date('Y-m-d H:i:s', strtotime('-1 day'))
-            ]
-        ];
+        $wallets = $this->walletService->getAllWallets();
 
         echo $app->view->render('backend/wallet/index', [
-            'wallet' => $wallet,
-            'transactions' => $recentTransactions,
-            'title' => 'Wallet'
+            'wallets' => $wallets,
+            'title' => 'Wallet Management'
         ]);
     }
 
-    public function history()
+    /**
+     * Show top-up form for a user
+     */
+    public function topup($userId = null)
     {
         $app = Application::getInstance();
+        $userId = $userId ?? ($_GET['user_id'] ?? null);
 
-        // Mock full transaction history
-        $transactions = [];
-
-        echo $app->view->render('backend/wallet/history', [
-            'transactions' => $transactions,
-            'title' => 'Transaction History'
-        ]);
-    }
-
-    public function topup()
-    {
-        $app = Application::getInstance();
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $amount = $_POST['amount'] ?? 0;
-            $method = $_POST['method'] ?? 'paypal';
-
-            // TODO: Process payment
-
+        if (!$userId) {
+            $_SESSION['flash_error'] = 'User ID is required';
             redirect('/admin/wallet');
             exit;
         }
 
+        $wallet = $this->walletService->getWallet($userId);
+
         echo $app->view->render('backend/wallet/topup', [
+            'wallet' => $wallet,
+            'userId' => $userId,
             'title' => 'Top-up Wallet'
+        ]);
+    }
+
+    /**
+     * Process top-up
+     */
+    public function processTopup()
+    {
+        $userId = $_POST['user_id'] ?? null;
+        $amount = $_POST['amount'] ?? 0;
+        $description = $_POST['description'] ?? 'Admin credit';
+
+        if (!$userId || $amount <= 0) {
+            $_SESSION['flash_error'] = 'Invalid user ID or amount';
+            redirect('/admin/wallet');
+            exit;
+        }
+
+        try {
+            $this->walletService->addCredit($userId, $amount, $description);
+            $_SESSION['flash_success'] = "Successfully added {$amount} XOF to wallet";
+        } catch (\Exception $e) {
+            $_SESSION['flash_error'] = 'Failed to add credit: ' . $e->getMessage();
+        }
+
+        redirect('/admin/wallet');
+        exit;
+    }
+
+    /**
+     * Process debit
+     */
+    public function processDebit()
+    {
+        $userId = $_POST['user_id'] ?? null;
+        $amount = $_POST['amount'] ?? 0;
+        $description = $_POST['description'] ?? 'Admin debit';
+
+        if (!$userId || $amount <= 0) {
+            $_SESSION['flash_error'] = 'Invalid user ID or amount';
+            redirect('/admin/wallet');
+            exit;
+        }
+
+        try {
+            $this->walletService->deductCredit($userId, $amount, $description);
+            $_SESSION['flash_success'] = "Successfully deducted {$amount} XOF from wallet";
+        } catch (\Exception $e) {
+            $_SESSION['flash_error'] = 'Failed to deduct credit: ' . $e->getMessage();
+        }
+
+        redirect('/admin/wallet');
+        exit;
+    }
+
+    /**
+     * View wallet transactions
+     */
+    public function transactions($userId)
+    {
+        $app = Application::getInstance();
+        $transactions = $this->walletService->getTransactions($userId, 50);
+        $wallet = $this->walletService->getWallet($userId);
+
+        echo $app->view->render('backend/wallet/transactions', [
+            'transactions' => $transactions,
+            'wallet' => $wallet,
+            'title' => 'Wallet Transactions'
         ]);
     }
 }

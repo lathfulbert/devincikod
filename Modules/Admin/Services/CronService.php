@@ -35,13 +35,21 @@ class CronService
             $taskClass = get_class($task);
 
             // Get last execution from logs
-            $lastRun = $this->db->query("
-                SELECT started_at, status, output
-                FROM cron_logs
-                WHERE task_class = ?
-                ORDER BY started_at DESC
-                LIMIT 1
+            // First, find the task_id from cron_tasks
+            $taskRecord = $this->db->query("
+                SELECT id FROM cron_tasks WHERE class = ? LIMIT 1
             ", [$taskClass])->fetch();
+
+            $lastRun = null;
+            if ($taskRecord) {
+                $lastRun = $this->db->query("
+                    SELECT started_at, status, output
+                    FROM cron_logs
+                    WHERE task_id = ?
+                    ORDER BY started_at DESC
+                    LIMIT 1
+                ", [$taskRecord['id']])->fetch();
+            }
 
             $result[] = [
                 'class' => $taskClass,

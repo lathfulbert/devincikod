@@ -24,6 +24,7 @@ class SmsPricingController
                     'currency' => 'XOF'
                 ],
                 'CI' => [
+                    'name' => 'Côte d\'Ivoire',
                     'default' => 10,
                     'networks' => [
                         'orange' => 12,
@@ -34,8 +35,19 @@ class SmsPricingController
             ];
         }
 
+        // Extract default price and countries
+        $defaultPrice = $pricingGrid['default']['price'] ?? 15;
+        $countries = [];
+
+        foreach ($pricingGrid as $code => $data) {
+            if ($code !== 'default' && is_array($data)) {
+                $countries[$code] = $data;
+            }
+        }
+
         echo $app->view->render('backend/sms/pricing/index', [
-            'pricingGrid' => json_encode($pricingGrid, JSON_PRETTY_PRINT)
+            'defaultPrice' => $defaultPrice,
+            'countries' => $countries
         ]);
     }
 
@@ -62,6 +74,106 @@ class SmsPricingController
     }
 
     /**
+     * Update default price
+     */
+    public function updateDefault()
+    {
+        $defaultPrice = (float)($_POST['default_price'] ?? 15);
+
+        $pricingGrid = Setting::get('sms_pricing_grid', []);
+        $pricingGrid['default'] = [
+            'price' => $defaultPrice,
+            'currency' => 'XOF'
+        ];
+
+        Setting::set('sms_pricing_grid', $pricingGrid, 'json', 'sms_pricing');
+
+        $_SESSION['flash_success'] = 'Tarif par défaut mis à jour';
+        redirect('/admin/sms/pricing');
+        exit;
+    }
+
+    /**
+     * Update country pricing
+     */
+    public function updateCountry()
+    {
+        $countryCode = $_POST['country_code'] ?? $_POST['country'] ?? '';
+        $country = $_POST['country'] ?? '';
+        $defaultPrice = (float)($_POST['default_price'] ?? 0);
+        $operators = $_POST['operators'] ?? [];
+
+        if (empty($country)) {
+            $_SESSION['flash_error'] = 'Pays requis';
+            redirect('/admin/sms/pricing');
+            exit;
+        }
+
+        $pricingGrid = Setting::get('sms_pricing_grid', []);
+
+        // Get country name
+        $countryNames = [
+            'CI' => 'Côte d\'Ivoire',
+            'SN' => 'Sénégal',
+            'ML' => 'Mali',
+            'BF' => 'Burkina Faso',
+            'BJ' => 'Bénin',
+            'TG' => 'Togo',
+            'NE' => 'Niger',
+            'GN' => 'Guinée',
+            'CM' => 'Cameroun',
+            'FR' => 'France',
+            'US' => 'États-Unis'
+        ];
+
+        $pricingGrid[$country] = [
+            'name' => $countryNames[$country] ?? $country,
+            'default' => $defaultPrice
+        ];
+
+        // Add operators
+        $networks = [];
+        foreach ($operators as $operator) {
+            if (!empty($operator['name']) && !empty($operator['price'])) {
+                $networks[strtolower($operator['name'])] = (float)$operator['price'];
+            }
+        }
+
+        if (!empty($networks)) {
+            $pricingGrid[$country]['networks'] = $networks;
+        }
+
+        Setting::set('sms_pricing_grid', $pricingGrid, 'json', 'sms_pricing');
+
+        $_SESSION['flash_success'] = 'Tarif pays mis à jour';
+        redirect('/admin/sms/pricing');
+        exit;
+    }
+
+    /**
+     * Delete country pricing
+     */
+    public function deleteCountry()
+    {
+        $countryCode = $_POST['country_code'] ?? '';
+
+        if (empty($countryCode)) {
+            $_SESSION['flash_error'] = 'Code pays requis';
+            redirect('/admin/sms/pricing');
+            exit;
+        }
+
+        $pricingGrid = Setting::get('sms_pricing_grid', []);
+        unset($pricingGrid[$countryCode]);
+
+        Setting::set('sms_pricing_grid', $pricingGrid, 'json', 'sms_pricing');
+
+        $_SESSION['flash_success'] = 'Tarif pays supprimé';
+        redirect('/admin/sms/pricing');
+        exit;
+    }
+
+    /**
      * Display billing logs
      */
     public function logs()
@@ -71,7 +183,7 @@ class SmsPricingController
         $limit = 20;
         $offset = ($page - 1) * $limit;
 
-        $query = SmsBillingLog::with('user')->orderBy('created_at', 'desc');
+        $query = SmsBillingLog::orderBy('created_at', 'desc');
 
         // Filters
         if (isset($_GET['status']) && !empty($_GET['status'])) {

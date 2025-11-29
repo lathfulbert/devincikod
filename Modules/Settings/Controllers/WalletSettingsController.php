@@ -41,7 +41,7 @@ class WalletSettingsController
 
                 if ($gateway) {
                     $updateData = [
-                        'is_active' => isset($config['is_active']) ? (bool)$config['is_active'] : false,
+                        'is_active' => isset($config['is_active']) ? 1 : 0,
                     ];
 
                     // Update credentials if provided

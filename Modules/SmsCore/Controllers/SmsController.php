@@ -133,18 +133,110 @@ class SmsController
         $app = Application::getInstance();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Process bulk SMS
-            $recipients = $_POST['recipients'] ?? []; // Array or CSV
-            $message = $_POST['message'] ?? '';
+            try {
+                $campaignName = $_POST['campaign_name'] ?? 'Untitled Campaign';
+                $message = $_POST['message'] ?? '';
+                $sender = $_POST['sender'] ?? 'SMS';
+                $source = $_POST['source'] ?? 'manual';
+                $scheduledAt = $_POST['scheduled_at'] ?? null;
 
-            // TODO: Queue bulk messages
+                // Parse recipients based on source
+                $recipients = [];
 
-            redirect('/admin/sms/history');
-            exit;
+                if ($source === 'manual') {
+                    $manual = $_POST['recipients_manual'] ?? '';
+                    $recipients = array_map('trim', explode(',', $manual));
+                } elseif ($source === 'csv' && isset($_FILES['recipients_file'])) {
+                    $recipients = $this->parseCSV($_FILES['recipients_file']);
+                }
+
+                // Remove empty values
+                $recipients = array_filter($recipients);
+
+                if (empty($recipients)) {
+                    $_SESSION['flash_error'] = 'Aucun destinataire valide trouvé.';
+                    redirect('/admin/sms/bulk');
+                    exit;
+                }
+
+                // Create campaign
+                $campaign = \Modules\SmsCore\Models\SmsCampaign::create([
+                    'name' => $campaignName,
+                    'message' => $message,
+                    'sender_id' => $sender,
+                    'status' => $scheduledAt ? 'scheduled' : 'draft',
+                    'total_recipients' => count($recipients),
+                    'sent_count' => 0,
+                    'failed_count' => 0,
+                    'scheduled_at' => $scheduledAt ? date('Y-m-d H:i:s', strtotime($scheduledAt)) : null,
+                    'created_by' => $_SESSION['user']['id'] ?? null
+                ]);
+
+                // Queue all recipients
+                $queueManager = \App\Core\Queue\QueueManager::getInstance();
+
+                foreach ($recipients as $recipient) {
+                    // Add to sms_queue table
+                    $queueItem = \Modules\SmsCore\Models\SmsQueue::create([
+                        'campaign_id' => $campaign->id,
+                        'recipient' => $recipient,
+                        'message' => $message,
+                        'sender_id' => $sender,
+                        'status' => 'pending',
+                        'scheduled_at' => $scheduledAt ? date('Y-m-d H:i:s', strtotime($scheduledAt)) : null
+                    ]);
+
+                    // Push to Core Queue system
+                    $queueManager->push(
+                        \Modules\SmsCore\Jobs\SendBulkSmsJob::class,
+                        ['queueId' => $queueItem->id],
+                        'sms'
+                    );
+                }
+
+                // Mark campaign as sending if not scheduled
+                if (!$scheduledAt) {
+                    $campaign->markAsStarted();
+                }
+
+                $_SESSION['flash_success'] = "Campagne créée avec succès! {$campaign->total_recipients} SMS en file d'attente.";
+                redirect('/admin/sms/campaigns');
+                exit;
+
+            } catch (\Exception $e) {
+                $_SESSION['flash_error'] = 'Erreur lors de la création de la campagne: ' . $e->getMessage();
+                redirect('/admin/sms/bulk');
+                exit;
+            }
         }
 
         echo $app->view->render('backend/sms/bulk', [
             'title' => 'Send Bulk SMS'
         ]);
+    }
+
+    /**
+     * Parse CSV file to extract phone numbers
+     */
+    private function parseCSV($file): array
+    {
+        $recipients = [];
+
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            return $recipients;
+        }
+
+        $handle = fopen($file['tmp_name'], 'r');
+
+        if ($handle) {
+            while (($data = fgetcsv($handle)) !== false) {
+                if (!empty($data[0])) {
+                    $recipients[] = trim($data[0]);
+                }
+            }
+            fclose($handle);
+        }
+
+        return $recipients;
     }
 }

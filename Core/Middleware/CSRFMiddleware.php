@@ -18,6 +18,12 @@ class CSRFMiddleware
             return;
         }
 
+        // Ignorer les routes API
+        $uri = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+        if ($this->isExcluded($uri)) {
+            return;
+        }
+
         $csrf = CSRF::getInstance();
         $token = $_POST[CSRF::getTokenName()] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
 
@@ -33,7 +39,8 @@ class CSRFMiddleware
     private function isExcluded(string $uri): bool
     {
         $excludedRoutes = [
-            '/api/*', // Exclure les routes API (utiliser un autre système d'auth)
+            '/api/*',
+            '*/api/*', // Exclure les routes API (utiliser un autre système d'auth)
         ];
 
         foreach ($excludedRoutes as $pattern) {

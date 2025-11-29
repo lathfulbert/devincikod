@@ -16,6 +16,11 @@ class SmsCoreModule extends AbstractModule
         $authMiddleware = [new \App\Core\Middleware\AuthMiddleware(), 'handle'];
 
         return [
+            // API Routes (no middleware for now, will be added in controller)
+            ['POST', '/api/v1/sms/send', [\Modules\SmsCore\Controllers\SmsApiController::class, 'send'], []],
+            ['GET', '/api/v1/sms/history', [\Modules\SmsCore\Controllers\SmsApiController::class, 'history'], []],
+            ['GET', '/api/v1/sms/balance', [\Modules\SmsCore\Controllers\SmsApiController::class, 'balance'], []],
+
             // Dashboard
             ['GET', '/admin/sms', [\Modules\SmsCore\Controllers\DashboardController::class, 'index'], [$authMiddleware]],
             ['GET', '/admin/sms/statistics', [\Modules\SmsCore\Controllers\DashboardController::class, 'statistics'], [$authMiddleware]],
@@ -28,9 +33,17 @@ class SmsCoreModule extends AbstractModule
             ['GET', '/admin/sms/bulk', [\Modules\SmsCore\Controllers\SmsController::class, 'bulk'], [$authMiddleware]],
             ['POST', '/admin/sms/bulk', [\Modules\SmsCore\Controllers\SmsController::class, 'bulk'], [$authMiddleware]],
 
+            // Campaigns
+            ['GET', '/admin/sms/campaigns', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'index'], [$authMiddleware]],
+            ['GET', '/admin/sms/campaigns/{id}', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'show'], [$authMiddleware]],
+            ['POST', '/admin/sms/campaigns/{id}/delete', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'delete'], [$authMiddleware]],
+
             // Billing & Pricing
             ['GET', '/admin/sms/pricing', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'index'], [$authMiddleware]],
             ['POST', '/admin/sms/pricing/update', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'update'], [$authMiddleware]],
+            ['POST', '/admin/sms/pricing/update-default', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'updateDefault'], [$authMiddleware]],
+            ['POST', '/admin/sms/pricing/update-country', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'updateCountry'], [$authMiddleware]],
+            ['POST', '/admin/sms/pricing/delete-country', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'deleteCountry'], [$authMiddleware]],
             ['GET', '/admin/sms/billing', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'logs'], [$authMiddleware]],
         ];
     }
@@ -46,6 +59,7 @@ class SmsCoreModule extends AbstractModule
                     ['title' => 'Dashboard', 'url' => '/admin/sms'],
                     ['title' => 'Send SMS', 'url' => '/admin/sms/send'],
                     ['title' => 'Bulk SMS', 'url' => '/admin/sms/bulk'],
+                    ['title' => 'Campaigns', 'url' => '/admin/sms/campaigns'],
                     ['title' => 'History', 'url' => '/admin/sms/history'],
                     ['title' => 'Statistics', 'url' => '/admin/sms/statistics'],
                     ['title' => 'Tarification', 'url' => '/admin/sms/pricing'],

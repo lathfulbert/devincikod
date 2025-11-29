@@ -55,7 +55,17 @@
                                 <?php else: ?>
                                     <?php foreach ($logs as $log): ?>
                                         <tr>
-                                            <td><?= $log->created_at->format('d/m/Y H:i') ?></td>
+                                            <td>
+                                                <?php
+                                                if (is_object($log->created_at)) {
+                                                    echo $log->created_at->format('d/m/Y H:i');
+                                                } elseif ($log->created_at) {
+                                                    echo date('d/m/Y H:i', strtotime($log->created_at));
+                                                } else {
+                                                    echo '-';
+                                                }
+                                                ?>
+                                            </td>
                                             <td>
                                                 <?php if ($log->user): ?>
                                                     <?= htmlspecialchars($log->user->username ?? $log->user->email) ?>
