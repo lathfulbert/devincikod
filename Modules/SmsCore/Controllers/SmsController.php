@@ -52,7 +52,16 @@ class SmsController
                 $gateway = SmsGatewayFactory::create($gatewayConfig);
 
                 if ($gateway) {
-                    $result = $gateway->send($to, $message, $sender);
+                    // Initialize services for billing
+                    $pricingService = new \Modules\SmsCore\Services\SmsPricingService();
+                    $billingService = new \Modules\SmsCore\Services\SmsBillingService();
+                    $senderService = new \Modules\SmsCore\Services\SmsSenderService($gateway, $pricingService, $billingService);
+
+                    // Send with billing logic
+                    $result = $senderService->send($to, $message, $sender, [
+                        'user_id' => $_SESSION['user']['id'] ?? null,
+                        'gateway_name' => $gatewayConfig->provider_code
+                    ]);
 
                     // Update message with gateway response
                     $smsMessage->gateway_response = $result['gateway_response'] ?? null;
@@ -68,7 +77,6 @@ class SmsController
                     $smsMessage->markAsFailed('Gateway not implemented');
                     $_SESSION['flash_error'] = 'Gateway non implémenté pour ' . $gatewayConfig->provider_code;
                 }
-
             } catch (\Exception $e) {
                 if (isset($smsMessage)) {
                     $smsMessage->markAsFailed($e->getMessage());

@@ -27,6 +27,11 @@ class SmsCoreModule extends AbstractModule
             ['GET', '/admin/sms/details/{id}', [\Modules\SmsCore\Controllers\SmsController::class, 'details'], [$authMiddleware]],
             ['GET', '/admin/sms/bulk', [\Modules\SmsCore\Controllers\SmsController::class, 'bulk'], [$authMiddleware]],
             ['POST', '/admin/sms/bulk', [\Modules\SmsCore\Controllers\SmsController::class, 'bulk'], [$authMiddleware]],
+
+            // Billing & Pricing
+            ['GET', '/admin/sms/pricing', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'index'], [$authMiddleware]],
+            ['POST', '/admin/sms/pricing/update', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'update'], [$authMiddleware]],
+            ['GET', '/admin/sms/billing', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'logs'], [$authMiddleware]],
         ];
     }
 
@@ -43,6 +48,8 @@ class SmsCoreModule extends AbstractModule
                     ['title' => 'Bulk SMS', 'url' => '/admin/sms/bulk'],
                     ['title' => 'History', 'url' => '/admin/sms/history'],
                     ['title' => 'Statistics', 'url' => '/admin/sms/statistics'],
+                    ['title' => 'Tarification', 'url' => '/admin/sms/pricing'],
+                    ['title' => 'Facturation', 'url' => '/admin/sms/billing'],
                 ]
             ]
         ];
