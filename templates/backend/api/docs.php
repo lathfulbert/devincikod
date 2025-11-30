@@ -12,7 +12,7 @@
             <div class="col-6">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="<?= url('/admin/dashboard') ?>"><i data-feather="home"></i></a></li>
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/settings/api') ?>">API</a></li>
+                    <li class="breadcrumb-item"><a href="<?= url('/admin/api-keys') ?>">API Keys</a></li>
                     <li class="breadcrumb-item active">Documentation</li>
                 </ol>
             </div>
@@ -301,7 +301,7 @@ if ($result['success']) {
                     <hr>
 
                     <div class="alert alert-info">
-                        <i data-feather="help-circle"></i> Need help? Contact support or check your <a href="<?= url('/admin/settings/api') ?>">API settings</a>.
+                        <i data-feather="help-circle"></i> Need help? Contact support or check your <a href="<?= url('/admin/api-keys') ?>">API settings</a>.
                     </div>
                 </div>
             </div>

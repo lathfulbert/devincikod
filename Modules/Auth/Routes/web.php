@@ -20,8 +20,8 @@ $router->get('/logout', [AuthController::class, 'logout']);
 // API Key Management
 $authMiddleware = [new \App\Core\Middleware\AuthMiddleware(), 'handle'];
 
-$router->get('/admin/settings/api', [ApiKeyController::class, 'index'], [$authMiddleware]);
-$router->post('/admin/settings/api/generate', [ApiKeyController::class, 'generate'], [$authMiddleware]);
-$router->post('/admin/settings/api/regenerate', [ApiKeyController::class, 'regenerate'], [$authMiddleware]);
-$router->post('/admin/settings/api/revoke', [ApiKeyController::class, 'revoke'], [$authMiddleware]);
-$router->get('/admin/settings/api/docs', [ApiKeyController::class, 'docs'], [$authMiddleware]);
+$router->get('/admin/api-keys', [ApiKeyController::class, 'index'], [$authMiddleware]);
+$router->post('/admin/api-keys/generate', [ApiKeyController::class, 'generate'], [$authMiddleware]);
+$router->post('/admin/api-keys/regenerate', [ApiKeyController::class, 'regenerate'], [$authMiddleware]);
+$router->post('/admin/api-keys/revoke', [ApiKeyController::class, 'revoke'], [$authMiddleware]);
+$router->get('/admin/api-keys/docs', [ApiKeyController::class, 'docs'], [$authMiddleware]);

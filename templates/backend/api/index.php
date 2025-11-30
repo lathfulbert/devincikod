@@ -53,14 +53,14 @@
                         </div>
 
                         <div class="d-flex gap-2">
-                            <form action="<?= url('/admin/settings/api/regenerate') ?>" method="POST" onsubmit="return confirm('Are you sure? This will invalidate your current API key.')">
+                            <form action="<?= url('/admin/api-keys/regenerate') ?>" method="POST" onsubmit="return confirm('Are you sure? This will invalidate your current API key.')">
                                 <?= csrf_field() ?>
                                 <button type="submit" class="btn btn-warning">
                                     <i data-feather="refresh-cw"></i> Regenerate Key
                                 </button>
                             </form>
 
-                            <form action="<?= url('/admin/settings/api/revoke') ?>" method="POST" onsubmit="return confirm('Are you sure you want to revoke your API key?')">
+                            <form action="<?= url('/admin/api-keys/revoke') ?>" method="POST" onsubmit="return confirm('Are you sure you want to revoke your API key?')">
                                 <?= csrf_field() ?>
                                 <button type="submit" class="btn btn-danger">
                                     <i data-feather="x-circle"></i> Revoke Key
@@ -74,7 +74,7 @@
 
                         <p>Generate an API key to integrate SMS functionality into your applications.</p>
 
-                        <form action="<?= url('/admin/settings/api/generate') ?>" method="POST">
+                        <form action="<?= url('/admin/api-keys/generate') ?>" method="POST">
                             <?= csrf_field() ?>
                             <button type="submit" class="btn btn-primary">
                                 <i data-feather="plus"></i> Generate API Key
@@ -108,7 +108,7 @@
                         <li><strong>GET</strong> <code>/api/v1/sms/balance</code> - Get account balance</li>
                     </ul>
 
-                    <a href="<?= url('/admin/settings/api/docs') ?>" class="btn btn-info">
+                    <a href="<?= url('/admin/api-keys/docs') ?>" class="btn btn-info">
                         <i data-feather="book"></i> View Full Documentation
                     </a>
                 </div>

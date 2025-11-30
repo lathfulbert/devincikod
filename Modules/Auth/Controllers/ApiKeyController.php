@@ -44,7 +44,7 @@ class ApiKeyController
 
         if (!$user) {
             $_SESSION['flash_error'] = 'User not found';
-            redirect('/admin/settings/api');
+            redirect('/admin/api-keys');
             exit;
         }
 
@@ -58,7 +58,7 @@ class ApiKeyController
         ]);
 
         $_SESSION['flash_success'] = 'API key generated successfully';
-        redirect('/admin/settings/api');
+        redirect('/admin/api-keys');
         exit;
     }
 
@@ -78,7 +78,7 @@ class ApiKeyController
 
         if (!$user) {
             $_SESSION['flash_error'] = 'User not found';
-            redirect('/admin/settings/api');
+            redirect('/admin/api-keys');
             exit;
         }
 
@@ -92,7 +92,7 @@ class ApiKeyController
         ]);
 
         $_SESSION['flash_success'] = 'API key regenerated successfully. Please update your applications with the new key.';
-        redirect('/admin/settings/api');
+        redirect('/admin/api-keys');
         exit;
     }
 
@@ -112,7 +112,7 @@ class ApiKeyController
 
         if (!$user) {
             $_SESSION['flash_error'] = 'User not found';
-            redirect('/admin/settings/api');
+            redirect('/admin/api-keys');
             exit;
         }
 
@@ -123,7 +123,7 @@ class ApiKeyController
         ]);
 
         $_SESSION['flash_success'] = 'API key revoked successfully';
-        redirect('/admin/settings/api');
+        redirect('/admin/api-keys');
         exit;
     }
 

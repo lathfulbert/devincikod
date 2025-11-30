@@ -7,7 +7,7 @@ use Modules\SmsCore\Services\SmsGatewayFactory;
 use Modules\SmsCore\Services\SmsPricingService;
 use Modules\SmsCore\Services\SmsBillingService;
 use Modules\SmsCore\Services\SmsSenderService;
-use Modules\SmsCore\Models\SmsLog;
+use Modules\SmsCore\Models\SmsBillingLog;
 use Modules\Wallet\Services\WalletService;
 
 class SmsApiController
@@ -233,7 +233,7 @@ class SmsApiController
 
         try {
             // Build query
-            $query = SmsLog::where('user_id', $user->id)
+            $query = SmsBillingLog::where('user_id', $user->id)
                 ->orderBy('created_at', 'desc');
 
             // Apply filters
@@ -259,16 +259,17 @@ class SmsApiController
             $data = [];
             foreach ($logs as $log) {
                 $data[] = [
-                    'id' => $log->id,
-                    'recipient' => $log->recipient,
-                    'message' => $log->message,
-                    'sender_id' => $log->sender_id,
-                    'status' => $log->status,
-                    'segments' => $log->segments,
-                    'cost' => $log->cost,
-                    'gateway' => $log->gateway_name,
-                    'created_at' => $log->created_at,
-                    'sent_at' => $log->sent_at ?? null
+                    'id' => $log->id ?? null,
+                    'recipient' => $log->recipient ?? '',
+                    'sender_id' => $log->sender_id ?? '',
+                    'status' => $log->status ?? '',
+                    'segments' => $log->segments ?? 1,
+                    'cost' => $log->total_cost ?? 0,
+                    'currency' => $log->currency ?? 'XOF',
+                    'gateway' => $log->gateway ?? '',
+                    'country_code' => $log->country_code ?? '',
+                    'operator' => $log->operator ?? '',
+                    'created_at' => $log->created_at ?? null
                 ];
             }
 
@@ -317,17 +318,18 @@ class SmsApiController
             $balance = $walletService->getBalance($user->id);
 
             // Get SMS stats
-            $totalSent = SmsLog::where('user_id', $user->id)
-                ->where('status', 'sent')
+            $totalSent = SmsBillingLog::where('user_id', $user->id)
+                ->where('status', 'paid')
                 ->count();
 
-            $totalFailed = SmsLog::where('user_id', $user->id)
+            $totalFailed = SmsBillingLog::where('user_id', $user->id)
                 ->where('status', 'failed')
                 ->count();
 
-            $totalCost = SmsLog::where('user_id', $user->id)
-                ->where('status', 'sent')
-                ->sum('cost') ?? 0;
+            // Calculate total cost using raw query
+            $db = \App\Core\Database\Database::getInstance();
+            $costResult = $db->query("SELECT SUM(total_cost) as total FROM sms_billing_logs WHERE user_id = ? AND status = 'paid'", [$user->id])->fetch();
+            $totalCost = $costResult['total'] ?? 0;
 
             http_response_code(200);
             echo json_encode([

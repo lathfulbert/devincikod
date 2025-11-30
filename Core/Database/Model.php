@@ -187,4 +187,13 @@ abstract class Model
     {
         return (new QueryBuilder(static::class))->$method(...$parameters);
     }
+    /**
+     * Convert the model instance to an array.
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return $this->attributes;
+    }
 }

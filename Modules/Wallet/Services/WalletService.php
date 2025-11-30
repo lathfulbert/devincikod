@@ -150,7 +150,6 @@ class WalletService
             $wallet->update(['status' => 'active']);
         }
     }
-
     /**
      * Get all wallets (for admin)
      */
@@ -159,63 +158,19 @@ class WalletService
         $wallets = Wallet::orderBy('created_at', 'desc')->get();
         $result = [];
 
-        // Convert each wallet to array and load user data
         foreach ($wallets as $wallet) {
-            // Use Reflection to get all properties
-            $walletArray = $this->objectToArray($wallet);
+            $walletArray = $wallet->toArray();
 
-            // Get user_id
-            $userId = $walletArray['user_id'] ?? null;
-
-            if ($userId) {
-                $user = \Modules\Auth\Models\User::find($userId);
-                if ($user) {
-                    // Convert user to array
-                    $walletArray['user'] = $this->objectToArray($user);
-                }
+            // Manually load user data
+            $user = \Modules\Auth\Models\User::find($walletArray['user_id']);
+            if ($user) {
+                $walletArray['user'] = $user->toArray();
             }
 
             $result[] = $walletArray;
         }
 
         return $result;
-    }
-
-    /**
-     * Convert object to array using Reflection
-     */
-    private function objectToArray($obj): array
-    {
-        if (!is_object($obj)) {
-            return is_array($obj) ? $obj : [];
-        }
-
-        $array = [];
-        $reflection = new \ReflectionClass($obj);
-
-        // Check if object has 'attributes' property (Model class)
-        if ($reflection->hasProperty('attributes')) {
-            $attributesProperty = $reflection->getProperty('attributes');
-            $attributesProperty->setAccessible(true);
-
-            if ($attributesProperty->isInitialized($obj)) {
-                $attributes = $attributesProperty->getValue($obj);
-                if (is_array($attributes)) {
-                    return $attributes;
-                }
-            }
-        }
-
-        // Fallback: get all public properties directly set (like PDO FETCH_CLASS does)
-        foreach (get_object_vars($obj) as $key => $value) {
-            // Skip internal Model properties
-            if (in_array($key, ['table', 'fillable', 'casts', 'primaryKey', 'attributes'])) {
-                continue;
-            }
-            $array[$key] = $value;
-        }
-
-        return $array;
     }
 
     /**
