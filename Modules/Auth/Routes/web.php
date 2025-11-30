@@ -2,6 +2,8 @@
 
 use Modules\Auth\Controllers\AuthController;
 use Modules\Auth\Controllers\ApiKeyController;
+use Modules\Auth\Controllers\ProfileController;
+use Modules\Auth\Controllers\PasswordResetController;
 
 /** @var \App\Core\Routing\Router $router */
 
@@ -17,9 +19,22 @@ $router->post('/register', [AuthController::class, 'register']);
 
 $router->get('/logout', [AuthController::class, 'logout']);
 
-// API Key Management
+// Password Reset
+$router->get('/forgot-password', [PasswordResetController::class, 'forgotPassword']);
+$router->post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
+$router->get('/reset-password', [PasswordResetController::class, 'resetPassword']);
+$router->post('/reset-password', [PasswordResetController::class, 'updatePassword']);
+
+// Protected Routes
 $authMiddleware = [new \App\Core\Middleware\AuthMiddleware(), 'handle'];
 
+// Profile Management
+$router->get('/admin/profile', [ProfileController::class, 'edit'], [$authMiddleware]);
+$router->post('/admin/profile/update', [ProfileController::class, 'update'], [$authMiddleware]);
+$router->get('/admin/profile/change-password', [ProfileController::class, 'changePassword'], [$authMiddleware]);
+$router->post('/admin/profile/update-password', [ProfileController::class, 'updatePassword'], [$authMiddleware]);
+
+// API Key Management
 $router->get('/admin/api-keys', [ApiKeyController::class, 'index'], [$authMiddleware]);
 $router->post('/admin/api-keys/generate', [ApiKeyController::class, 'generate'], [$authMiddleware]);
 $router->post('/admin/api-keys/regenerate', [ApiKeyController::class, 'regenerate'], [$authMiddleware]);

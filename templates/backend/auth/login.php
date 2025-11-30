@@ -44,7 +44,7 @@
                                 <div class="form-check">
                                     <input class="checkbox-primary form-check-input" id="checkbox1" type="checkbox">
                                     <label class="text-muted form-check-label" for="checkbox1">Remember password</label>
-                                </div><a class="link" href="{{ route('admin.forget_password') }}">Forgot password?</a>
+                                </div><a class="link" href="<?= url('/forgot-password') ?>">Forgot password?</a>
                                 <div class="text-end">
                                     <button class="btn btn-primary btn-block w-100 mt-3" type="submit">Sign in</button>
                                 </div>
