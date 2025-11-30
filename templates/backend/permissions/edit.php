@@ -44,9 +44,16 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="module_name" class="form-label">Module</label>
-                    <input type="text" name="module_name" id="module_name" class="form-control" value="<?= htmlspecialchars($permission->module_name ?? '') ?>">
-                    <small class="form-text text-muted">Nom du module associé (optionnel)</small>
+                    <label for="module_id" class="form-label">Module</label>
+                    <select name="module_id" id="module_id" class="form-select">
+                        <option value="">-- Sélectionner un module (Optionnel) --</option>
+                        <?php foreach ($modules as $module): ?>
+                            <option value="<?= $module->id ?>" <?= ($permission->module_id == $module->id) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($module->name) ?> (<?= htmlspecialchars($module->slug) ?>)
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <small class="form-text text-muted">Module auquel cette permission est rattachée</small>
                 </div>
 
                 <div class="mt-4">

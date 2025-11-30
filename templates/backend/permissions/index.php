@@ -21,6 +21,8 @@
 </div>
 
 <div class="container-fluid">
+
+    affiche ici
     <!-- Actions -->
     <div class="row mb-3">
         <div class="col-12 text-end">

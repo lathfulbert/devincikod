@@ -6,7 +6,8 @@
       "Bash(php:*)",
       "Bash(find:*)",
       "Bash(echo:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(mysql:*)"
     ],
     "deny": [],
     "ask": []

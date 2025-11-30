@@ -74,11 +74,11 @@ class ModuleRegistry
     {
         try {
             $result = $this->db->query(
-                "SELECT is_enabled FROM modules WHERE name = ?",
+                "SELECT is_active FROM modules WHERE name = ?",
                 [$moduleName]
             )->fetch();
 
-            return $result ? (bool)$result['is_enabled'] : false;
+            return $result ? (bool)$result['is_active'] : false;
         } catch (\PDOException $e) {
             return false;
         }
@@ -101,7 +101,7 @@ class ModuleRegistry
     public function setEnabled(string $moduleName, bool $enabled): void
     {
         $this->db->query(
-            "UPDATE modules SET is_enabled = ?, updated_at = NOW() WHERE name = ?",
+            "UPDATE modules SET is_active = ?, updated_at = NOW() WHERE name = ?",
             [$enabled ? 1 : 0, $moduleName]
         );
     }
@@ -126,7 +126,7 @@ class ModuleRegistry
     public function getEnabled(): array
     {
         try {
-            return $this->db->query("SELECT * FROM modules WHERE is_enabled = 1 ORDER BY name")->fetchAll();
+            return $this->db->query("SELECT * FROM modules WHERE is_active = 1 ORDER BY name")->fetchAll();
         } catch (\PDOException $e) {
             return [];
         }

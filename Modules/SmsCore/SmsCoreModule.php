@@ -64,6 +64,7 @@ class SmsCoreModule extends AbstractModule
                     ['title' => 'Statistics', 'url' => '/admin/sms/statistics'],
                     ['title' => 'Tarification', 'url' => '/admin/sms/pricing'],
                     ['title' => 'Facturation', 'url' => '/admin/sms/billing'],
+                    ['title' => 'API Keys', 'url' => '/admin/api-keys', 'icon' => 'key'],
                 ]
             ]
         ];
