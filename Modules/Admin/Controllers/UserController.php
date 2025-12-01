@@ -13,14 +13,14 @@ class UserController
     {
         $app = Application::getInstance();
         $users = User::query()->with('roles')->orderBy('id', 'DESC')->paginate(10);
-        echo view('admin/users/index', ['title' => 'Users', 'users' => $users]);
+        echo view('backend/users/index', ['title' => 'Users', 'users' => $users]);
     }
 
     public function create()
     {
         $app = Application::getInstance();
         $roles = Role::all();
-        echo view('admin/users/create', ['title' => 'Create User', 'roles' => $roles]);
+        echo view('users/create', ['title' => 'Create User', 'roles' => $roles]);
     }
 
     public function store()

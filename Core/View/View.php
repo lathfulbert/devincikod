@@ -97,8 +97,8 @@ class View
 
         file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "Resolving '$view' -> viewPath='$viewPath'\n", FILE_APPEND);
 
-        // 1. Check in resources/views/backend for layouts and components (PRIORITY)
-        if (strpos($viewPath, 'backend/layouts/') === 0 || strpos($viewPath, 'backend/components/') === 0) {
+        // 1. Check in resources/views/backend for all backend views (PRIORITY)
+        if (strpos($viewPath, 'backend/') === 0) {
             $path = $this->checkPath($basePath . '/resources/views/' . $viewPath);
             if ($path) {
                 file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to RESOURCES: $path\n", FILE_APPEND);
@@ -106,7 +106,16 @@ class View
             }
         }
 
-        // 2. Check in module directories (PRIORITY for module views)
+        // 2. Check in resources/views/errors for error pages
+        if (strpos($viewPath, 'errors/') === 0) {
+            $path = $this->checkPath($basePath . '/resources/views/' . $viewPath);
+            if ($path) {
+                file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to RESOURCES: $path\n", FILE_APPEND);
+                return self::$resolvedPathsCache[$view] = $path;
+            }
+        }
+
+        // 3. Check in module directories (PRIORITY for module views)
         $parts = explode('/', $viewPath);
         if (count($parts) >= 2) {
             $moduleName = ucfirst($parts[0]); // First segment is module name
