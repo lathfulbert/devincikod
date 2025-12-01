@@ -19,7 +19,9 @@ class SmsCampaign extends Model
         'scheduled_at',
         'started_at',
         'completed_at',
-        'created_by'
+        'created_by',
+        'contact_ids',
+        'use_personalization'
     ];
 
     public function getProgress(): float

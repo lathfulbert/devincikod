@@ -4,7 +4,7 @@
 doc/
 
 # Vendor
-temp/
+
 /vendor/
 composer.lock
 
@@ -42,7 +42,7 @@ Thumbs.db
 *.swp
 *.swo
 *~
-
+examples/
 # Tests
 /phpunit.xml
 /coverage/

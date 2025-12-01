@@ -35,8 +35,13 @@ class SmsCoreModule extends AbstractModule
 
             // Campaigns
             ['GET', '/admin/sms/campaigns', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'index'], [$authMiddleware]],
+            ['GET', '/admin/sms/campaigns/create', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'create'], [$authMiddleware]],
+            ['POST', '/admin/sms/campaigns/store', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'store'], [$authMiddleware]],
             ['GET', '/admin/sms/campaigns/{id}', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'show'], [$authMiddleware]],
-            ['POST', '/admin/sms/campaigns/{id}/delete', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'delete'], [$authMiddleware]],
+            ['GET', '/admin/sms/campaigns/{id}/edit', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'edit'], [$authMiddleware]],
+            ['POST', '/admin/sms/campaigns/{id}/update', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'update'], [$authMiddleware]],
+            ['POST', '/admin/sms/campaigns/preview', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'preview'], [$authMiddleware]],
+            ['GET', '/admin/sms/campaigns/{id}/delete', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'delete'], [$authMiddleware]],
 
             // Billing & Pricing
             ['GET', '/admin/sms/pricing', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'index'], [$authMiddleware]],
