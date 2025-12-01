@@ -45,7 +45,7 @@ class CacheController
             'apcu' => extension_loaded('apcu') && ini_get('apc.enabled')
         ];
 
-        echo $app->view->render('admin/cache/index', [
+        echo view('admin/cache/index', [
             'title' => 'Configuration du Cache',
             'config' => $config,
             'extensions' => $extensions
@@ -230,7 +230,7 @@ class CacheController
 
         $stats = $cache->getStats();
 
-        echo $app->view->render('backend/cache/stats', [
+        echo view('admin/cache/stats', [
             'title' => 'Statistiques du Cache',
             'stats' => $stats
         ]);

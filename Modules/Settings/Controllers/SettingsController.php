@@ -24,7 +24,7 @@ class SettingsController
 
         $settings = Setting::getAll();
 
-        echo $app->view->render('settings/index', [
+        echo view('settings/index', [
             'title' => 'Configuration Générale',
             'settings' => $settings
         ]);

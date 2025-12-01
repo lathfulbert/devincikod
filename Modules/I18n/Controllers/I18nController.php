@@ -35,7 +35,7 @@ class I18nController
         $translations = $this->manager->all($locale);
         $flatTranslations = $this->flattenTranslations($translations);
 
-        echo $app->view->render('i18n/index', [
+        echo view('i18n/index', [
             'title' => 'Gestion des Traductions',
             'translations' => $flatTranslations,
             'current_locale' => $locale,
@@ -68,7 +68,7 @@ class I18nController
             ? $this->manager->trans($key, [], $locale)
             : '';
 
-        echo $app->view->render('i18n/edit', [
+        echo view('i18n/edit', [
             'title' => 'Modifier la Traduction',
             'key' => $key,
             'value' => $value,
@@ -133,7 +133,7 @@ class I18nController
         $app = Application::getInstance();
         $locale = $_GET['locale'] ?? $this->manager->getLocale();
 
-        echo $app->view->render('i18n/create', [
+        echo view('i18n/create', [
             'title' => 'Nouvelle Traduction',
             'locale' => $locale
         ]);

@@ -9,6 +9,10 @@ class View
     protected TemplateEngine $engine;
     protected array $templateVars = [];
 
+    // Static cache for resolved view paths (performance optimization)
+    protected static array $resolvedPathsCache = [];
+    protected static bool $cacheEnabled = true;
+
     public function __construct(string $templatePath)
     {
         $this->templatePath = $templatePath;
@@ -82,66 +86,72 @@ class View
 
     protected function resolveViewPath(string $view): ?string
     {
+        // Check cache first for performance
+        if (self::$cacheEnabled && isset(self::$resolvedPathsCache[$view])) {
+            return self::$resolvedPathsCache[$view];
+        }
+
         // Handle dot notation: layouts.app -> layouts/app
         $viewPath = str_replace('.', '/', $view);
         $basePath = dirname(dirname(__DIR__));
 
         file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "Resolving '$view' -> viewPath='$viewPath'\n", FILE_APPEND);
 
-        // 1. Check in resources/views/backend for layouts and components (NEW PRIORITY)
+        // 1. Check in resources/views/backend for layouts and components (PRIORITY)
         if (strpos($viewPath, 'backend/layouts/') === 0 || strpos($viewPath, 'backend/components/') === 0) {
-            $resourcesPath = $basePath . '/resources/views/' . $viewPath;
-            $resourcesTpl = $resourcesPath . '.tpl';
-            $resourcesPhp = $resourcesPath . '.php';
-
-            if (file_exists($resourcesTpl)) {
-                file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to RESOURCES: $resourcesTpl\n", FILE_APPEND);
-                return $resourcesTpl;
-            }
-            if (file_exists($resourcesPhp)) {
-                file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to RESOURCES: $resourcesPhp\n", FILE_APPEND);
-                return $resourcesPhp;
+            $path = $this->checkPath($basePath . '/resources/views/' . $viewPath);
+            if ($path) {
+                file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to RESOURCES: $path\n", FILE_APPEND);
+                return self::$resolvedPathsCache[$view] = $path;
             }
         }
 
         // 2. Check in module directories (PRIORITY for module views)
-        // Extract module name from view path
         $parts = explode('/', $viewPath);
         if (count($parts) >= 2) {
             $moduleName = ucfirst($parts[0]); // First segment is module name
             $moduleViewPath = implode('/', array_slice($parts, 1)); // Rest is the view path
 
             $moduleBasePath = $basePath . '/Modules/' . $moduleName . '/Views/' . $moduleViewPath;
-            $moduleTplFile = $moduleBasePath . '.tpl';
-            $modulePhpFile = $moduleBasePath . '.php';
 
-            file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  Checking module views:\n    tpl=$moduleTplFile (exists=" . (file_exists($moduleTplFile) ? 'YES' : 'NO') . ")\n    php=$modulePhpFile (exists=" . (file_exists($modulePhpFile) ? 'YES' : 'NO') . ")\n", FILE_APPEND);
+            file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  Checking module: $moduleName, path: $moduleViewPath\n", FILE_APPEND);
 
-            if (file_exists($moduleTplFile)) {
-                file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to MODULE: $moduleTplFile\n", FILE_APPEND);
-                return $moduleTplFile;
-            }
-            if (file_exists($modulePhpFile)) {
-                file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to MODULE: $modulePhpFile\n", FILE_APPEND);
-                return $modulePhpFile;
+            $path = $this->checkPath($moduleBasePath);
+            if ($path) {
+                file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to MODULE: $path\n", FILE_APPEND);
+                return self::$resolvedPathsCache[$view] = $path;
             }
         }
 
-        // 3. Fallback to standard templates directory
-        $tplFile = $this->templatePath . '/' . $viewPath . '.tpl';
-        $phpFile = $this->templatePath . '/' . $viewPath . '.php';
+        // Not found
+        file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Failed to resolve: $view\n", FILE_APPEND);
+        return null;
+    }
+
+    /**
+     * Check if a view file exists (.tpl or .php)
+     */
+    protected function checkPath(string $basePath): ?string
+    {
+        $tplFile = $basePath . '.tpl';
+        $phpFile = $basePath . '.php';
 
         if (file_exists($tplFile)) {
-            file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to TEMPLATES: $tplFile\n", FILE_APPEND);
             return $tplFile;
         }
         if (file_exists($phpFile)) {
-            file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to TEMPLATES: $phpFile\n", FILE_APPEND);
             return $phpFile;
         }
 
-        file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Failed to resolve: $view\n", FILE_APPEND);
         return null;
+    }
+
+    /**
+     * Clear the resolved paths cache (useful for development)
+     */
+    public static function clearCache(): void
+    {
+        self::$resolvedPathsCache = [];
     }
 
     /**

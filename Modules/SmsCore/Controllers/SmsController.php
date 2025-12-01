@@ -91,7 +91,7 @@ class SmsController
         // Get available gateways for dropdown
         $gateways = SmsGateway::where('is_active', 1)->get();
 
-        echo $app->view->render('backend/sms/send', [
+        echo view('smscore/sms/send', [
             'title' => 'Send SMS',
             'gateways' => $gateways
         ]);
@@ -104,7 +104,7 @@ class SmsController
         // Get real SMS history from database
         $messages = SmsMessage::orderBy('created_at', 'DESC')->get();
 
-        echo $app->view->render('backend/sms/history', [
+        echo view('smscore/sms/history', [
             'messages' => $messages,
             'title' => 'SMS History'
         ]);
@@ -122,7 +122,7 @@ class SmsController
             exit;
         }
 
-        echo $app->view->render('backend/sms/details', [
+        echo view('smscore/sms/details', [
             'sms' => $sms,
             'title' => 'SMS Details'
         ]);
@@ -210,7 +210,7 @@ class SmsController
             }
         }
 
-        echo $app->view->render('backend/sms/bulk', [
+        echo view('smscore/sms/bulk', [
             'title' => 'Send Bulk SMS'
         ]);
     }

@@ -13,7 +13,6 @@ class BlogController
             ['id' => 2, 'title' => 'Modular PHP', 'content' => 'Building a modular framework is fun.']
         ];
 
-        $app = Application::getInstance();
-        echo $app->view->render('blog/index', ['title' => 'Blog Module', 'posts' => $posts]);
+        echo view('blog/index', ['title' => 'Blog Module', 'posts' => $posts]);
     }
 }

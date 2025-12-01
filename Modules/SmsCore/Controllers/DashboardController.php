@@ -20,7 +20,7 @@ class DashboardController
             'wallet_balance' => 500.00
         ];
 
-        echo $app->view->render('backend/sms/dashboard', [
+        echo view('smscore/sms/dashboard', [
             'stats' => $stats,
             'title' => 'SMS Dashboard'
         ]);
@@ -42,7 +42,7 @@ class DashboardController
             'failed' => [5, 5, 5, 5, 5, 5, 5]
         ];
 
-        echo $app->view->render('backend/sms/statistics', [
+        echo view('smscore/sms/statistics', [
             'chartData' => $chartData,
             'from' => $from,
             'to' => $to,

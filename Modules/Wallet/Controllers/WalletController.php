@@ -23,7 +23,7 @@ class WalletController
         $app = Application::getInstance();
         $wallets = $this->walletService->getAllWallets();
 
-        echo $app->view->render('backend/wallet/index', [
+        echo view('wallet/wallet/index', [
             'wallets' => $wallets,
             'title' => 'Wallet Management'
         ]);
@@ -45,7 +45,7 @@ class WalletController
 
         $wallet = $this->walletService->getWallet($userId);
 
-        echo $app->view->render('backend/wallet/topup', [
+        echo view('wallet/wallet/topup', [
             'wallet' => $wallet,
             'userId' => $userId,
             'title' => 'Top-up Wallet'
@@ -113,7 +113,7 @@ class WalletController
         $transactions = $this->walletService->getTransactions($userId, 50);
         $wallet = $this->walletService->getWallet($userId);
 
-        echo $app->view->render('backend/wallet/transactions', [
+        echo view('wallet/wallet/transactions', [
             'transactions' => $transactions,
             'wallet' => $wallet,
             'title' => 'Wallet Transactions'

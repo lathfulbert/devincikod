@@ -19,7 +19,7 @@ class MailSettingsController
         $app = Application::getInstance();
         $settings = $this->settingsService->getMailSettings();
 
-        echo $app->view->render('settings/mail', [
+        echo view('settings/mail', [
             'title' => 'Configuration Mail',
             'settings' => $settings,
         ]);

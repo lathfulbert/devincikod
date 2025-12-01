@@ -204,7 +204,7 @@ class LengthAwarePaginator implements ArrayAccess, Countable, IteratorAggregate
 
         ob_start();
         $paginator = $this;
-        $viewPath = dirname(dirname(__DIR__)) . '/templates/components/' . str_replace('.', '/', $view) . '.php';
+        $viewPath = dirname(dirname(__DIR__)) . '/resources/views/components/' . str_replace('.', '/', $view) . '.php';
 
         if (file_exists($viewPath)) {
             include $viewPath;

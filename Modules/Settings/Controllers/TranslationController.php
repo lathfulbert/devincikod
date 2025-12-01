@@ -20,7 +20,7 @@ class TranslationController
         $languages = ['fr' => 'Français', 'en' => 'English', 'ar' => 'العربية'];
         $modules = ['general', 'admin', 'auth', 'blog'];
 
-        echo $app->view->render('settings/translations/index', [
+        echo view('settings/translations/index', [
             'title' => 'Gestion des Traductions',
             'translations' => $translations,
             'languages' => $languages,
@@ -36,7 +36,7 @@ class TranslationController
         $languages = ['fr' => 'Français', 'en' => 'English', 'ar' => 'العربية'];
         $modules = ['general', 'admin', 'auth', 'blog'];
 
-        echo $app->view->render('settings/translations/create', [
+        echo view('settings/translations/create', [
             'title' => 'Nouvelle Traduction',
             'languages' => $languages,
             'modules' => $modules,
@@ -78,7 +78,7 @@ class TranslationController
         $languages = ['fr' => 'Français', 'en' => 'English', 'ar' => 'العربية'];
         $modules = ['general', 'admin', 'auth', 'blog'];
 
-        echo $app->view->render('settings/translations/edit', [
+        echo view('settings/translations/edit', [
             'title' => 'Modifier la Traduction',
             'translation' => $translation,
             'languages' => $languages,
@@ -186,7 +186,7 @@ class TranslationController
             ->limit(100)
             ->get();
 
-        echo $app->view->render('settings/translations/history', [
+        echo view('settings/translations/history', [
             'title' => 'Historique des Traductions',
             'history' => $history,
         ]);

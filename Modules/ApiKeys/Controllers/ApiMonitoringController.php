@@ -47,7 +47,7 @@ class ApiMonitoringController
             $healthStatuses[$key->id] = $this->monitoringService->getHealthStatus($key->id, '1h');
         }
 
-        echo $app->view->render('backend/apikeys/monitoring', [
+        echo view('apikeys/apikeys/monitoring', [
             'title' => 'API Monitoring',
             'apiKeys' => $apiKeys,
             'allAlerts' => $allAlerts,
@@ -92,7 +92,7 @@ class ApiMonitoringController
         $anomalies = $this->monitoringService->detectAnomalies($apiKeyId);
         $alerts = $this->monitoringService->needsAttention($apiKeyId);
 
-        echo $app->view->render('backend/apikeys/monitoring-details', [
+        echo view('apikeys/apikeys/monitoring-details', [
             'title' => 'API Monitoring - ' . $apiKey->name,
             'apiKey' => $apiKey,
             'usageSummary' => $usageSummary,

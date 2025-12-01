@@ -18,7 +18,7 @@ class SmsSettingsController
         $gateways = SmsGateway::all();
         $settings = Setting::getByGroup('sms');
 
-        echo $app->view->render('settings/sms/index', [
+        echo view('settings/sms/index', [
             'title' => 'Configuration SMS',
             'gateways' => $gateways,
             'settings' => $settings
@@ -32,7 +32,7 @@ class SmsSettingsController
     {
         $app = Application::getInstance();
 
-        echo $app->view->render('settings/sms/create', [
+        echo view('settings/sms/create', [
             'title' => 'Ajouter un Gateway SMS'
         ]);
     }
@@ -76,7 +76,7 @@ class SmsSettingsController
             redirect('/admin/settings/sms');
         }
 
-        echo $app->view->render('settings/sms/edit', [
+        echo view('settings/sms/edit', [
             'title' => 'Éditer Gateway SMS',
             'gateway' => $gateway
         ]);

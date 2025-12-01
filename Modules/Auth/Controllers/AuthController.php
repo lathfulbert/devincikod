@@ -62,8 +62,7 @@ class AuthController
             }
         }
 
-        $app = Application::getInstance();
-        echo $app->view->render('backend/auth/login', ['title' => 'Login']);
+        echo view('auth/auth/login', ['title' => 'Login']);
     }
 
     public function register()
@@ -131,8 +130,7 @@ class AuthController
             return;
         }
 
-        $app = Application::getInstance();
-        echo $app->view->render('backend/auth/register', ['title' => 'Inscription']);
+        echo view('auth/auth/register', ['title' => 'Inscription']);
     }
 
     public function logout()
@@ -146,6 +144,6 @@ class AuthController
     {
         $app = Application::getInstance();
         $user = $this->auth->user();
-        echo $app->view->render('backend/auth/dashboard', ['title' => 'Dashboard', 'user' => $user]);
+        echo view('auth/auth/dashboard', ['title' => 'Dashboard', 'user' => $user]);
     }
 }

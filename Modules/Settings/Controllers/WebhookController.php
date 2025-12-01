@@ -12,7 +12,7 @@ class WebhookController
         $app = Application::getInstance();
         $webhooks = Webhook::orderBy('created_at', 'DESC')->get();
 
-        echo $app->view->render('settings/webhooks/index', [
+        echo view('settings/webhooks/index', [
             'title' => 'Gestion des Webhooks',
             'webhooks' => $webhooks,
         ]);
@@ -31,7 +31,7 @@ class WebhookController
             'payment.success' => 'Paiement réussi',
         ];
 
-        echo $app->view->render('settings/webhooks/create', [
+        echo view('settings/webhooks/create', [
             'title' => 'Nouveau Webhook',
             'events' => $events,
         ]);
@@ -81,7 +81,7 @@ class WebhookController
             'payment.success' => 'Paiement réussi',
         ];
 
-        echo $app->view->render('settings/webhooks/edit', [
+        echo view('settings/webhooks/edit', [
             'title' => 'Modifier le Webhook',
             'webhook' => $webhook,
             'events' => $events,
@@ -155,7 +155,7 @@ class WebhookController
 
         $logs = $webhook->logs();
 
-        echo $app->view->render('settings/webhooks/logs', [
+        echo view('settings/webhooks/logs', [
             'title' => 'Logs du Webhook',
             'webhook' => $webhook,
             'logs' => $logs,

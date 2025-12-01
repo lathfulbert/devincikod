@@ -45,7 +45,7 @@ class SmsPricingController
             }
         }
 
-        echo $app->view->render('backend/sms/pricing/index', [
+        echo view('smscore/sms/pricing/index', [
             'defaultPrice' => $defaultPrice,
             'countries' => $countries
         ]);
@@ -198,7 +198,7 @@ class SmsPricingController
         $logs = $query->limit($limit)->offset($offset)->get();
         $totalPages = ceil($total / $limit);
 
-        echo $app->view->render('backend/sms/billing/index', [
+        echo view('smscore/sms/billing/index', [
             'logs' => $logs,
             'currentPage' => $page,
             'totalPages' => $totalPages,

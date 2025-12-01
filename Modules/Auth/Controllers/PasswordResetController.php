@@ -13,8 +13,7 @@ class PasswordResetController
      */
     public function forgotPassword()
     {
-        $app = Application::getInstance();
-        echo $app->view->render('auth/forgot-password', []);
+        echo view('auth/forgot-password', []);
     }
 
     /**
@@ -94,8 +93,7 @@ class PasswordResetController
             exit;
         }
 
-        $app = Application::getInstance();
-        echo $app->view->render('auth/reset-password', [
+        echo view('auth/reset-password', [
             'token' => $token,
             'email' => $email
         ]);

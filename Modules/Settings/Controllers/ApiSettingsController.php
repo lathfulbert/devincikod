@@ -19,7 +19,7 @@ class ApiSettingsController
         $app = Application::getInstance();
         $settings = $this->settingsService->getApiSettings();
 
-        echo $app->view->render('settings/api', [
+        echo view('settings/api', [
             'title' => 'Paramètres API',
             'settings' => $settings,
         ]);

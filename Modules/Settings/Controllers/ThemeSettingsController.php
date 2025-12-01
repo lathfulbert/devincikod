@@ -19,7 +19,7 @@ class ThemeSettingsController
         $app = Application::getInstance();
         $settings = $this->settingsService->getThemeSettings();
 
-        echo $app->view->render('settings/theme', [
+        echo view('settings/theme', [
             'title' => 'Paramètres du Thème',
             'settings' => $settings,
         ]);

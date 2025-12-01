@@ -26,7 +26,7 @@ class SmsCampaignController
 
         $campaigns = SmsCampaign::orderBy('created_at', 'desc')->get();
 
-        echo $app->view->render('backend/sms/campaigns/index', [
+        echo view('smscore/sms/campaigns/index', [
             'campaigns' => $campaigns,
             'title' => 'SMS Campaigns'
         ]);
@@ -42,7 +42,7 @@ class SmsCampaignController
         $contacts = Contact::query()->where('is_active', 1)->orderBy('first_name')->get();
         $placeholders = $this->personalizationService->getAvailablePlaceholders();
 
-        echo $app->view->render('backend/sms/campaigns/create', [
+        echo view('smscore/sms/campaigns/create', [
             'title' => 'Nouvelle Campagne SMS',
             'contacts' => $contacts,
             'placeholders' => $placeholders
@@ -129,7 +129,7 @@ class SmsCampaignController
         $placeholders = $this->personalizationService->getAvailablePlaceholders();
         $selectedContactIds = json_decode($campaign->contact_ids ?? '[]', true);
 
-        echo $app->view->render('backend/sms/campaigns/edit', [
+        echo view('smscore/sms/campaigns/edit', [
             'title' => 'Modifier Campagne: ' . $campaign->name,
             'campaign' => $campaign,
             'contacts' => $contacts,
@@ -215,7 +215,7 @@ class SmsCampaignController
             ->orderBy('created_at', 'desc')
             ->get();
 
-        echo $app->view->render('backend/sms/campaigns/show', [
+        echo view('smscore/sms/campaigns/show', [
             'campaign' => $campaign,
             'queueItems' => $queueItems,
             'title' => 'Campaign: ' . $campaign->name

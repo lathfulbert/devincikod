@@ -18,7 +18,7 @@ class WalletSettingsController
         $gateways = WalletGateway::all();
         $settings = Setting::getByGroup('wallet');
 
-        echo $app->view->render('settings/wallet/index', [
+        echo view('settings/wallet/index', [
             'title' => 'Configuration Wallet',
             'gateways' => $gateways,
             'settings' => $settings
@@ -71,7 +71,7 @@ class WalletSettingsController
     {
         $app = Application::getInstance();
 
-        echo $app->view->render('settings/wallet/create', [
+        echo view('settings/wallet/create', [
             'title' => 'Ajouter un Gateway Wallet'
         ]);
     }
@@ -128,7 +128,7 @@ class WalletSettingsController
             redirect('/admin/settings/wallet');
         }
 
-        echo $app->view->render('settings/wallet/edit', [
+        echo view('settings/wallet/edit', [
             'title' => 'Éditer Gateway Wallet',
             'gateway' => $gateway
         ]);

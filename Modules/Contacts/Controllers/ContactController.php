@@ -24,7 +24,7 @@ class ContactController
         $contacts = $this->contactService->search($filters);
         $fieldDefinitions = ContactFieldDefinition::query()->orderBy('sort_order')->get();
 
-        echo $app->view->render('contacts/index', [
+        echo view('contacts/index', [
             'title' => 'Contacts',
             'contacts' => $contacts,
             'fieldDefinitions' => $fieldDefinitions,
@@ -37,7 +37,7 @@ class ContactController
         $app = Application::getInstance();
         $fieldDefinitions = ContactFieldDefinition::query()->orderBy('sort_order')->get();
 
-        echo $app->view->render('contacts/create', [
+        echo view('contacts/create', [
             'title' => 'Nouveau Contact',
             'fieldDefinitions' => $fieldDefinitions
         ]);
@@ -90,7 +90,7 @@ class ContactController
         $app = Application::getInstance();
         $fieldDefinitions = ContactFieldDefinition::query()->orderBy('sort_order')->get();
 
-        echo $app->view->render('contacts/edit', [
+        echo view('contacts/edit', [
             'title' => 'Modifier Contact',
             'contact' => $contact,
             'fieldDefinitions' => $fieldDefinitions

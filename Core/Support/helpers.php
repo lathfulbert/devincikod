@@ -117,7 +117,7 @@ if (!function_exists('env')) {
 
 if (!function_exists('component')) {
     /**
-     * Include an admin component with absolute path
+     * Include an admin component from resources/views/backend/components/
      */
     function component(string $name, array $data = [])
     {
@@ -130,16 +130,14 @@ if (!function_exists('component')) {
 
         $depth++;
 
-        // Essayer d'abord dans backend, puis admin pour rétrocompatibilité
-        $backendPath = dirname(__DIR__, 2) . '/templates/backend/components/' . $name . '.php';
-        $adminPath = dirname(__DIR__, 2) . '/templates/admin/components/' . $name . '.php';
+        // Chercher uniquement dans resources/views/backend/components/
+        $componentPath = dirname(__DIR__, 2) . '/resources/views/backend/components/' . $name . '.php';
 
-        if (file_exists($backendPath)) {
+        if (file_exists($componentPath)) {
             extract($data, EXTR_SKIP);
-            include $backendPath;
-        } elseif (file_exists($adminPath)) {
-            extract($data, EXTR_SKIP);
-            include $adminPath;
+            include $componentPath;
+        } else {
+            error_log("Component not found: $name at $componentPath");
         }
 
         $depth--;
@@ -354,13 +352,18 @@ if (!function_exists('current_url')) {
 if (!function_exists('view')) {
     /**
      * Get the evaluated view contents for the given view.
+     * Can be used in two ways:
+     * 1. echo view('module/subfolder/view', $data) - Returns rendered content
+     * 2. view('module/subfolder/view', $data)->render() - Chainable
      */
     function view(string $view = null, array $data = [], array $mergeData = [])
     {
         $viewInstance = app()->view;
+
         if (func_num_args() === 0) {
             return $viewInstance;
         }
+
         return $viewInstance->render($view, array_merge($data, $mergeData));
     }
 }

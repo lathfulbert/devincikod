@@ -225,7 +225,7 @@ class Router
         http_response_code(404);
 
         // Try to render a 404 view if it exists
-        $viewPath = dirname(dirname(dirname(__DIR__))) . '/templates/errors/404.php';
+        $viewPath = dirname(dirname(dirname(__DIR__))) . '/resources/views/errors/404.php';
         if (file_exists($viewPath)) {
             require $viewPath;
         } else {
