@@ -7,12 +7,7 @@ use App\Core\Database\Database;
 
 class ContactService
 {
-    protected FieldPersonalizationService $personalizationService;
-
-    public function __construct()
-    {
-        $this->personalizationService = new FieldPersonalizationService();
-    }
+    public function __construct(protected FieldPersonalizationService $personalizationService) {}
 
     /**
      * Create a new contact

@@ -3,13 +3,13 @@
 namespace App\Core;
 
 use App\Core\Config\Config;
+use App\Core\Container\Container;
 use App\Core\Module\ModuleManager;
 use App\Core\Routing\Router;
 use App\Core\View\View;
 
-class Application
+class Application extends Container
 {
-    protected static Application $instance;
     public Config $config;
     public Router $router;
     public ModuleManager $moduleManager;
@@ -18,8 +18,15 @@ class Application
 
     public function __construct(protected string $basePath)
     {
+        // Set the global container instance
+        static::setInstance($this);
+
+        // Bind the Application instance to the container
+        $this->instance(Application::class, $this);
+        $this->instance('app', $this);
+        $this->instance(Container::class, $this);
+
         $this->basePath = $basePath;
-        self::$instance = $this;
 
         // Load Helpers
         require_once __DIR__ . '/Support/helpers.php';
@@ -30,15 +37,30 @@ class Application
         // Load .env
         (new \App\Core\Support\DotEnv($basePath . '/.env'))->load();
 
-        $this->config = new Config();
-        $this->router = new Router();
-        $this->view = new View($basePath . '/templates');
+        // Bind Core Services
+        $this->singleton(Config::class, function () {
+            return new Config();
+        });
+        $this->config = $this->make(Config::class);
+
+        $this->singleton(Router::class, function () {
+            return new Router();
+        });
+        $this->router = $this->make(Router::class);
+
+        $this->singleton(View::class, function ($app) {
+            return new View($app->getBasePath() . '/templates');
+        });
+        $this->view = $this->make(View::class);
 
         // Initialize Queue Manager
         $this->queue = \App\Core\Queue\QueueManager::getInstance();
 
         // Initialize Module System with dependencies (SOLID: Dependency Injection)
         $modulesPath = $basePath . '/Modules';
+
+        // We can now use the container to resolve these if we wanted to bind them first,
+        // but for now we'll keep explicit instantiation for clarity during migration.
         $loader = new \App\Core\Module\ModuleLoader($modulesPath);
         $registry = new \App\Core\Module\ModuleRegistry();
         $activator = new \App\Core\Module\ModuleActivator($registry);
@@ -56,9 +78,14 @@ class Application
         $exceptionHandler->register();
     }
 
+    /**
+     * Get the globally available instance of the application.
+     * Overrides Container::getInstance to return Application type hint.
+     */
     public static function getInstance(): Application
     {
-        return self::$instance;
+        /** @var Application */
+        return static::$instance;
     }
 
     public function getBasePath(): string
@@ -68,13 +95,15 @@ class Application
 
     public function boot(): void
     {
-        // Start Session
-        if (session_status() === PHP_SESSION_NONE) {
+        // Start Session (only if not CLI)
+        if (php_sapi_name() !== 'cli' && session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
-        // Apply Security Headers
-        \App\Core\Http\SecurityHeaders::apply();
+        // Apply Security Headers (only if not CLI)
+        if (php_sapi_name() !== 'cli') {
+            \App\Core\Http\SecurityHeaders::apply();
+        }
 
         // Initialize CSRF Protection
         \App\Core\Security\CSRF::getInstance();
@@ -184,71 +213,5 @@ class Application
         $uri = '/' . ltrim($uri, '/');
 
         $this->router->dispatch($method, $uri);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Service Container Methods
-    |--------------------------------------------------------------------------
-    */
-
-    protected array $bindings = [];
-    protected array $instances = [];
-
-    /**
-     * Register a binding in the container.
-     */
-    public function bind(string $abstract, $concrete = null): void
-    {
-        if ($concrete === null) {
-            $concrete = $abstract;
-        }
-
-        $this->bindings[$abstract] = $concrete;
-    }
-
-    /**
-     * Register a shared binding (singleton) in the container.
-     */
-    public function singleton(string $abstract, $concrete = null): void
-    {
-        $this->bind($abstract, $concrete);
-        $this->instances[$abstract] = null;
-    }
-
-    /**
-     * Resolve a binding from the container.
-     */
-    public function make(string $abstract)
-    {
-        // Check if we have a singleton instance
-        if (isset($this->instances[$abstract]) && $this->instances[$abstract] !== null) {
-            return $this->instances[$abstract];
-        }
-
-        // Get the concrete implementation
-        $concrete = $this->bindings[$abstract] ?? $abstract;
-
-        // If it's a callable, execute it
-        if (is_callable($concrete)) {
-            $object = $concrete($this);
-        } else {
-            $object = new $concrete();
-        }
-
-        // Store if it's a singleton
-        if (array_key_exists($abstract, $this->instances)) {
-            $this->instances[$abstract] = $object;
-        }
-
-        return $object;
-    }
-
-    /**
-     * Check if a binding exists.
-     */
-    public function bound(string $abstract): bool
-    {
-        return isset($this->bindings[$abstract]);
     }
 }

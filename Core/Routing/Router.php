@@ -111,9 +111,9 @@ class Router
         if (is_array($handler)) {
             [$controller, $method] = $handler;
 
-            // If controller is a class name string, instantiate it
+            // If controller is a class name string, instantiate it via Container
             if (is_string($controller) && class_exists($controller)) {
-                $controller = new $controller();
+                $controller = \App\Core\Application::getInstance()->make($controller);
             }
 
             // Use reflection to get method parameters and pass them in order

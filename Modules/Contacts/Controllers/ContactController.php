@@ -9,12 +9,7 @@ use Modules\Contacts\Services\ContactService;
 
 class ContactController
 {
-    protected ContactService $contactService;
-
-    public function __construct()
-    {
-        $this->contactService = new ContactService();
-    }
+    public function __construct(protected ContactService $contactService) {}
 
     public function index()
     {
