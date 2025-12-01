@@ -48,12 +48,14 @@ class ModuleRegistry
         } else {
             // Insert new module
             $isEnabled = $module->getName() === 'Admin' ? 1 : 0;
+            $slug = strtolower(str_replace(' ', '-', $module->getName()));
 
             $this->db->query(
-                "INSERT INTO modules (name, version, description, author, is_enabled, is_installed, config, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+                "INSERT INTO modules (name, slug, version, description, author, is_active, is_installed, config, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
                 [
                     $module->getName(),
+                    $slug,
                     $module->getVersion(),
                     $module->getDescription(),
                     $module->getAuthor(),

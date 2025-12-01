@@ -16,11 +16,13 @@ class Auth
     public function login(array $user): void
     {
         $this->session->set('user', $user);
+        $this->session->set('user_id', $user['id'] ?? null);
     }
 
     public function logout(): void
     {
         $this->session->remove('user');
+        $this->session->remove('user_id');
     }
 
     public function check(): bool

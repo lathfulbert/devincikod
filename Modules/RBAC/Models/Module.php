@@ -14,8 +14,8 @@ class Module extends Model
     public function permissions(): array
     {
         $db = \App\Core\Database\Database::getInstance();
-        $sql = "SELECT * FROM permissions WHERE module_id = ?";
-        $stmt = $db->query($sql, [$this->id]);
+        $sql = "SELECT * FROM permissions WHERE module_slug = ?";
+        $stmt = $db->query($sql, [$this->slug]);
         return $stmt->fetchAll(\PDO::FETCH_CLASS, Permission::class);
     }
 }

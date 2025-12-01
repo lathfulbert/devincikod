@@ -16,11 +16,17 @@ class Permission extends Model
     /**
      * Get the module this permission belongs to
      */
-    public function module(): ?Module
+    public function module(): ?\Modules\RBAC\Models\Module
     {
-        if (!isset($this->module_id) || $this->module_id === null) {
+        if (!isset($this->module_slug)) {
             return null;
         }
-        return Module::find($this->module_id);
+
+        $db = \App\Core\Database\Database::getInstance();
+        $sql = "SELECT * FROM modules WHERE slug = ? LIMIT 1";
+        $stmt = $db->query($sql, [$this->module_slug]);
+        $result = $stmt->fetchObject(\Modules\RBAC\Models\Module::class);
+
+        return $result ?: null;
     }
 }

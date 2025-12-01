@@ -11,27 +11,25 @@ class AddModuleToPermissions extends Migration
     {
         $db = Database::getInstance();
 
-        // Add module_id column
-        $db->query("ALTER TABLE permissions ADD COLUMN module_id BIGINT UNSIGNED NULL AFTER id");
+        // Add module_slug column
+        $db->query("ALTER TABLE permissions ADD COLUMN module_slug VARCHAR(100) NULL AFTER id");
 
-        // Add description column
+        // Add description column if not exists
         $db->query("ALTER TABLE permissions ADD COLUMN description TEXT NULL AFTER slug");
 
-        // Add foreign key constraint
-        $db->query("ALTER TABLE permissions ADD CONSTRAINT fk_permissions_module 
-                    FOREIGN KEY (module_id) REFERENCES modules(id) 
-                    ON DELETE SET NULL");
+        // Add index on module_slug for better performance
+        $db->query("ALTER TABLE permissions ADD INDEX idx_permissions_module_slug (module_slug)");
     }
 
     public function down(): void
     {
         $db = Database::getInstance();
 
-        // Drop foreign key first
-        $db->query("ALTER TABLE permissions DROP FOREIGN KEY fk_permissions_module");
+        // Drop index first
+        $db->query("ALTER TABLE permissions DROP INDEX idx_permissions_module_slug");
 
         // Drop columns
-        $db->query("ALTER TABLE permissions DROP COLUMN module_id");
+        $db->query("ALTER TABLE permissions DROP COLUMN module_slug");
         $db->query("ALTER TABLE permissions DROP COLUMN description");
     }
 }

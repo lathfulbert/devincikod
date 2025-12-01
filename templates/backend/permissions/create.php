@@ -36,6 +36,12 @@
                     <label for="name" class="form-label">Nom de la permission <span class="text-danger">*</span></label>
                     <input type="text" name="name" id="name" class="form-control" value="<?= old('name') ?>" required autofocus>
                     <small class="form-text text-muted">Exemple: users.create, posts.edit, etc.</small>
+                    <div class="mb-3">
+                        <label for="slug" class="form-label">Slug <span class="text-danger">*</span></label>
+                        <input type="text" name="slug" id="slug" class="form-control" value="<?= old('slug') ?>" required>
+                        <small class="form-text text-muted">Exemple: users.create, posts.edit, etc.</small>
+                    </div>
+
                 </div>
 
                 <div class="mb-3">
@@ -45,11 +51,11 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="module_id" class="form-label">Module</label>
-                    <select name="module_id" id="module_id" class="form-select">
+                    <label for="module_slug" class="form-label">Module</label>
+                    <select name="module_slug" id="module_slug" class="form-select">
                         <option value="">-- Sélectionner un module (Optionnel) --</option>
                         <?php foreach ($modules as $module): ?>
-                            <option value="<?= $module->id ?>" <?= old('module_id') == $module->id ? 'selected' : '' ?>>
+                            <option value="<?= $module->slug ?>" <?= old('module_slug') == $module->slug ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($module->name) ?> (<?= htmlspecialchars($module->slug) ?>)
                             </option>
                         <?php endforeach; ?>

@@ -186,17 +186,23 @@
           </div>
         </li>
         <li class="profile-nav onhover-dropdown pe-0 py-0">
-          <div class="media profile-media"><img class="b-r-10" src="<?= url() ?>/assets/images/dashboard/profile.png" alt="">
-            <div class="media-body"><span>Emay Walter</span>
+          <div class="media profile-media">
+            <?php
+            $currentUser = \Modules\Auth\Models\User::find($_SESSION['user_id'] ?? 0);
+            $avatarUrl = $currentUser && $currentUser->avatar ? url($currentUser->avatar) : url('assets/images/dashboard/profile.png');
+            $displayName = $currentUser ? ($currentUser->first_name ? $currentUser->first_name . ' ' . ($currentUser->last_name ?? '') : $currentUser->username) : 'User';
+            ?>
+            <img class="b-r-10" src="<?= $avatarUrl ?>" alt="Profile" style="width: 40px; height: 40px; object-fit: cover;">
+            <div class="media-body">
+              <span><?= htmlspecialchars($displayName) ?></span>
               <p class="mb-0 font-roboto">Admin <i class="middle fa fa-angle-down"></i></p>
             </div>
           </div>
           <ul class="profile-dropdown onhover-show-div">
-            <li><a href="#"><i data-feather="user"></i><span>Account </span></a></li>
-            <li><a href="#"><i data-feather="mail"></i><span>Inbox</span></a></li>
-            <li><a href="#"><i data-feather="file-text"></i><span>Taskboard</span></a></li>
-            <li><a href="#"><i data-feather="settings"></i><span>Settings</span></a></li>
-            <li><a href="<?= url('/logout') ?>"><i data-feather="log-in"> </i><span>Log in</span></a></li>
+            <li><a href="<?= url('/admin/profile') ?>"><i data-feather="user"></i><span>My Profile</span></a></li>
+            <li><a href="<?= url('/admin/profile/change-password') ?>"><i data-feather="lock"></i><span>Change Password</span></a></li>
+            <li><a href="<?= url('/admin/api-keys') ?>"><i data-feather="key"></i><span>API Keys</span></a></li>
+            <li><a href="<?= url('/logout') ?>"><i data-feather="log-out"></i><span>Logout</span></a></li>
           </ul>
         </li>
       </ul>

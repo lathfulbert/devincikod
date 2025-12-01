@@ -144,6 +144,33 @@ abstract class Model
         $this->attributes[$key] = $value;
     }
 
+    /**
+     * Define a one-to-one relationship.
+     */
+    public function hasOne(string $related, string $foreignKey = null, string $localKey = 'id'): \App\Core\Database\ORM\Relations\HasOne
+    {
+        $instance = new $related();
+        return new \App\Core\Database\ORM\Relations\HasOne($this, $instance, $foreignKey, $localKey);
+    }
+
+    /**
+     * Define a one-to-many relationship.
+     */
+    public function hasMany(string $related, string $foreignKey = null, string $localKey = 'id'): \App\Core\Database\ORM\Relations\HasMany
+    {
+        $instance = new $related();
+        return new \App\Core\Database\ORM\Relations\HasMany($this, $instance, $foreignKey, $localKey);
+    }
+
+    /**
+     * Define an inverse one-to-one or one-to-many relationship.
+     */
+    public function belongsTo(string $related, string $foreignKey = null, string $ownerKey = 'id'): \App\Core\Database\ORM\Relations\BelongsTo
+    {
+        $instance = new $related();
+        return new \App\Core\Database\ORM\Relations\BelongsTo($this, $instance, $foreignKey, $ownerKey);
+    }
+
     public function belongsToMany(string $related, string $table = null, string $foreignPivotKey = null, string $relatedPivotKey = null): ORM\Relations\BelongsToMany
     {
         $instance = new $related();

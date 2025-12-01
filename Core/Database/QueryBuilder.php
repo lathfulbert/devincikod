@@ -16,6 +16,7 @@ class QueryBuilder
     protected $limit;
     protected $offset;
     protected $with = []; // Relations to eager load
+    protected $joins = []; // JOIN clauses
 
     public function __construct(string $modelClass)
     {
@@ -60,6 +61,98 @@ class QueryBuilder
             'value' => $value
         ];
         $this->bindings[] = $value;
+        return $this;
+    }
+
+    /**
+     * Add a JOIN clause to the query.
+     */
+    public function join(string $table, string $first, string $operator = '=', string $second = null, string $type = 'INNER')
+    {
+        if ($second === null) {
+            $second = $operator;
+            $operator = '=';
+        }
+
+        $this->joins[] = [
+            'type' => $type,
+            'table' => $table,
+            'first' => $first,
+            'operator' => $operator,
+            'second' => $second
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Add a LEFT JOIN clause to the query.
+     */
+    public function leftJoin(string $table, string $first, string $operator = '=', string $second = null)
+    {
+        return $this->join($table, $first, $operator, $second, 'LEFT');
+    }
+
+    /**
+     * Add a RIGHT JOIN clause to the query.
+     */
+    public function rightJoin(string $table, string $first, string $operator = '=', string $second = null)
+    {
+        return $this->join($table, $first, $operator, $second, 'RIGHT');
+    }
+
+    /**
+     * Add a raw WHERE clause.
+     */
+    public function whereRaw(string $sql, array $bindings = [])
+    {
+        $this->wheres[] = [
+            'type' => 'raw',
+            'sql' => $sql,
+        ];
+        $this->bindings = array_merge($this->bindings, $bindings);
+        return $this;
+    }
+
+    /**
+     * Add a WHERE IN clause.
+     */
+    public function whereIn(string $column, array $values)
+    {
+        if (empty($values)) {
+            return $this;
+        }
+
+        $placeholders = implode(',', array_fill(0, count($values), '?'));
+
+        $this->wheres[] = [
+            'type' => 'in',
+            'column' => $column,
+            'placeholders' => $placeholders
+        ];
+
+        $this->bindings = array_merge($this->bindings, $values);
+        return $this;
+    }
+
+    /**
+     * Add a WHERE NOT IN clause.
+     */
+    public function whereNotIn(string $column, array $values)
+    {
+        if (empty($values)) {
+            return $this;
+        }
+
+        $placeholders = implode(',', array_fill(0, count($values), '?'));
+
+        $this->wheres[] = [
+            'type' => 'notIn',
+            'column' => $column,
+            'placeholders' => $placeholders
+        ];
+
+        $this->bindings = array_merge($this->bindings, $values);
         return $this;
     }
 
@@ -285,6 +378,13 @@ class QueryBuilder
     {
         $sql = "SELECT {$this->select} FROM `{$this->table}`";
 
+        // Add JOIN clauses
+        if (!empty($this->joins)) {
+            foreach ($this->joins as $join) {
+                $sql .= " {$join['type']} JOIN `{$join['table']}` ON {$join['first']} {$join['operator']} {$join['second']}";
+            }
+        }
+
         // Build WHERE clause
         $whereClauses = [];
 
@@ -315,29 +415,6 @@ class QueryBuilder
         }
 
         return $sql;
-    }
-
-    /**
-     * Build WHERE clause from array of conditions.
-     */
-    protected function buildWhereClause(array $conditions): string
-    {
-        $clauses = [];
-
-        foreach ($conditions as $index => $condition) {
-            $clause = "`{$condition['column']}` {$condition['operator']} ?";
-
-            if ($index === 0) {
-                // First condition, no conjunction needed
-                $clauses[] = $clause;
-            } else {
-                // Add AND or OR based on type
-                $conjunction = strtoupper($condition['type']);
-                $clauses[] = "{$conjunction} {$clause}";
-            }
-        }
-
-        return implode(' ', $clauses);
     }
 
     /**
@@ -408,5 +485,47 @@ class QueryBuilder
     public function exists(): bool
     {
         return $this->count() > 0;
+    }
+
+    /**
+     * Build WHERE clause from array of conditions.
+     */
+    protected function buildWhereClause(array $conditions): string
+    {
+        $clauses = [];
+
+        foreach ($conditions as $index => $condition) {
+            $clause = '';
+
+            // Handle different WHERE types
+            if (isset($condition['type'])) {
+                switch ($condition['type']) {
+                    case 'raw':
+                        $clause = $condition['sql'];
+                        break;
+                    case 'in':
+                        $clause = "`{$condition['column']}` IN ({$condition['placeholders']})";
+                        break;
+                    case 'notIn':
+                        $clause = "`{$condition['column']}` NOT IN ({$condition['placeholders']})";
+                        break;
+                    case 'and':
+                    case 'or':
+                        $clause = "`{$condition['column']}` {$condition['operator']} ?";
+                        break;
+                }
+            }
+
+            if ($index === 0) {
+                // First condition, no conjunction needed
+                $clauses[] = $clause;
+            } else {
+                // Add AND or OR based on type
+                $conjunction = isset($condition['type']) && $condition['type'] === 'or' ? 'OR' : 'AND';
+                $clauses[] = "{$conjunction} {$clause}";
+            }
+        }
+
+        return implode(' ', $clauses);
     }
 }

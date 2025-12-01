@@ -7,7 +7,8 @@
       "Bash(find:*)",
       "Bash(echo:*)",
       "Bash(curl:*)",
-      "Bash(mysql:*)"
+      "Bash(mysql:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

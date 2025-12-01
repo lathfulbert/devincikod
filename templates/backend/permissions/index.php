@@ -21,12 +21,41 @@
 </div>
 
 <div class="container-fluid">
-
-    affiche ici
-    <!-- Actions -->
+    <!-- Filters -->
     <div class="row mb-3">
-        <div class="col-12 text-end">
-            <a href="<?= url('/admin/permissions/create') ?>" class="btn btn-primary">
+        <div class="col-md-10">
+            <form method="GET" action="<?= url('/admin/permissions') ?>" class="row g-2">
+                <div class="col-md-4">
+                    <select name="module_slug" class="form-select" onchange="this.form.submit()">
+                        <option value="">Tous les modules</option>
+                        <?php foreach ($modules ?? [] as $module): ?>
+                            <option value="<?= $module->slug ?>" <?= ($selectedModuleSlug == $module->slug) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($module->name) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select name="role_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">Tous les rôles</option>
+                        <?php foreach ($roles ?? [] as $role): ?>
+                            <option value="<?= $role->id ?>" <?= ($selectedRoleId == $role->id) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($role->name) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <?php if ($selectedModuleSlug || $selectedRoleId): ?>
+                        <a href="<?= url('/admin/permissions') ?>" class="btn btn-secondary w-100">
+                            <i data-feather="x"></i> Réinitialiser
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-2 text-end">
+            <a href="<?= url('/admin/permissions/create') ?>" class="btn btn-primary w-100">
                 <i data-feather="plus"></i> Nouvelle permission
             </a>
         </div>

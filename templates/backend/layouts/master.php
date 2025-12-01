@@ -42,7 +42,6 @@
 
         <!-- Header Start -->
         @include('backend.layouts.header')
-
         <!--Header End  -->
 
         <!-- Page Body Start-->
