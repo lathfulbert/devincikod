@@ -1,13 +1,23 @@
-<?php
-$breadcrumb = [
-    ['label' => 'Dashboard', 'url' => '/admin/dashboard'],
-    ['label' => 'Contacts', 'url' => '/admin/contacts'],
-    ['label' => 'Champs Personnalisés']
-];
-component('breadcrumb');
-?>
+@extends('backend.layouts.master')
 
-<?php component('alerts'); ?>
+@section('title', 'Champs Personnalisés')
+
+@section('content')
+
+<div class="container-fluid">
+    <?php
+    $breadcrumb = [
+        ['label' => 'Dashboard', 'url' => '/admin/dashboard'],
+        ['label' => 'Contacts', 'url' => '/admin/contacts'],
+        ['label' => 'Champs Personnalisés']
+    ];
+    component('breadcrumb');
+    ?>
+</div>
+
+<div class="container-fluid">
+    <?php component('alerts'); ?>
+</div>
 
 <div class="container-fluid">
     <div class="row mb-3">
@@ -31,7 +41,7 @@ component('breadcrumb');
 
             <div class="alert alert-info">
                 <i data-feather="info"></i>
-                <strong>Placeholders pour SMS:</strong> Dans vos messages SMS, utilisez le format custom.slug entre doubles accolades.
+                <strong>Placeholders pour SMS:</strong> Dans vos messages SMS, utilisez le format <code>&#123;&#123;custom.slug&#125;&#125;</code>.
             </div>
 
             <div class="table-responsive">
@@ -113,6 +123,10 @@ component('breadcrumb');
     </div>
 </div>
 
+@endsection
+
+@section('scripts')
 <script>
     feather.replace();
 </script>
+@endsection
