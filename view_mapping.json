@@ -1,0 +1,314 @@
+{
+    "moves": [
+        {
+            "from": "\/templates\/backend\/ai\\index.php",
+            "to": "\/Modules\/AI\/Views\/ai\/index.php",
+            "module": "AI"
+        },
+        {
+            "from": "\/templates\/backend\/ai\\logs.php",
+            "to": "\/Modules\/AI\/Views\/ai\/logs.php",
+            "module": "AI"
+        },
+        {
+            "from": "\/templates\/backend\/ai\\settings.php",
+            "to": "\/Modules\/AI\/Views\/ai\/settings.php",
+            "module": "AI"
+        },
+        {
+            "from": "\/templates\/backend\/ai\\test.php",
+            "to": "\/Modules\/AI\/Views\/ai\/test.php",
+            "module": "AI"
+        },
+        {
+            "from": "\/templates\/backend\/apikeys\\analytics.php",
+            "to": "\/Modules\/ApiKeys\/Views\/apikeys\/analytics.php",
+            "module": "ApiKeys"
+        },
+        {
+            "from": "\/templates\/backend\/apikeys\\index.php",
+            "to": "\/Modules\/ApiKeys\/Views\/apikeys\/index.php",
+            "module": "ApiKeys"
+        },
+        {
+            "from": "\/templates\/backend\/apikeys\\monitoring.php",
+            "to": "\/Modules\/ApiKeys\/Views\/apikeys\/monitoring.php",
+            "module": "ApiKeys"
+        },
+        {
+            "from": "\/templates\/backend\/auth\\layout.php",
+            "to": "\/Modules\/Auth\/Views\/auth\/layout.php",
+            "module": "Auth"
+        },
+        {
+            "from": "\/templates\/backend\/auth\\login.php",
+            "to": "\/Modules\/Auth\/Views\/auth\/login.php",
+            "module": "Auth"
+        },
+        {
+            "from": "\/templates\/backend\/auth\\password-reset.php",
+            "to": "\/Modules\/Auth\/Views\/auth\/password-reset.php",
+            "module": "Auth"
+        },
+        {
+            "from": "\/templates\/backend\/auth\\register.php",
+            "to": "\/Modules\/Auth\/Views\/auth\/register.php",
+            "module": "Auth"
+        },
+        {
+            "from": "\/templates\/backend\/cache\\index.php",
+            "to": "\/Modules\/Admin\/Views\/cache\/index.php",
+            "module": "Admin"
+        },
+        {
+            "from": "\/templates\/backend\/cache\\stats.php",
+            "to": "\/Modules\/Admin\/Views\/cache\/stats.php",
+            "module": "Admin"
+        },
+        {
+            "from": "\/templates\/backend\/cron\\index.php",
+            "to": "\/Modules\/Cron\/Views\/cron\/index.php",
+            "module": "Cron"
+        },
+        {
+            "from": "\/templates\/backend\/cron\\logs.php",
+            "to": "\/Modules\/Cron\/Views\/cron\/logs.php",
+            "module": "Cron"
+        },
+        {
+            "from": "\/templates\/backend\/cron\\stats.php",
+            "to": "\/Modules\/Cron\/Views\/cron\/stats.php",
+            "module": "Cron"
+        },
+        {
+            "from": "\/templates\/backend\/demo\\index.php",
+            "to": "\/Modules\/Demo\/Views\/demo\/index.php",
+            "module": "Demo"
+        },
+        {
+            "from": "\/templates\/backend\/demo\\template-demo.tpl",
+            "to": "\/Modules\/Demo\/Views\/demo\/template-demo.tpl",
+            "module": "Demo"
+        },
+        {
+            "from": "\/templates\/backend\/i18n\\create.php",
+            "to": "\/Modules\/I18n\/Views\/i18n\/create.php",
+            "module": "I18n"
+        },
+        {
+            "from": "\/templates\/backend\/i18n\\edit.php",
+            "to": "\/Modules\/I18n\/Views\/i18n\/edit.php",
+            "module": "I18n"
+        },
+        {
+            "from": "\/templates\/backend\/i18n\\index.php",
+            "to": "\/Modules\/I18n\/Views\/i18n\/index.php",
+            "module": "I18n"
+        },
+        {
+            "from": "\/templates\/backend\/modules\\create.php",
+            "to": "\/Modules\/Modules\/Views\/modules\/create.php",
+            "module": "Modules"
+        },
+        {
+            "from": "\/templates\/backend\/modules\\edit.php",
+            "to": "\/Modules\/Modules\/Views\/modules\/edit.php",
+            "module": "Modules"
+        },
+        {
+            "from": "\/templates\/backend\/modules\\index.php",
+            "to": "\/Modules\/Modules\/Views\/modules\/index.php",
+            "module": "Modules"
+        },
+        {
+            "from": "\/templates\/backend\/modules\\upload.php",
+            "to": "\/Modules\/Modules\/Views\/modules\/upload.php",
+            "module": "Modules"
+        },
+        {
+            "from": "\/templates\/backend\/monitoring\\index.php",
+            "to": "\/Modules\/Admin\/Views\/monitoring\/index.php",
+            "module": "Admin"
+        },
+        {
+            "from": "\/templates\/backend\/permissions\\create.php",
+            "to": "\/Modules\/RBAC\/Views\/permissions\/create.php",
+            "module": "RBAC"
+        },
+        {
+            "from": "\/templates\/backend\/permissions\\edit.php",
+            "to": "\/Modules\/RBAC\/Views\/permissions\/edit.php",
+            "module": "RBAC"
+        },
+        {
+            "from": "\/templates\/backend\/permissions\\index.php",
+            "to": "\/Modules\/RBAC\/Views\/permissions\/index.php",
+            "module": "RBAC"
+        },
+        {
+            "from": "\/templates\/backend\/profile\\change-password.php",
+            "to": "\/Modules\/Auth\/Views\/profile\/change-password.php",
+            "module": "Auth"
+        },
+        {
+            "from": "\/templates\/backend\/profile\\edit.php",
+            "to": "\/Modules\/Auth\/Views\/profile\/edit.php",
+            "module": "Auth"
+        },
+        {
+            "from": "\/templates\/backend\/queue\\failed.php",
+            "to": "\/Modules\/Queue\/Views\/queue\/failed.php",
+            "module": "Queue"
+        },
+        {
+            "from": "\/templates\/backend\/queue\\index.php",
+            "to": "\/Modules\/Queue\/Views\/queue\/index.php",
+            "module": "Queue"
+        },
+        {
+            "from": "\/templates\/backend\/queue\\jobs.php",
+            "to": "\/Modules\/Queue\/Views\/queue\/jobs.php",
+            "module": "Queue"
+        },
+        {
+            "from": "\/templates\/backend\/queue\\stats.php",
+            "to": "\/Modules\/Queue\/Views\/queue\/stats.php",
+            "module": "Queue"
+        },
+        {
+            "from": "\/templates\/backend\/roles\\create.php",
+            "to": "\/Modules\/RBAC\/Views\/roles\/create.php",
+            "module": "RBAC"
+        },
+        {
+            "from": "\/templates\/backend\/roles\\edit.php",
+            "to": "\/Modules\/RBAC\/Views\/roles\/edit.php",
+            "module": "RBAC"
+        },
+        {
+            "from": "\/templates\/backend\/roles\\index.php",
+            "to": "\/Modules\/RBAC\/Views\/roles\/index.php",
+            "module": "RBAC"
+        },
+        {
+            "from": "\/templates\/backend\/settings\\api.php",
+            "to": "\/Modules\/Settings\/Views\/settings\/api.php",
+            "module": "Settings"
+        },
+        {
+            "from": "\/templates\/backend\/sms\\billing\\index.php",
+            "to": "\/Modules\/SmsCore\/Views\/sms\/billing\\index.php",
+            "module": "SmsCore"
+        },
+        {
+            "from": "\/templates\/backend\/sms\\bulk.php",
+            "to": "\/Modules\/SmsCore\/Views\/sms\/bulk.php",
+            "module": "SmsCore"
+        },
+        {
+            "from": "\/templates\/backend\/sms\\campaigns\\create.php",
+            "to": "\/Modules\/SmsCore\/Views\/sms\/campaigns\\create.php",
+            "module": "SmsCore"
+        },
+        {
+            "from": "\/templates\/backend\/sms\\campaigns\\index.php",
+            "to": "\/Modules\/SmsCore\/Views\/sms\/campaigns\\index.php",
+            "module": "SmsCore"
+        },
+        {
+            "from": "\/templates\/backend\/sms\\campaigns\\show.php",
+            "to": "\/Modules\/SmsCore\/Views\/sms\/campaigns\\show.php",
+            "module": "SmsCore"
+        },
+        {
+            "from": "\/templates\/backend\/sms\\dashboard.php",
+            "to": "\/Modules\/SmsCore\/Views\/sms\/dashboard.php",
+            "module": "SmsCore"
+        },
+        {
+            "from": "\/templates\/backend\/sms\\details.php",
+            "to": "\/Modules\/SmsCore\/Views\/sms\/details.php",
+            "module": "SmsCore"
+        },
+        {
+            "from": "\/templates\/backend\/sms\\history.php",
+            "to": "\/Modules\/SmsCore\/Views\/sms\/history.php",
+            "module": "SmsCore"
+        },
+        {
+            "from": "\/templates\/backend\/sms\\pricing\\index.php",
+            "to": "\/Modules\/SmsCore\/Views\/sms\/pricing\\index.php",
+            "module": "SmsCore"
+        },
+        {
+            "from": "\/templates\/backend\/sms\\pricing\\index_old.php",
+            "to": "\/Modules\/SmsCore\/Views\/sms\/pricing\\index_old.php",
+            "module": "SmsCore"
+        },
+        {
+            "from": "\/templates\/backend\/sms\\send.php",
+            "to": "\/Modules\/SmsCore\/Views\/sms\/send.php",
+            "module": "SmsCore"
+        },
+        {
+            "from": "\/templates\/backend\/sms\\statistics.php",
+            "to": "\/Modules\/SmsCore\/Views\/sms\/statistics.php",
+            "module": "SmsCore"
+        },
+        {
+            "from": "\/templates\/backend\/users\\create.php",
+            "to": "\/Modules\/Auth\/Views\/users\/create.php",
+            "module": "Auth"
+        },
+        {
+            "from": "\/templates\/backend\/users\\edit.php",
+            "to": "\/Modules\/Auth\/Views\/users\/edit.php",
+            "module": "Auth"
+        },
+        {
+            "from": "\/templates\/backend\/users\\index-datatable.php",
+            "to": "\/Modules\/Auth\/Views\/users\/index-datatable.php",
+            "module": "Auth"
+        },
+        {
+            "from": "\/templates\/backend\/users\\index.php",
+            "to": "\/Modules\/Auth\/Views\/users\/index.php",
+            "module": "Auth"
+        },
+        {
+            "from": "\/templates\/backend\/wallet\\history.php",
+            "to": "\/Modules\/Wallet\/Views\/wallet\/history.php",
+            "module": "Wallet"
+        },
+        {
+            "from": "\/templates\/backend\/wallet\\index.php",
+            "to": "\/Modules\/Wallet\/Views\/wallet\/index.php",
+            "module": "Wallet"
+        },
+        {
+            "from": "\/templates\/backend\/wallet\\topup.php",
+            "to": "\/Modules\/Wallet\/Views\/wallet\/topup.php",
+            "module": "Wallet"
+        }
+    ],
+    "mappings": {
+        "ai": "AI",
+        "apikeys": "ApiKeys",
+        "auth": "Auth",
+        "cache": "Admin",
+        "cron": "Cron",
+        "demo": "Demo",
+        "i18n": "I18n",
+        "modules": "Modules",
+        "monitoring": "Admin",
+        "permissions": "RBAC",
+        "profile": "Auth",
+        "queue": "Queue",
+        "roles": "RBAC",
+        "settings": "Settings",
+        "sms": "SmsCore",
+        "users": "Auth",
+        "wallet": "Wallet"
+    },
+    "timestamp": "2025-12-01 10:25:29"
+}

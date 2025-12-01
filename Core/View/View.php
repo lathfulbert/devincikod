@@ -84,32 +84,34 @@ class View
     {
         // Handle dot notation: layouts.app -> layouts/app
         $viewPath = str_replace('.', '/', $view);
+        $basePath = dirname(dirname(__DIR__));
 
-        // 1. Check in standard templates directory first (priority)
-        $tplFile = $this->templatePath . '/' . $viewPath . '.tpl';
-        $phpFile = $this->templatePath . '/' . $viewPath . '.php';
+        file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "Resolving '$view' -> viewPath='$viewPath'\n", FILE_APPEND);
 
-        file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "Resolving '$view' -> viewPath='$viewPath'\n  tpl=$tplFile (exists=" . (file_exists($tplFile) ? 'YES' : 'NO') . ")\n  php=$phpFile (exists=" . (file_exists($phpFile) ? 'YES' : 'NO') . ")\n", FILE_APPEND);
+        // 1. Check in resources/views/backend for layouts and components (NEW PRIORITY)
+        if (strpos($viewPath, 'backend/layouts/') === 0 || strpos($viewPath, 'backend/components/') === 0) {
+            $resourcesPath = $basePath . '/resources/views/' . $viewPath;
+            $resourcesTpl = $resourcesPath . '.tpl';
+            $resourcesPhp = $resourcesPath . '.php';
 
-        if (file_exists($tplFile)) {
-            file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to: $tplFile\n", FILE_APPEND);
-            return $tplFile;
+            if (file_exists($resourcesTpl)) {
+                file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to RESOURCES: $resourcesTpl\n", FILE_APPEND);
+                return $resourcesTpl;
+            }
+            if (file_exists($resourcesPhp)) {
+                file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to RESOURCES: $resourcesPhp\n", FILE_APPEND);
+                return $resourcesPhp;
+            }
         }
-        if (file_exists($phpFile)) {
-            file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to: $phpFile\n", FILE_APPEND);
-            return $phpFile;
-        }
 
-        // 2. Check in module directories (fallback)
-        // Extract module name from view path (e.g., "akpa/index" -> "Akpa")
+        // 2. Check in module directories (PRIORITY for module views)
+        // Extract module name from view path
         $parts = explode('/', $viewPath);
         if (count($parts) >= 2) {
             $moduleName = ucfirst($parts[0]); // First segment is module name
             $moduleViewPath = implode('/', array_slice($parts, 1)); // Rest is the view path
 
-            $basePath = dirname(dirname(__DIR__));
             $moduleBasePath = $basePath . '/Modules/' . $moduleName . '/Views/' . $moduleViewPath;
-
             $moduleTplFile = $moduleBasePath . '.tpl';
             $modulePhpFile = $moduleBasePath . '.php';
 
@@ -123,6 +125,19 @@ class View
                 file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to MODULE: $modulePhpFile\n", FILE_APPEND);
                 return $modulePhpFile;
             }
+        }
+
+        // 3. Fallback to standard templates directory
+        $tplFile = $this->templatePath . '/' . $viewPath . '.tpl';
+        $phpFile = $this->templatePath . '/' . $viewPath . '.php';
+
+        if (file_exists($tplFile)) {
+            file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to TEMPLATES: $tplFile\n", FILE_APPEND);
+            return $tplFile;
+        }
+        if (file_exists($phpFile)) {
+            file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to TEMPLATES: $phpFile\n", FILE_APPEND);
+            return $phpFile;
         }
 
         file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Failed to resolve: $view\n", FILE_APPEND);
