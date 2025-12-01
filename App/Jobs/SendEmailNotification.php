@@ -43,7 +43,7 @@ class SendEmailNotification implements JobContract
             }
 
             // Get user
-            $user = \Modules\Auth\Models\User::find($recipient->user_id);
+            $user = \Modules\Users\Models\User::find($recipient->user_id);
 
             if (!$user || !$user->email) {
                 throw new \RuntimeException("User email not found");

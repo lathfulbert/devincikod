@@ -4,14 +4,17 @@ namespace Modules\Auth\Controllers;
 
 use App\Core\Application;
 use App\Core\Auth\Auth;
+use Modules\Users\Services\UserService;
 
 class AuthController
 {
+    protected UserService $userService;
     protected Auth $auth;
 
     public function __construct()
     {
         $this->auth = new Auth();
+        $this->userService = new UserService();
     }
 
     public function login()
@@ -39,18 +42,16 @@ class AuthController
             $password = $validatedData['password'];
 
             // Recherche de l'utilisateur
-            $db = \App\Core\Database\Database::getInstance();
-            $stmt = $db->query("SELECT * FROM users WHERE username = ?", [$username]);
-            $user = $stmt->fetch();
+            $user = $this->userService->findByUsername($username);
 
-            if ($user && password_verify($password, $user['password'])) {
+            if ($user && password_verify($password, $user->password)) {
                 $this->auth->login([
-                    'id' => $user['id'],
-                    'username' => $user['username'],
-                    'email' => $user['email'] ?? null
+                    'id' => $user->id,
+                    'username' => $user->username,
+                    'email' => $user->email ?? null
                 ]);
 
-                flash('success', 'Connexion réussie! Bienvenue ' . $user['username'] . '.');
+                flash('success', 'Connexion réussie! Bienvenue ' . $user->username . '.');
                 redirect('/admin/dashboard');
                 return;
             } else {
@@ -101,31 +102,22 @@ class AuthController
             $validatedData = $validator->validated();
 
             // Créer l'utilisateur
-            $db = \App\Core\Database\Database::getInstance();
-
-            $stmt = $db->query(
-                "INSERT INTO users (username, email, first_name, last_name, password, created_at, updated_at) 
-                 VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
-                [
-                    $validatedData['username'],
-                    $validatedData['email'],
-                    $validatedData['first_name'] ?? null,
-                    $validatedData['last_name'] ?? null,
-                    password_hash($validatedData['password'], PASSWORD_DEFAULT)
-                ]
-            );
-
-            // Récupérer l'ID du nouvel utilisateur
-            $userId = $db->lastInsertId();
+            $user = $this->userService->createUser([
+                'username' => $validatedData['username'],
+                'email' => $validatedData['email'],
+                'first_name' => $validatedData['first_name'] ?? null,
+                'last_name' => $validatedData['last_name'] ?? null,
+                'password' => $validatedData['password']
+            ]);
 
             // Connexion automatique après inscription
             $this->auth->login([
-                'id' => $userId,
-                'username' => $validatedData['username'],
-                'email' => $validatedData['email']
+                'id' => $user->id,
+                'username' => $user->username,
+                'email' => $user->email
             ]);
 
-            flash('success', 'Inscription réussie! Bienvenue ' . $validatedData['username'] . '!');
+            flash('success', 'Inscription réussie! Bienvenue ' . $user->username . '!');
             redirect('/admin/dashboard');
             return;
         }

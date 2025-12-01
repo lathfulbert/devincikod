@@ -1142,6 +1142,33 @@ if (!function_exists('logs')) {
 |--------------------------------------------------------------------------
 */
 
+if (!function_exists('base_path')) {
+    /**
+     * Get the path to the base of the install.
+     *
+     * @param string $path
+     * @return string
+     */
+    function base_path(string $path = ''): string
+    {
+        $basePath = dirname(dirname(__DIR__));
+        return $path ? $basePath . '/' . ltrim($path, '/') : $basePath;
+    }
+}
+
+if (!function_exists('config_path')) {
+    /**
+     * Get the path to the config folder.
+     *
+     * @param string $path
+     * @return string
+     */
+    function config_path(string $path = ''): string
+    {
+        return base_path('config' . ($path ? '/' . ltrim($path, '/') : ''));
+    }
+}
+
 if (!function_exists('storage_path')) {
     /**
      * Get the path to the storage folder.

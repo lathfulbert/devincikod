@@ -3,7 +3,7 @@
 namespace Modules\ApiKeys\Models;
 
 use App\Core\Database\Model;
-use Modules\Auth\Models\User;
+use Modules\Users\Models\User;
 
 class ApiKey extends Model
 {

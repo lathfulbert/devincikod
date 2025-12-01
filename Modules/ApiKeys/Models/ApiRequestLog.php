@@ -226,6 +226,6 @@ class ApiRequestLog extends Model
      */
     public function user()
     {
-        return $this->belongsTo(\Modules\Auth\Models\User::class, 'user_id');
+        return $this->belongsTo(\Modules\Users\Models\User::class, 'user_id');
     }
 }

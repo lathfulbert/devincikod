@@ -1,0 +1,90 @@
+@extends('backend.layouts.master')
+
+@section('title', $title ?? 'Admin')
+
+@section('content')
+
+<div class="container-fluid">
+    <?php
+    // Breadcrumb
+    $breadcrumb = [
+        ['label' => 'Dashboard', 'url' => '/admin/dashboard'],
+        ['label' => 'Permissions', 'url' => '/admin/permissions'],
+        ['label' => 'Éditer']
+    ];
+    component('breadcrumb');
+    ?>
+</div>
+
+<div class="container-fluid">
+    <!-- Messages Flash -->
+    <?php component('alerts'); ?>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <?php
+            $card_title = "Éditer la permission : " . htmlspecialchars($permission->name);
+            component('card-start');
+            ?>
+
+            <form action="<?= url('/admin/permissions/' . $permission->id . '/update') ?>" method="POST">
+                <?= csrf_field() ?>
+
+                <div class="mb-3">
+                    <label for="name" class="form-label">Nom de la permission <span class="text-danger">*</span></label>
+                    <input type="text" name="name" id="name" class="form-control" value="<?= htmlspecialchars($permission->name) ?>" required autofocus>
+                </div>
+                <div class="mb-3">
+                    <label for="slug" class="form-label">Slug <span class="text-danger">*</span></label>
+                    <input type="text" name="slug" id="slug" class="form-control" value="<?= htmlspecialchars($permission->slug) ?>" required>
+                </div>
+
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea name="description" id="description" class="form-control" rows="3"><?= htmlspecialchars($permission->description ?? '') ?></textarea>
+                    <small class="form-text text-muted">Description optionnelle de la permission</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="module_slug" class="form-label">Module</label>
+                    <select name="module_slug" id="module_slug" class="form-select">
+                        <option value="">-- Sélectionner un module (Optionnel) --</option>
+                        <?php foreach ($modules as $module): ?>
+                            <option value="<?= $module->slug ?>" <?= ($permission->module_slug == $module->slug) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($module->name) ?> (<?= htmlspecialchars($module->slug) ?>)
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <small class="form-text text-muted">Module auquel cette permission est rattachée</small>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i data-feather="save"></i> Mettre à jour
+                    </button>
+                    <a href="<?= url('/admin/permissions') ?>" class="btn btn-secondary">
+                        <i data-feather="x"></i> Annuler
+                    </a>
+                    <a href="<?= url('/admin/permissions/' . $permission->id . '/delete') ?>"
+                        class="btn btn-danger float-end"
+                        onclick="return confirm('Supprimer définitivement cette permission ?')">
+                        <i data-feather="trash-2"></i> Supprimer
+                    </a>
+                </div>
+            </form>
+
+            <?php component('card-end'); ?>
+        </div>
+    </div>
+</div>
+
+@endsection
+
+@section('scripts')
+<script>
+    feather.replace();
+</script>
+@endsection

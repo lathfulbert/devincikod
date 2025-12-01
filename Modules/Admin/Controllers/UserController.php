@@ -3,7 +3,7 @@
 namespace Modules\Admin\Controllers;
 
 use App\Core\Application;
-use Modules\Auth\Models\User;
+use Modules\Users\Models\User;
 use Modules\RBAC\Models\Role;
 use App\Core\Database\Database;
 
@@ -13,14 +13,14 @@ class UserController
     {
         $app = Application::getInstance();
         $users = User::query()->with('roles')->orderBy('id', 'DESC')->paginate(10);
-        echo view('backend/users/index', ['title' => 'Users', 'users' => $users]);
+        echo view('admin.users.index', ['title' => 'Users', 'users' => $users]);
     }
 
     public function create()
     {
         $app = Application::getInstance();
         $roles = Role::all();
-        echo view('users/create', ['title' => 'Create User', 'roles' => $roles]);
+        echo view('admin.users.create', ['title' => 'Create User', 'roles' => $roles]);
     }
 
     public function store()
@@ -64,7 +64,7 @@ class UserController
         $userRoles = $user->roles()->getResults();
         $userRoleIds = array_map(fn($r) => $r->id, $userRoles);
 
-        echo view('admin/users/edit', [
+        echo view('admin.users.edit', [
             'title' => 'Edit User',
             'user' => $user,
             'roles' => $roles,

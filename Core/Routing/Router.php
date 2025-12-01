@@ -12,7 +12,8 @@ class Router
     protected ?string $currentRouteName = null;
     protected array $middlewareAliases = [];
 
-    public function middleware(string $alias, string $class): void
+
+    public function registerMiddleware(string $alias, string $class): void
     {
         $this->middlewareAliases[$alias] = $class;
     }
@@ -266,6 +267,33 @@ class Router
             $lastRoute = &$this->routes[count($this->routes) - 1];
             $lastRoute['name'] = $name;
         }
+        return $this;
+    }
+
+    /**
+     * Add middleware to the last registered route (chainable method).
+     * 
+     * Supports both string aliases and parameters:
+     * - ->middleware('can:admin.access')
+     * - ->middleware('role:admin')
+     * 
+     * @param string $middleware Middleware alias with optional parameters
+     * @return self For method chaining
+     */
+    public function middleware(string $middleware): self
+    {
+        if (!empty($this->routes)) {
+            $lastRoute = &$this->routes[count($this->routes) - 1];
+
+            // Initialize middleware array if not exists
+            if (!isset($lastRoute['middleware'])) {
+                $lastRoute['middleware'] = [];
+            }
+
+            // Add the middleware to the route
+            $lastRoute['middleware'][] = $middleware;
+        }
+
         return $this;
     }
 

@@ -116,7 +116,7 @@ class NotificationService
             $rendered = $this->templateEngine->render($template, 'email', $data);
 
             // Get user (simplified - you should have User model)
-            $user = \Modules\Auth\Models\User::find($userId);
+            $user = \Modules\Users\Models\User::find($userId);
 
             if (!$user) {
                 throw new \RuntimeException("User {$userId} not found");

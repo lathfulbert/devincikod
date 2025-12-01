@@ -16,6 +16,6 @@ class Role extends Model
 
     public function users(): \App\Core\Database\ORM\Relations\BelongsToMany
     {
-        return $this->belongsToMany(\Modules\Auth\Models\User::class, 'user_roles', 'role_id', 'user_id');
+        return $this->belongsToMany(\Modules\Users\Models\User::class, 'user_roles', 'role_id', 'user_id');
     }
 }

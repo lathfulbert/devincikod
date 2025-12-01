@@ -29,14 +29,18 @@ $router->post('/reset-password', [PasswordResetController::class, 'updatePasswor
 $authMiddleware = [new \App\Core\Middleware\AuthMiddleware(), 'handle'];
 
 // Profile Management
-$router->get('/admin/profile', [ProfileController::class, 'edit'], [$authMiddleware]);
-$router->post('/admin/profile/update', [ProfileController::class, 'update'], [$authMiddleware]);
+$router->get('/admin/profile', [ProfileController::class, 'edit'])
+    ->middleware('can:auth.profile.view');
+$router->post('/admin/profile/update', [ProfileController::class, 'update'])
+    ->middleware('can:auth.profile.edit');
 $router->get('/admin/profile/change-password', [ProfileController::class, 'changePassword'], [$authMiddleware]);
 $router->post('/admin/profile/update-password', [ProfileController::class, 'updatePassword'], [$authMiddleware]);
 
 // API Key Management
-$router->get('/admin/api-keys', [ApiKeyController::class, 'index'], [$authMiddleware]);
-$router->post('/admin/api-keys/generate', [ApiKeyController::class, 'generate'], [$authMiddleware]);
+$router->get('/admin/api-keys', [ApiKeyController::class, 'index'])
+    ->middleware('can:apikeys.view');
+$router->post('/admin/api-keys/generate', [ApiKeyController::class, 'generate'])
+    ->middleware('can:apikeys.create');
 $router->post('/admin/api-keys/regenerate', [ApiKeyController::class, 'regenerate'], [$authMiddleware]);
 $router->post('/admin/api-keys/revoke', [ApiKeyController::class, 'revoke'], [$authMiddleware]);
 $router->get('/admin/api-keys/docs', [ApiKeyController::class, 'docs'], [$authMiddleware]);

@@ -14,7 +14,7 @@ class TranslationHistory extends Model
      */
     public function user()
     {
-        return \Modules\Auth\Models\User::find($this->changed_by);
+        return \Modules\Users\Models\User::find($this->changed_by);
     }
 
     /**

@@ -11,6 +11,14 @@ class RBACModule extends AbstractModule
         return [];  // Routes are managed by Admin module
     }
 
+    public function boot(): void
+    {
+        // Load permissions and seed default roles
+        $loader = new \Modules\RBAC\Services\PermissionLoader();
+        $loader->scanAndLoad();
+        $loader->seedDefaultRoles();
+    }
+
     protected function getModulePath(): string
     {
         return __DIR__;

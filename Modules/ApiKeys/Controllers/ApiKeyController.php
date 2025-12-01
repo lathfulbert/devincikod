@@ -4,7 +4,7 @@ namespace Modules\ApiKeys\Controllers;
 
 use App\Core\Application;
 use Modules\ApiKeys\Models\ApiKey;
-use Modules\Auth\Models\User;
+use Modules\Users\Models\User;
 
 class ApiKeyController
 {

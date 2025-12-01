@@ -4,7 +4,7 @@ namespace Modules\Auth\Controllers;
 
 use App\Core\Application;
 use App\Core\Database\Database;
-use Modules\Auth\Models\User;
+use Modules\Users\Models\User;
 
 class PasswordResetController
 {

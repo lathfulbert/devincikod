@@ -120,9 +120,11 @@ class Application extends Container
         \App\Core\I18n\Middleware\SetLocaleMiddleware::run();
 
         // Register Authorization Middleware
-        $this->router->middleware('can', \App\Core\Middleware\PermissionMiddleware::class);
-        $this->router->middleware('role', \App\Core\Middleware\RoleMiddleware::class);
-        $this->router->middleware('secure_upload', \App\Core\Files\Middleware\SecureUploadMiddleware::class);
+        $this->router->registerMiddleware('can', \Modules\RBAC\Middleware\CheckPermission::class);
+        $this->router->registerMiddleware('role', \Modules\RBAC\Middleware\CheckRole::class);
+        $this->router->registerMiddleware('can_any', \Modules\RBAC\Middleware\CheckAnyPermission::class);
+        $this->router->registerMiddleware('api_auth', \App\Core\Middleware\ApiAuthMiddleware::class);
+        $this->router->registerMiddleware('secure_upload', \App\Core\Files\Middleware\SecureUploadMiddleware::class);
 
         // Load Global Routes
         $routesPath = $this->basePath . '/routes/web.php';

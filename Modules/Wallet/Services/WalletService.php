@@ -162,7 +162,7 @@ class WalletService
             $walletArray = $wallet->toArray();
 
             // Manually load user data
-            $user = \Modules\Auth\Models\User::find($walletArray['user_id']);
+            $user = \Modules\Users\Models\User::find($walletArray['user_id']);
             if ($user) {
                 $walletArray['user'] = $user->toArray();
             }

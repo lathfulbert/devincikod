@@ -188,7 +188,7 @@
         <li class="profile-nav onhover-dropdown pe-0 py-0">
           <div class="media profile-media">
             <?php
-            $currentUser = \Modules\Auth\Models\User::find($_SESSION['user_id'] ?? 0);
+            $currentUser = \Modules\Users\Models\User::find($_SESSION['user_id'] ?? 0);
             $avatarUrl = $currentUser && $currentUser->avatar ? url($currentUser->avatar) : url('assets/images/dashboard/profile.png');
             $displayName = $currentUser ? ($currentUser->first_name ? $currentUser->first_name . ' ' . ($currentUser->last_name ?? '') : $currentUser->username) : 'User';
             ?>

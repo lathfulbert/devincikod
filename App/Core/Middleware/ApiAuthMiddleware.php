@@ -2,7 +2,7 @@
 
 namespace App\Core\Middleware;
 
-use Modules\Auth\Models\User;
+use Modules\Users\Models\User;
 
 class ApiAuthMiddleware
 {
@@ -11,8 +11,12 @@ class ApiAuthMiddleware
      *
      * Expects Authorization header: Bearer {api_key}
      * or api_key parameter in query string or POST data
+     * 
+     * @param mixed $request Request data (array from Router)
+     * @param callable $next Next middleware/handler
+     * @return mixed
      */
-    public function handle(): bool
+    public function handle($request, $next)
     {
         $apiKey = $this->extractApiKey();
 
@@ -31,10 +35,14 @@ class ApiAuthMiddleware
             return false;
         }
 
+        // Store authenticated user in session for RBAC middlewares
+        $_SESSION['api_user_id'] = $user->id;
+        $_SESSION['user_id'] = $user->id; // For RBAC compatibility
+
         // Store user in request for controller access
         $_REQUEST['api_user'] = $user;
 
-        return true;
+        return $next($request);
     }
 
     /**

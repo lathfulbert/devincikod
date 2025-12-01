@@ -25,7 +25,7 @@ class SmsApiController
         }
 
         // Find user by API key
-        $user = \Modules\Auth\Models\User::where('api_key', $apiKey)
+        $user = \Modules\Users\Models\User::where('api_key', $apiKey)
             ->where('is_active', 1)
             ->first();
 
@@ -188,7 +188,6 @@ class SmsApiController
                     'message' => $result['message'] ?? 'Failed to send SMS'
                 ]);
             }
-
         } catch (\Exception $e) {
             http_response_code(500);
             echo json_encode([
@@ -284,7 +283,6 @@ class SmsApiController
                     'pages' => ceil($total / $limit)
                 ]
             ]);
-
         } catch (\Exception $e) {
             http_response_code(500);
             echo json_encode([
@@ -344,7 +342,6 @@ class SmsApiController
                     ]
                 ]
             ]);
-
         } catch (\Exception $e) {
             http_response_code(500);
             echo json_encode([

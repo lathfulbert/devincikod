@@ -2,7 +2,7 @@
 
 namespace Modules\Admin\Database\Seeders;
 
-use Modules\Auth\Models\User;
+use Modules\Users\Models\User;
 use Modules\RBAC\Models\Role;
 use App\Core\Database\Database;
 
@@ -15,7 +15,7 @@ class AdminUserSeeder
         // 1. Create Super Admin Role if not exists
         $roleSlug = 'super-admin';
         $roleName = 'Super Admin';
-        
+
         $stmt = $db->query("SELECT * FROM roles WHERE slug = ?", [$roleSlug]);
         $role = $stmt->fetchObject(Role::class);
 
@@ -33,7 +33,7 @@ class AdminUserSeeder
         // 2. Create Admin User
         $username = 'admin';
         $password = 'password'; // Default password
-        
+
         $stmt = $db->query("SELECT * FROM users WHERE username = ?", [$username]);
         $user = $stmt->fetchObject(User::class);
 

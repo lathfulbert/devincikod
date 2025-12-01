@@ -3,7 +3,7 @@
 namespace Modules\Admin\Controllers;
 
 use App\Core\Application;
-use Modules\Auth\Models\User;
+use Modules\Users\Models\User;
 
 class UserApiController
 {
