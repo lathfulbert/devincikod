@@ -11,6 +11,7 @@ return [
     \Modules\Admin\AdminModule::class,
     \Modules\Auth\AuthModule::class,
     \Modules\RBAC\RBACModule::class,
+    \Modules\Users\UsersModule::class,
     \Modules\I18n\I18nModule::class,
     \Modules\Notifications\NotificationsModule::class,
     \Modules\Backup\BackupModule::class,

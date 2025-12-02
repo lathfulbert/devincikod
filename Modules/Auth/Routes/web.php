@@ -39,6 +39,8 @@ $router->post('/admin/profile/update-password', [ProfileController::class, 'upda
 // API Key Management
 $router->get('/admin/api-keys', [ApiKeyController::class, 'index'])
     ->middleware('can:apikeys.view');
+$router->post('/admin/api-keys/generate', [ApiKeyController::class, 'generate'])
+    ->middleware('can:apikeys.manage');
 $router->post('/admin/api-keys/revoke', [ApiKeyController::class, 'revoke'])
     ->middleware('can:apikeys.revoke');
 $router->get('/admin/api-keys/docs', [ApiKeyController::class, 'docs'])

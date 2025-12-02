@@ -41,16 +41,6 @@ class AdminModule extends AbstractModule
                 'class' => 'badge-light-primary'
             ],
             [
-                'type' => 'dropdown',
-                'title' => 'Utilisateurs',
-                'icon' => 'users',
-                'children' => [
-                    ['title' => 'Liste des utilisateurs', 'url' => '/admin/users'],
-                    ['title' => 'Rôles', 'url' => '/admin/roles'],
-                    ['title' => 'Permissions', 'url' => '/admin/permissions'],
-                ]
-            ],
-            [
                 'type' => 'separator',
                 'label' => 'Système',
                 'class' => 'badge-light-secondary'
