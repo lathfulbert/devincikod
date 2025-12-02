@@ -25,6 +25,8 @@ $currentConfig = $localeConfig[$currentLocale] ?? [
 ];
 ?>
 
+
+
 <div class="translate_wrapper" style="position: relative; z-index: 1000;">
     <div class="current_lang">
         <div class="lang">

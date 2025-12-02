@@ -17,7 +17,9 @@ class User extends Model
         'first_name',
         'last_name',
         'phone',
-        'is_active'
+        'is_active',
+        'api_key',
+        'api_key_created_at'
     ];
 
     protected array $hidden = [

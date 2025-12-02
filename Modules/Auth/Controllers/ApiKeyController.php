@@ -36,6 +36,7 @@ class ApiKeyController
         $userId = $_SESSION['user_id'] ?? null;
 
         if (!$userId) {
+            $_SESSION['flash']['danger'][] = 'Vous devez être connecté pour générer une clé API';
             redirect('/login');
             exit;
         }
@@ -43,21 +44,27 @@ class ApiKeyController
         $user = User::find($userId);
 
         if (!$user) {
-            $_SESSION['flash_error'] = 'User not found';
+            $_SESSION['flash']['danger'][] = 'Utilisateur non trouvé';
             redirect('/admin/api-keys');
             exit;
         }
 
-        // Generate secure API key
-        $apiKey = bin2hex(random_bytes(32));
+        try {
+            // Generate secure API key
+            $apiKey = bin2hex(random_bytes(32));
 
-        // Update user
-        $user->update([
-            'api_key' => $apiKey,
-            'api_key_created_at' => date('Y-m-d H:i:s')
-        ]);
+            // Update user directly via database
+            $db = \App\Core\Database\Database::getInstance();
+            $db->query(
+                "UPDATE users SET api_key = ?, api_key_created_at = NOW() WHERE id = ?",
+                [$apiKey, $userId]
+            );
 
-        $_SESSION['flash_success'] = 'API key generated successfully';
+            $_SESSION['flash']['success'][] = 'Clé API générée avec succès !';
+        } catch (\Exception $e) {
+            $_SESSION['flash']['danger'][] = 'Erreur lors de la génération de la clé API : ' . $e->getMessage();
+        }
+
         redirect('/admin/api-keys');
         exit;
     }
@@ -77,7 +84,7 @@ class ApiKeyController
         $user = User::find($userId);
 
         if (!$user) {
-            $_SESSION['flash_error'] = 'User not found';
+            $_SESSION['flash']['danger'][] = 'Utilisateur non trouvé';
             redirect('/admin/api-keys');
             exit;
         }
@@ -91,7 +98,7 @@ class ApiKeyController
             'api_key_created_at' => date('Y-m-d H:i:s')
         ]);
 
-        $_SESSION['flash_success'] = 'API key regenerated successfully. Please update your applications with the new key.';
+        $_SESSION['flash']['success'][] = 'Clé API régénérée avec succès. Veuillez mettre à jour vos applications avec la nouvelle clé.';
         redirect('/admin/api-keys');
         exit;
     }
@@ -104,6 +111,7 @@ class ApiKeyController
         $userId = $_SESSION['user_id'] ?? null;
 
         if (!$userId) {
+            $_SESSION['flash']['danger'][] = 'Vous devez être connecté pour révoquer une clé API';
             redirect('/login');
             exit;
         }
@@ -111,18 +119,24 @@ class ApiKeyController
         $user = User::find($userId);
 
         if (!$user) {
-            $_SESSION['flash_error'] = 'User not found';
+            $_SESSION['flash']['danger'][] = 'Utilisateur non trouvé';
             redirect('/admin/api-keys');
             exit;
         }
 
-        // Revoke API key
-        $user->update([
-            'api_key' => null,
-            'api_key_created_at' => null
-        ]);
+        try {
+            // Revoke API key directly via database
+            $db = \App\Core\Database\Database::getInstance();
+            $db->query(
+                "UPDATE users SET api_key = NULL, api_key_created_at = NULL WHERE id = ?",
+                [$userId]
+            );
 
-        $_SESSION['flash_success'] = 'API key revoked successfully';
+            $_SESSION['flash']['success'][] = 'Clé API révoquée avec succès';
+        } catch (\Exception $e) {
+            $_SESSION['flash']['danger'][] = 'Erreur lors de la révocation de la clé API : ' . $e->getMessage();
+        }
+
         redirect('/admin/api-keys');
         exit;
     }

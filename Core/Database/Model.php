@@ -144,6 +144,11 @@ abstract class Model
         $this->attributes[$key] = $value;
     }
 
+    public function __isset($key)
+    {
+        return isset($this->attributes[$key]);
+    }
+
     /**
      * Define a one-to-one relationship.
      */
