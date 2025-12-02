@@ -9,11 +9,11 @@
     "register": "Register",
     "welcome": "Welcome, :name",
     "login_success": "Login successful! Welcome :name.",
-    "logout_success": "Logged out successfully. See you soon!",
-    "login_failed": "Invalid username or password.",
+    "logout_success": "Logout successful. See you soon!",
+    "login_failed": "Incorrect username or password.",
     "password_reset": "Password Reset",
-    "forgot_password": "Forgot password?",
-    "remember_me": "Remember me"
+    "forgot_password": "Forgot Password?",
+    "remember_me": "Remember Me"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -37,10 +37,10 @@
     "email": "The :field field must be a valid email address.",
     "min": "The :field field must be at least :min characters.",
     "max": "The :field field cannot exceed :max characters.",
-    "unique": "This :field value is already in use.",
+    "unique": "This value for :field is already in use.",
     "confirmed": "The :field confirmation does not match.",
-    "alpha": "The :field field can only contain letters.",
-    "alpha_dash": "The :field field can only contain letters, numbers, dashes and underscores.",
+    "alpha": "The :field field may only contain letters.",
+    "alpha_dash": "The :field field may only contain letters, numbers, dashes and underscores.",
     "numeric": "The :field field must be a number."
   },
   "messages": {

@@ -27,7 +27,7 @@ return [
     | Internationalization (I18n) Settings
     |--------------------------------------------------------------------------
     */
-    'locale' => 'fr',
+    'locale' => 'en',
     'fallback_locale' => 'en',
     'supported_locales' => ['fr', 'en', 'ar'],
 

@@ -1,0 +1,40 @@
+{
+  "rbac": {
+    "roles": {
+      "title": "Role Management",
+      "list": "Role List",
+      "create_role": "Create Role",
+      "edit_role": "Edit Role",
+      "delete_role": "Delete Role",
+      "fields": {
+        "name": "Name",
+        "slug": "Slug",
+        "description": "Description",
+        "permissions": "Associated Permissions"
+      },
+      "messages": {
+        "created": "Role created successfully",
+        "updated": "Role updated successfully",
+        "deleted": "Role deleted successfully"
+      }
+    },
+    "permissions": {
+      "title": "Permission Management",
+      "list": "Permission List",
+      "create_permission": "Create Permission",
+      "edit_permission": "Edit Permission",
+      "delete_permission": "Delete Permission",
+      "fields": {
+        "name": "Name",
+        "slug": "Slug",
+        "description": "Description",
+        "module": "Module"
+      },
+      "messages": {
+        "created": "Permission created successfully",
+        "updated": "Permission updated successfully",
+        "deleted": "Permission deleted successfully"
+      }
+    }
+  }
+}

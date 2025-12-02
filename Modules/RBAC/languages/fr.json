@@ -1,0 +1,40 @@
+{
+  "rbac": {
+    "roles": {
+      "title": "Gestion des rôles",
+      "list": "Liste des rôles",
+      "create_role": "Créer un rôle",
+      "edit_role": "Modifier le rôle",
+      "delete_role": "Supprimer le rôle",
+      "fields": {
+        "name": "Nom",
+        "slug": "Identifiant",
+        "description": "Description",
+        "permissions": "Permissions associées"
+      },
+      "messages": {
+        "created": "Rôle créé avec succès",
+        "updated": "Rôle mis à jour avec succès",
+        "deleted": "Rôle supprimé avec succès"
+      }
+    },
+    "permissions": {
+      "title": "Gestion des permissions",
+      "list": "Liste des permissions",
+      "create_permission": "Créer une permission",
+      "edit_permission": "Modifier la permission",
+      "delete_permission": "Supprimer la permission",
+      "fields": {
+        "name": "Nom",
+        "slug": "Identifiant",
+        "description": "Description",
+        "module": "Module"
+      },
+      "messages": {
+        "created": "Permission créée avec succès",
+        "updated": "Permission mise à jour avec succès",
+        "deleted": "Permission supprimée avec succès"
+      }
+    }
+  }
+}

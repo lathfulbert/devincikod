@@ -5,10 +5,9 @@ require 'Core/Support/helpers.php';
 
 $app = new \App\Core\Application(__DIR__);
 $app->boot();
-
 $db = \App\Core\Database\Database::getInstance();
 
-echo "=== Status des Modules dans la BD ===\n\n";
+echo "=== Modules dans la BD ===\n";
 
 try {
     $modules = $db->query('SELECT name, is_active, is_installed FROM modules ORDER BY name')->fetchAll();
@@ -33,6 +32,8 @@ if ($users) {
         echo "\n⚠️ Le module Users est désactivé! Activation...\n";
         $db->query("UPDATE modules SET is_active = 1 WHERE name = 'Users'");
         echo "✓ Module Users activé!\n";
+    } else {
+        echo "\n✓ Module Users est ACTIF\n";
     }
 } else {
     echo "❌ Module Users non trouvé dans la BD!\n";
@@ -56,3 +57,6 @@ if ($users) {
 
     echo "✓ Module Users ajouté et activé!\n";
 }
+
+echo "\n=== Vérification finale ===\n";
+echo "Rafraîchissez votre page pour voir le menu Users!\n";

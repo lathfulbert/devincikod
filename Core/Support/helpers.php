@@ -1021,6 +1021,21 @@ if (!function_exists('__t')) {
     }
 }
 
+if (!function_exists('__')) {
+    /**
+     * Translate the given message (Laravel-style shorthand).
+     *
+     * @param string $key Translation key (dot notation)
+     * @param array $replace Replacement parameters
+     * @param string|null $locale Specific locale
+     * @return string Translated string
+     */
+    function __(string $key, array $replace = [], ?string $locale = null): string
+    {
+        return App\Core\I18n\LanguageManager::getInstance()->trans($key, $replace, $locale);
+    }
+}
+
 if (!function_exists('trans')) {
     /**
      * Translate the given message.

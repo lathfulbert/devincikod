@@ -1,0 +1,27 @@
+{
+  "users": {
+    "title": "Gestion des utilisateurs",
+    "list": "Liste des utilisateurs",
+    "create_user": "Ajouter un utilisateur",
+    "edit_user": "Modifier l'utilisateur",
+    "delete_user": "Supprimer l'utilisateur",
+    "delete_confirm": "Êtes-vous sûr de vouloir supprimer cet utilisateur ?",
+    "fields": {
+      "name": "Nom",
+      "username": "Nom d'utilisateur",
+      "email": "Adresse email",
+      "password": "Mot de passe",
+      "password_confirmation": "Confirmer le mot de passe",
+      "role": "Rôle",
+      "status": "Statut",
+      "created_at": "Créé le",
+      "updated_at": "Modifié le"
+    },
+    "messages": {
+      "created": "Utilisateur créé avec succès",
+      "updated": "Utilisateur mis à jour avec succès",
+      "deleted": "Utilisateur supprimé avec succès",
+      "error": "Une erreur est survenue lors de l'opération"
+    }
+  }
+}
