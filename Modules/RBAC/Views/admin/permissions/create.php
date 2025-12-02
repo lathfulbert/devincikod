@@ -35,13 +35,13 @@
                 <div class="mb-3">
                     <label for="name" class="form-label">Nom de la permission <span class="text-danger">*</span></label>
                     <input type="text" name="name" id="name" class="form-control" value="<?= old('name') ?>" required autofocus>
-                    <small class="form-text text-muted">Exemple: users.create, posts.edit, etc.</small>
-                    <div class="mb-3">
-                        <label for="slug" class="form-label">Slug <span class="text-danger">*</span></label>
-                        <input type="text" name="slug" id="slug" class="form-control" value="<?= old('slug') ?>" required>
-                        <small class="form-text text-muted">Exemple: users.create, posts.edit, etc.</small>
-                    </div>
+                    <small class="form-text text-muted">Exemple: Créer des utilisateurs, Modifier des posts, etc.</small>
+                </div>
 
+                <div class="mb-3">
+                    <label for="slug" class="form-label">Slug <span class="text-danger">*</span></label>
+                    <input type="text" name="slug" id="slug" class="form-control" value="<?= old('slug') ?>" required>
+                    <small class="form-text text-muted">Exemple: users.create, posts.edit, etc.</small>
                 </div>
 
                 <div class="mb-3">

@@ -15,4 +15,7 @@ return [
     'admin.modules.manage' => 'Manage Modules',
     'admin.settings.view' => 'View Settings',
     'admin.settings.edit' => 'Edit Settings',
+    'files.upload' => 'Upload Files',
+    'files.list' => 'List Files',
+    'files.delete' => 'Delete Files',
 ];

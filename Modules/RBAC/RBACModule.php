@@ -8,7 +8,9 @@ class RBACModule extends AbstractModule
 {
     public function getRoutes(): array
     {
-        return [];  // Routes are managed by Admin module
+        return [
+            __DIR__ . '/Routes/web.php'
+        ];
     }
 
     public function boot(): void
@@ -22,5 +24,28 @@ class RBACModule extends AbstractModule
     protected function getModulePath(): string
     {
         return __DIR__;
+    }
+
+    public function getMenuItems(): array
+    {
+        return [
+            [
+                'type' => 'dropdown',
+                'title' => 'Rôles & Permissions',
+                'icon' => 'shield',
+                'children' => [
+                    [
+                        'title' => 'Rôles',
+                        'url' => '/admin/roles',
+                        'permission' => 'admin.roles.view'
+                    ],
+                    [
+                        'title' => 'Permissions',
+                        'url' => '/admin/permissions',
+                        'permission' => 'admin.permissions.view'
+                    ]
+                ]
+            ]
+        ];
     }
 }

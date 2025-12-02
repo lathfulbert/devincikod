@@ -12,8 +12,8 @@ use App\Core\Files\Controllers\FileController;
 */
 
 // File Manager API Routes
-$router->group(['prefix' => '/api/files', 'middleware' => ['secure_upload']], function ($router) {
-    $router->post('/upload', [FileController::class, 'upload']);
-    $router->get('/list', [FileController::class, 'list']);
-    $router->delete('/delete', [FileController::class, 'delete']);
+$router->group(['prefix' => '/api/files', 'middleware' => ['secure_upload', 'api_auth']], function ($router) {
+    $router->post('/upload', [FileController::class, 'upload'])->middleware('can:files.upload');
+    $router->get('/list', [FileController::class, 'list'])->middleware('can:files.list');
+    $router->delete('/delete', [FileController::class, 'delete'])->middleware('can:files.delete');
 });

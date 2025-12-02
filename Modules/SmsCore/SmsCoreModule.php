@@ -16,10 +16,10 @@ class SmsCoreModule extends AbstractModule
         $authMiddleware = [new \App\Core\Middleware\AuthMiddleware(), 'handle'];
 
         return [
-            // API Routes (no middleware for now, will be added in controller)
-            ['POST', '/api/v1/sms/send', [\Modules\SmsCore\Controllers\SmsApiController::class, 'send'], []],
-            ['GET', '/api/v1/sms/history', [\Modules\SmsCore\Controllers\SmsApiController::class, 'history'], []],
-            ['GET', '/api/v1/sms/balance', [\Modules\SmsCore\Controllers\SmsApiController::class, 'balance'], []],
+            // API Routes (Secured with API Auth + RBAC)
+            ['POST', '/api/v1/sms/send', [\Modules\SmsCore\Controllers\SmsApiController::class, 'send'], ['api_auth', 'can:sms.send']],
+            ['GET', '/api/v1/sms/history', [\Modules\SmsCore\Controllers\SmsApiController::class, 'history'], ['api_auth', 'can:sms.history.view']],
+            ['GET', '/api/v1/sms/balance', [\Modules\SmsCore\Controllers\SmsApiController::class, 'balance'], ['api_auth', 'can:sms.stats.view']],
 
             // Dashboard
             ['GET', '/admin/sms', [\Modules\SmsCore\Controllers\DashboardController::class, 'index'], [$authMiddleware]],

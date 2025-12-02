@@ -68,11 +68,12 @@
                     <a href="<?= url('/admin/permissions') ?>" class="btn btn-secondary">
                         <i data-feather="x"></i> Annuler
                     </a>
-                    <a href="<?= url('/admin/permissions/' . $permission->id . '/delete') ?>"
-                        class="btn btn-danger float-end"
-                        onclick="return confirm('Supprimer définitivement cette permission ?')">
-                        <i data-feather="trash-2"></i> Supprimer
-                    </a>
+                    <form action="<?= url('/admin/permissions/' . $permission->id . '/delete') ?>" method="POST" style="display:inline;" class="float-end" onsubmit="return confirm('Supprimer définitivement cette permission ?');">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-danger">
+                            <i data-feather="trash-2"></i> Supprimer
+                        </button>
+                    </form>
                 </div>
             </form>
 

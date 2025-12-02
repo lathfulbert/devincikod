@@ -10,7 +10,7 @@
     $breadcrumb = [
         ['label' => 'Dashboard', 'url' => '/admin/dashboard'],
         ['label' => 'Rôles', 'url' => '/admin/roles'],
-        ['label' => 'Créer']
+        ['label' => 'Éditer']
     ];
     component('breadcrumb');
     ?>
@@ -25,23 +25,27 @@
     <div class="row">
         <div class="col-lg-8 offset-lg-2">
             <?php
-            $card_title = "Créer un nouveau rôle";
+            $card_title = "Éditer le rôle : " . htmlspecialchars($role->name);
             component('card-start');
             ?>
 
-            <form action="<?= url('/admin/roles/store') ?>
-" method="POST">
+            <form action="<?= url('/admin/roles/' . $role->id . '/update') ?>" method="POST">
                 <?= csrf_field() ?>
 
                 <div class="mb-3">
                     <label for="name" class="form-label">Nom du rôle <span class="text-danger">*</span></label>
-                    <input type="text" name="name" id="name" class="form-control" required autofocus>
-                    <small class="form-text text-muted">Exemple: Administrateur, Éditeur, etc.</small>
+                    <input type="text" name="name" id="name" class="form-control" value="<?= htmlspecialchars($role->name) ?>" required autofocus>
+                </div>
+
+                <div class="mb-3">
+                    <label for="slug" class="form-label">Slug <span class="text-danger">*</span></label>
+                    <input type="text" name="slug" id="slug" class="form-control" value="<?= htmlspecialchars($role->slug) ?>" required>
+                    <small class="form-text text-muted">Exemple: admin, editor, etc. (en minuscules, sans espaces)</small>
                 </div>
 
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
-                    <textarea name="description" id="description" class="form-control" rows="3"></textarea>
+                    <textarea name="description" id="description" class="form-control" rows="3"><?= htmlspecialchars($role->description ?? '') ?></textarea>
                     <small class="form-text text-muted">Description optionnelle du rôle</small>
                 </div>
 
@@ -51,7 +55,12 @@
                         <?php if (!empty($permissions)): ?>
                             <?php foreach ($permissions as $permission): ?>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="permissions[]" value="<?= $permission->id ?>" id="perm_<?= $permission->id ?>">
+                                    <input class="form-check-input"
+                                        type="checkbox"
+                                        name="permissions[]"
+                                        value="<?= $permission->id ?>"
+                                        id="perm_<?= $permission->id ?>"
+                                        <?= in_array($permission->id, $rolePermissionIds ?? []) ? 'checked' : '' ?>>
                                     <label class="form-check-label" for="perm_<?= $permission->id ?>">
                                         <strong><?= htmlspecialchars($permission->name) ?></strong>
                                         <?php if (!empty($permission->description)): ?>
@@ -69,11 +78,17 @@
 
                 <div class="mt-4">
                     <button type="submit" class="btn btn-primary">
-                        <i data-feather="save"></i> Créer le rôle
+                        <i data-feather="save"></i> Mettre à jour
                     </button>
                     <a href="<?= url('/admin/roles') ?>" class="btn btn-secondary">
                         <i data-feather="x"></i> Annuler
                     </a>
+                    <form action="<?= url('/admin/roles/' . $role->id . '/delete') ?>" method="POST" style="display:inline;" class="float-end" onsubmit="return confirm('Supprimer définitivement ce rôle ?');">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-danger">
+                            <i data-feather="trash-2"></i> Supprimer
+                        </button>
+                    </form>
                 </div>
             </form>
 

@@ -180,8 +180,37 @@ class RbacRouteMigration
                 'pattern' => '/\$router->get\(\'\/admin\',.*?\[\$authMiddleware\]\);/s',
                 'replacement' => "\$router->get('/admin', [AdminController::class, 'index'])\n    ->middleware('can:admin.access');",
             ],
+            // Monitoring
+            [
+                'pattern' => '/\$router->get\(\'\/admin\/monitoring\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/monitoring', [AdminController::class, 'monitoring'])\n    ->middleware('can:admin.access');",
+            ],
+            [
+                'pattern' => '/\$router->post\(\'\/admin\/monitoring\/clear\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/monitoring/clear', [AdminController::class, 'clearCache'])\n    ->middleware('can:admin.settings.edit');",
+            ],
 
             // Module management (CRITIQUE - double protection)
+            [
+                'pattern' => '/\$router->get\(\'\/admin\/modules\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/modules', [ModuleController::class, 'index'])\n    ->middleware('can:admin.modules.view');",
+            ],
+            [
+                'pattern' => '/\$router->get\(\'\/admin\/modules\/upload\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/modules/upload', [ModuleController::class, 'upload'])\n    ->middleware('can:admin.modules.manage');",
+            ],
+            [
+                'pattern' => '/\$router->post\(\'\/admin\/modules\/process-upload\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/modules/process-upload', [ModuleController::class, 'processUpload'])\n    ->middleware('can:admin.modules.manage');",
+            ],
+            [
+                'pattern' => '/\$router->post\(\'\/admin\/modules\/enable\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/modules/enable', [ModuleController::class, 'enable'])\n    ->middleware('can:admin.modules.manage');",
+            ],
+            [
+                'pattern' => '/\$router->post\(\'\/admin\/modules\/disable\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/modules/disable', [ModuleController::class, 'disable'])\n    ->middleware('can:admin.modules.manage');",
+            ],
             [
                 'pattern' => '/\$router->post\(\'\/admin\/modules\/install\',.*?\[\$authMiddleware\]\);/s',
                 'replacement' => "\$router->post('/admin/modules/install', [ModuleController::class, 'install'])\n    ->middleware('role:admin')\n    ->middleware('can:admin.modules.manage');",
@@ -190,39 +219,121 @@ class RbacRouteMigration
                 'pattern' => '/\$router->post\(\'\/admin\/modules\/uninstall\',.*?\[\$authMiddleware\]\);/s',
                 'replacement' => "\$router->post('/admin/modules/uninstall', [ModuleController::class, 'uninstall'])\n    ->middleware('role:admin')\n    ->middleware('can:admin.modules.manage');",
             ],
+            [
+                'pattern' => '/\$router->post\(\'\/admin\/modules\/\{name\}\/delete\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/modules/{name}/delete', [ModuleController::class, 'delete'])\n    ->middleware('role:admin')\n    ->middleware('can:admin.modules.manage');",
+            ],
 
-            // Users - View
+            // Users Management
             [
                 'pattern' => '/\$router->get\(\'\/admin\/users\',.*?\[\$authMiddleware\]\);/s',
                 'replacement' => "\$router->get('/admin/users', [UserController::class, 'index'])\n    ->middleware('can:admin.users.view');",
             ],
-            // Users - Create
+            [
+                'pattern' => '/\$router->get\(\'\/admin\/users\/create\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/users/create', [UserController::class, 'create'])\n    ->middleware('can:admin.users.create');",
+            ],
             [
                 'pattern' => '/\$router->post\(\'\/admin\/users\/store\',.*?\[\$authMiddleware\]\);/s',
                 'replacement' => "\$router->post('/admin/users/store', [UserController::class, 'store'])\n    ->middleware('can:admin.users.create');",
             ],
-            // Users - Delete
+            [
+                'pattern' => '/\$router->get\(\'\/admin\/users\/\{id\}\/edit\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/users/{id}/edit', [UserController::class, 'edit'])\n    ->middleware('can:admin.users.edit');",
+            ],
+            [
+                'pattern' => '/\$router->post\(\'\/admin\/users\/\{id\}\/update\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/users/{id}/update', [UserController::class, 'update'])\n    ->middleware('can:admin.users.edit');",
+            ],
             [
                 'pattern' => '/\$router->post\(\'\/admin\/users\/\{id\}\/delete\',.*?\[\$authMiddleware\]\);/s',
                 'replacement' => "\$router->post('/admin/users/{id}/delete', [UserController::class, 'delete'])\n    ->middleware('can:admin.users.delete');",
             ],
 
-            // Roles
+            // Roles Management
             [
                 'pattern' => '/\$router->get\(\'\/admin\/roles\',.*?\[\$authMiddleware\]\);(?!.*edit)/s',
                 'replacement' => "\$router->get('/admin/roles', [RoleController::class, 'index'])\n    ->middleware('can:admin.roles.view');",
             ],
+            [
+                'pattern' => '/\$router->get\(\'\/admin\/roles\/create\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/roles/create', [RoleController::class, 'create'])\n    ->middleware('can:admin.roles.create');",
+            ],
+            [
+                'pattern' => '/\$router->post\(\'\/admin\/roles\/store\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/roles/store', [RoleController::class, 'store'])\n    ->middleware('can:admin.roles.create');",
+            ],
+            [
+                'pattern' => '/\$router->get\(\'\/admin\/roles\/\{id\}\/edit\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/roles/{id}/edit', [RoleController::class, 'edit'])\n    ->middleware('can:admin.roles.edit');",
+            ],
+            [
+                'pattern' => '/\$router->post\(\'\/admin\/roles\/\{id\}\/update\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/roles/{id}/update', [RoleController::class, 'update'])\n    ->middleware('can:admin.roles.edit');",
+            ],
+            [
+                'pattern' => '/\$router->post\(\'\/admin\/roles\/\{id\}\/delete\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/roles/{id}/delete', [RoleController::class, 'delete'])\n    ->middleware('can:admin.roles.delete');",
+            ],
 
             // Permissions (TRÈS CRITIQUE - super-admin only)
             [
+                'pattern' => '/\$router->get\(\'\/admin\/permissions\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/permissions', [PermissionController::class, 'index'])\n    ->middleware('role:admin');",
+            ],
+            [
+                'pattern' => '/\$router->get\(\'\/admin\/permissions\/create\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/permissions/create', [PermissionController::class, 'create'])\n    ->middleware('role:admin');",
+            ],
+            [
+                'pattern' => '/\$router->post\(\'\/admin\/permissions\/store\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/permissions/store', [PermissionController::class, 'store'])\n    ->middleware('role:admin');",
+            ],
+            [
+                'pattern' => '/\$router->get\(\'\/admin\/permissions\/\{id\}\/edit\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/permissions/{id}/edit', [PermissionController::class, 'edit'])\n    ->middleware('role:admin');",
+            ],
+            [
                 'pattern' => '/\$router->post\(\'\/admin\/permissions\/\{id\}\/update\',.*?\[\$authMiddleware\]\);/s',
                 'replacement' => "\$router->post('/admin/permissions/{id}/update', [PermissionController::class, 'update'])\n    ->middleware('role:admin');",
+            ],
+            [
+                'pattern' => '/\$router->post\(\'\/admin\/permissions\/\{id\}\/delete\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/permissions/{id}/delete', [PermissionController::class, 'delete'])\n    ->middleware('role:admin');",
             ],
 
             // Queue
             [
                 'pattern' => '/\$router->get\(\'\/admin\/queue\',.*?\[\$authMiddleware\]\);(?!.*\/)/s',
                 'replacement' => "\$router->get('/admin/queue', [QueueController::class, 'index'])\n    ->middleware('can:queue.view');",
+            ],
+            [
+                'pattern' => '/\$router->get\(\'\/admin\/queue\/jobs\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/queue/jobs', [QueueController::class, 'jobs'])\n    ->middleware('can:queue.view');",
+            ],
+            [
+                'pattern' => '/\$router->get\(\'\/admin\/queue\/failed\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/queue/failed', [QueueController::class, 'failed'])\n    ->middleware('can:queue.view');",
+            ],
+            [
+                'pattern' => '/\$router->post\(\'\/admin\/queue\/retry\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/queue/retry', [QueueController::class, 'retry'])\n    ->middleware('can:queue.retry');",
+            ],
+            [
+                'pattern' => '/\$router->post\(\'\/admin\/queue\/retry-all\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/queue/retry-all', [QueueController::class, 'retryAll'])\n    ->middleware('can:queue.manage');",
+            ],
+            [
+                'pattern' => '/\$router->post\(\'\/admin\/queue\/delete\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/queue/delete', [QueueController::class, 'delete'])\n    ->middleware('can:queue.delete');",
+            ],
+            [
+                'pattern' => '/\$router->get\(\'\/admin\/queue\/stats\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/queue/stats', [QueueController::class, 'stats'])\n    ->middleware('can:queue.view');",
+            ],
+            [
+                'pattern' => '/\$router->get\(\'\/admin\/queue\/api\/stats\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/queue/api/stats', [QueueController::class, 'apiStats'])\n    ->middleware('can:queue.view');",
             ],
 
             // Cron
@@ -231,8 +342,20 @@ class RbacRouteMigration
                 'replacement' => "\$router->get('/admin/cron', [CronController::class, 'index'])\n    ->middleware('can:cron.view');",
             ],
             [
+                'pattern' => '/\$router->post\(\'\/admin\/cron\/toggle\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/cron/toggle', [CronController::class, 'toggle'])\n    ->middleware('can:cron.manage');",
+            ],
+            [
                 'pattern' => '/\$router->post\(\'\/admin\/cron\/run\',.*?\[\$authMiddleware\]\);/s',
                 'replacement' => "\$router->post('/admin/cron/run', [CronController::class, 'runManually'])\n    ->middleware('can:cron.execute');",
+            ],
+            [
+                'pattern' => '/\$router->get\(\'\/admin\/cron\/logs\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/cron/logs', [CronController::class, 'logs'])\n    ->middleware('can:cron.view');",
+            ],
+            [
+                'pattern' => '/\$router->get\(\'\/admin\/cron\/stats\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/cron/stats', [CronController::class, 'stats'])\n    ->middleware('can:cron.view');",
             ],
         ];
 
@@ -278,6 +401,15 @@ class RbacRouteMigration
                 'pattern' => '/\$router->post\(\'\/admin\/profile\/update\',.*?\[\$authMiddleware\]\);/s',
                 'replacement' => "\$router->post('/admin/profile/update', [ProfileController::class, 'update'])\n    ->middleware('can:auth.profile.edit');",
             ],
+            [
+                'pattern' => '/\$router->get\(\'\/admin\/profile\/change-password\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/profile/change-password', [ProfileController::class, 'changePassword'])\n    ->middleware('can:auth.profile.edit');",
+            ],
+            [
+                'pattern' => '/\$router->post\(\'\/admin\/profile\/update-password\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/profile/update-password', [ProfileController::class, 'updatePassword'])\n    ->middleware('can:auth.profile.edit');",
+            ],
+
             // API Keys
             [
                 'pattern' => '/\$router->get\(\'\/admin\/api-keys\',.*?\[\$authMiddleware\]\);/s',
@@ -286,6 +418,18 @@ class RbacRouteMigration
             [
                 'pattern' => '/\$router->post\(\'\/admin\/api-keys\/generate\',.*?\[\$authMiddleware\]\);/s',
                 'replacement' => "\$router->post('/admin/api-keys/generate', [ApiKeyController::class, 'generate'])\n    ->middleware('can:apikeys.create');",
+            ],
+            [
+                'pattern' => '/\$router->post\(\'\/admin\/api-keys\/regenerate\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/api-keys/regenerate', [ApiKeyController::class, 'regenerate'])\n    ->middleware('can:apikeys.create');",
+            ],
+            [
+                'pattern' => '/\$router->post\(\'\/admin\/api-keys\/revoke\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->post('/admin/api-keys/revoke', [ApiKeyController::class, 'revoke'])\n    ->middleware('can:apikeys.revoke');",
+            ],
+            [
+                'pattern' => '/\$router->get\(\'\/admin\/api-keys\/docs\',.*?\[\$authMiddleware\]\);/s',
+                'replacement' => "\$router->get('/admin/api-keys/docs', [ApiKeyController::class, 'docs'])\n    ->middleware('can:apikeys.view');",
             ],
         ];
 

@@ -10,7 +10,7 @@
     $breadcrumb = [
         ['label' => 'Dashboard', 'url' => '/admin/dashboard'],
         ['label' => 'Rôles', 'url' => '/admin/roles'],
-        ['label' => 'Éditer']
+        ['label' => 'Créer']
     ];
     component('breadcrumb');
     ?>
@@ -25,21 +25,29 @@
     <div class="row">
         <div class="col-lg-8 offset-lg-2">
             <?php
-            $card_title = "Éditer le rôle : " . htmlspecialchars($role->name);
+            $card_title = "Créer un nouveau rôle";
             component('card-start');
             ?>
 
-            <form action="<?= url('/admin/roles/' . $role->id . '/update') ?>" method="POST">
+            <form action="<?= url('/admin/roles/store') ?>
+" method="POST">
                 <?= csrf_field() ?>
 
                 <div class="mb-3">
                     <label for="name" class="form-label">Nom du rôle <span class="text-danger">*</span></label>
-                    <input type="text" name="name" id="name" class="form-control" value="<?= htmlspecialchars($role->name) ?>" required autofocus>
+                    <input type="text" name="name" id="name" class="form-control" required autofocus>
+                    <small class="form-text text-muted">Exemple: Administrateur, Éditeur, etc.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="slug" class="form-label">Slug <span class="text-danger">*</span></label>
+                    <input type="text" name="slug" id="slug" class="form-control" required>
+                    <small class="form-text text-muted">Exemple: admin, editor, etc. (en minuscules, sans espaces)</small>
                 </div>
 
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
-                    <textarea name="description" id="description" class="form-control" rows="3"><?= htmlspecialchars($role->description ?? '') ?></textarea>
+                    <textarea name="description" id="description" class="form-control" rows="3"></textarea>
                     <small class="form-text text-muted">Description optionnelle du rôle</small>
                 </div>
 
@@ -49,12 +57,7 @@
                         <?php if (!empty($permissions)): ?>
                             <?php foreach ($permissions as $permission): ?>
                                 <div class="form-check">
-                                    <input class="form-check-input"
-                                        type="checkbox"
-                                        name="permissions[]"
-                                        value="<?= $permission->id ?>"
-                                        id="perm_<?= $permission->id ?>"
-                                        <?= in_array($permission->id, $rolePermissionIds ?? []) ? 'checked' : '' ?>>
+                                    <input class="form-check-input" type="checkbox" name="permissions[]" value="<?= $permission->id ?>" id="perm_<?= $permission->id ?>">
                                     <label class="form-check-label" for="perm_<?= $permission->id ?>">
                                         <strong><?= htmlspecialchars($permission->name) ?></strong>
                                         <?php if (!empty($permission->description)): ?>
@@ -72,15 +75,10 @@
 
                 <div class="mt-4">
                     <button type="submit" class="btn btn-primary">
-                        <i data-feather="save"></i> Mettre à jour
+                        <i data-feather="save"></i> Créer le rôle
                     </button>
                     <a href="<?= url('/admin/roles') ?>" class="btn btn-secondary">
                         <i data-feather="x"></i> Annuler
-                    </a>
-                    <a href="<?= url('/admin/roles/' . $role->id . '/delete') ?>"
-                        class="btn btn-danger float-end"
-                        onclick="return confirm('Supprimer définitivement ce rôle ?')">
-                        <i data-feather="trash-2"></i> Supprimer
                     </a>
                 </div>
             </form>

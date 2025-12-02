@@ -77,11 +77,12 @@
                     <a href="<?= url('/admin/users') ?>" class="btn btn-secondary">
                         <i data-feather="x"></i> Annuler
                     </a>
-                    <a href="<?= url('/admin/users/' . $user->id . '/delete') ?>"
-                        class="btn btn-danger float-end"
-                        onclick="return confirm('Supprimer définitivement cet utilisateur ?')">
-                        <i data-feather="trash-2"></i> Supprimer
-                    </a>
+                    <form action="<?= url('/admin/users/' . $user->id . '/delete') ?>" method="POST" style="display:inline;" class="float-end" onsubmit="return confirm('Supprimer définitivement cet utilisateur ?');">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-danger">
+                            <i data-feather="trash-2"></i> Supprimer
+                        </button>
+                    </form>
                 </div>
             </form>
 

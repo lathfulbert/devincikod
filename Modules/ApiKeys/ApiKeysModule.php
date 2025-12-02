@@ -141,22 +141,26 @@ class ApiKeysModule implements ModuleContract
     {
         return [
             [
-                'title' => 'System API Keys',
-                'url' => '/admin/system-api-keys',
+                'type' => 'dropdown',
+                'title' => 'API Keys',
                 'icon' => 'key',
-                'permission' => 'api-keys.view'
-            ],
-            [
-                'title' => 'API Analytics',
-                'url' => '/admin/system-api-keys/analytics',
-                'icon' => 'bar-chart-2',
-                'permission' => 'api-keys.view'
-            ],
-            [
-                'title' => 'API Monitoring',
-                'url' => '/admin/system-api-keys/monitoring',
-                'icon' => 'activity',
-                'permission' => 'api-keys.view'
+                'children' => [
+                    [
+                        'title' => 'System API Keys',
+                        'url' => '/admin/system-api-keys',
+                        'permission' => 'api-keys.view'
+                    ],
+                    [
+                        'title' => 'API Analytics',
+                        'url' => '/admin/system-api-keys/analytics',
+                        'permission' => 'api-keys.view'
+                    ],
+                    [
+                        'title' => 'API Monitoring',
+                        'url' => '/admin/system-api-keys/monitoring',
+                        'permission' => 'api-keys.view'
+                    ]
+                ]
             ]
         ];
     }

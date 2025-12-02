@@ -181,12 +181,15 @@ class Router
             $handler = explode('@', $handler);
         }
 
-        $path = $this->currentPrefix . $path;
+        // Combine prefix and path, avoiding double slashes
+        $fullPath = $this->currentPrefix . $path;
+        $fullPath = preg_replace('#/+#', '/', $fullPath); // Remove duplicate slashes
+
         $middleware = array_merge($this->currentMiddleware, $middleware);
 
         $this->routes[] = [
             'method' => $method,
-            'path' => $path,
+            'path' => $fullPath,
             'handler' => $handler,
             'middleware' => $middleware
         ];
