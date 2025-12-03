@@ -30,6 +30,13 @@ class QueryBuilder
         return $this;
     }
 
+    public function selectRaw(string $expression, array $bindings = [])
+    {
+        $this->select = $expression;
+        $this->bindings = array_merge($this->bindings, $bindings);
+        return $this;
+    }
+
     public function where($column, $operator = null, $value = null)
     {
         if ($value === null) {
@@ -44,6 +51,15 @@ class QueryBuilder
             'value' => $value
         ];
         $this->bindings[] = $value;
+        return $this;
+    }
+
+    public function whereNotNull(string $column)
+    {
+        $this->wheres[] = [
+            'type' => 'raw',
+            'sql' => "`{$column}` IS NOT NULL"
+        ];
         return $this;
     }
 

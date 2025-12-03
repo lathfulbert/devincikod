@@ -47,6 +47,20 @@ class HasMany extends Relation
     }
 
     /**
+     * Get the count of related models.
+     */
+    public function count(): int
+    {
+        $table = $this->related->getTable();
+        $sql = "SELECT COUNT(*) as count FROM `{$table}` WHERE `{$this->foreignKey}` = ?";
+
+        $stmt = $this->db->query($sql, [$this->parent->{$this->localKey}]);
+        $result = $stmt->fetch(\PDO::FETCH_OBJ);
+
+        return (int) ($result->count ?? 0);
+    }
+
+    /**
      * Create a new related model.
      */
     public function create(array $attributes): Model

@@ -1,0 +1,45 @@
+{
+  "name": "EmailMarketing",
+  "version": "1.0.0",
+  "description": "Advanced Email Marketing Module with campaigns, templates, workflows, and analytics",
+  "author": "SunuFramework Team",
+  "license": "MIT",
+  "dependencies": {
+    "php": ">=8.0"
+  },
+  "autoload": {
+    "routes": true,
+    "migrations": true,
+    "services": true,
+    "permissions": true,
+    "views": true,
+    "assets": false,
+    "config": true
+  },
+  "permissions": [
+    "email_marketing.view",
+    "email_marketing.manage",
+    "email_marketing.campaigns.create",
+    "email_marketing.campaigns.edit",
+    "email_marketing.campaigns.delete",
+    "email_marketing.campaigns.send",
+    "email_marketing.templates.create",
+    "email_marketing.templates.edit",
+    "email_marketing.templates.delete",
+    "email_marketing.workflows.create",
+    "email_marketing.workflows.edit",
+    "email_marketing.workflows.delete",
+    "email_marketing.analytics.view"
+  ],
+  "settings": {
+    "default_sender_name": "SunuFramework",
+    "default_sender_email": "noreply@sunuframework.local",
+    "default_gateway": "smtp",
+    "tracking_enabled": true,
+    "workflow_enabled": true
+  },
+  "assets": {
+    "js": [],
+    "css": []
+  }
+}

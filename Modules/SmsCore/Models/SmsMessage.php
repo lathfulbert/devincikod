@@ -123,7 +123,8 @@ class SmsMessage extends Model
         $this->status = 'sent';
         $this->sent_at = date('Y-m-d H:i:s');
         if ($gatewayMessageId) {
-            $this->gateway_message_id = $gatewayMessageId;
+            // Truncate to 100 chars to match database column
+            $this->gateway_message_id = substr($gatewayMessageId, 0, 100);
         }
         $this->save();
     }
@@ -137,6 +138,14 @@ class SmsMessage extends Model
 
     public function markAsFailed(string $error): void
     {
+        // Reload from DB to discard any invalid state (like too long gateway_message_id)
+        if (isset($this->attributes['id'])) {
+            $fresh = static::find($this->attributes['id']);
+            if ($fresh) {
+                $this->attributes = $fresh->attributes;
+            }
+        }
+
         $this->status = 'failed';
         $this->error = $error;
         $this->save();
