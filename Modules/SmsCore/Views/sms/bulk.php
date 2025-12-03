@@ -57,8 +57,28 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Sender ID</label>
-                            <input class="form-control" type="text" name="sender" placeholder="e.g. MyCompany" maxlength="11">
+                            <label class="form-label">Sender Name <span class="text-danger">*</span></label>
+                            <select class="form-control" id="sender_name_id" name="sender_name_id" required>
+                                <option value="">-- Select Sender Name --</option>
+                                <?php if (isset($senderNames) && !empty($senderNames)): ?>
+                                    <?php foreach ($senderNames as $senderName): ?>
+                                        <option value="<?= $senderName->id ?>">
+                                            <?= htmlspecialchars($senderName->name) ?>
+                                            <?php if ($senderName->operator): ?>
+                                                (<?= htmlspecialchars($senderName->operator) ?>)
+                                            <?php endif; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <option value="" disabled>No sender names assigned to you</option>
+                                <?php endif; ?>
+                            </select>
+                            <small class="form-text text-muted">
+                                Select the sender name that will appear on recipients' phones.
+                                <?php if (empty($senderNames)): ?>
+                                    <span class="text-warning">Please contact your administrator to assign sender names to your account.</span>
+                                <?php endif; ?>
+                            </small>
                         </div>
 
                         <div class="mb-3">

@@ -72,19 +72,26 @@ class CronService
     {
         $offset = ($page - 1) * $perPage;
 
-        $whereClause = $taskClass ? "WHERE task_class = ?" : "";
+        $whereClause = $taskClass ? "WHERE ct.class = ?" : "";
         $params = $taskClass ? [$taskClass, $perPage, $offset] : [$perPage, $offset];
 
         $logs = $this->db->query("
-            SELECT * FROM cron_logs
+            SELECT cl.*,
+                   ct.name as task_name,
+                   ct.class as task_class,
+                   ct.module as task_module
+            FROM cron_logs cl
+            JOIN cron_tasks ct ON cl.task_id = ct.id
             {$whereClause}
-            ORDER BY started_at DESC
+            ORDER BY cl.started_at DESC
             LIMIT ? OFFSET ?
         ", $params)->fetchAll();
 
         $countParams = $taskClass ? [$taskClass] : [];
         $total = $this->db->query("
-            SELECT COUNT(*) as count FROM cron_logs
+            SELECT COUNT(*) as count
+            FROM cron_logs cl
+            JOIN cron_tasks ct ON cl.task_id = ct.id
             {$whereClause}
         ", $countParams)->fetch();
 

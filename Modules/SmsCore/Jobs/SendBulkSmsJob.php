@@ -20,9 +20,11 @@ class SendBulkSmsJob extends Job
         // Constructor sans paramètres pour le JobSerializer
     }
 
-    public function setData(array $data): void
+    public function setData(array $data): Job
     {
+        parent::setData($data);
         $this->queueId = $data['queueId'] ?? 0;
+        return $this;
     }
 
     public function handle(): void

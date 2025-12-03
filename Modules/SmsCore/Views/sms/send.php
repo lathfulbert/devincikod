@@ -40,10 +40,28 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="sender">Sender ID</label>
-                            <input type="text" class="form-control" id="sender" name="sender"
-                                value="SMS" maxlength="11">
-                            <small class="form-text text-muted">Max 11 characters</small>
+                            <label for="sender_name_id">Sender Name <span class="text-danger">*</span></label>
+                            <select class="form-control" id="sender_name_id" name="sender_name_id" required>
+                                <option value="">-- Select Sender Name --</option>
+                                <?php if (isset($senderNames) && !empty($senderNames)): ?>
+                                    <?php foreach ($senderNames as $senderName): ?>
+                                        <option value="<?= $senderName->id ?>">
+                                            <?= htmlspecialchars($senderName->name) ?>
+                                            <?php if ($senderName->operator): ?>
+                                                (<?= htmlspecialchars($senderName->operator) ?>)
+                                            <?php endif; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <option value="" disabled>No sender names assigned to you</option>
+                                <?php endif; ?>
+                            </select>
+                            <small class="form-text text-muted">
+                                Select the sender name that will appear on the recipient's phone.
+                                <?php if (empty($senderNames)): ?>
+                                    <span class="text-warning">Please contact your administrator to assign sender names to your account.</span>
+                                <?php endif; ?>
+                            </small>
                         </div>
 
                         <div class="form-group mb-3">

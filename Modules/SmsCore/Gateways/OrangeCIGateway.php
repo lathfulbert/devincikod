@@ -29,17 +29,37 @@ class OrangeCIGateway implements SmsGatewayInterface
                 ];
             }
 
-            // 2. Format sender address according to Orange API spec: tel:+XXXXXXXXXXXX
-            // If senderId is just a name like "TICAFRIQUE", we need a valid phone number
-            // For now, use the sender_id from config which should be a phone number
-            $senderPhone = $this->formatPhoneNumber($this->config->sender_id ?? $senderId);
+            // 2. Determine Sender Address (Technical number) and Sender Name (Display name)
+            // Try to get valid numeric address from config first, then from input
+            $configSender = $this->formatPhoneNumber($this->config->sender_id ?? '');
+            $inputSender = $this->formatPhoneNumber($senderId);
+
+            // Use configured sender ID as technical address if available, otherwise input
+            $senderAddress = $configSender ?: $inputSender;
+
+            if (!$senderAddress) {
+                return [
+                    'success' => false,
+                    'message' => 'Invalid Sender Address. Please configure a numeric Sender ID in gateway settings.',
+                    'gateway_response' => null,
+                    'sent_at' => date('Y-m-d H:i:s')
+                ];
+            }
 
             // 3. Format recipient number
             $recipientPhone = $this->formatPhoneNumber($to);
 
+            if (!$recipientPhone) {
+                return [
+                    'success' => false,
+                    'message' => 'Invalid Recipient Number',
+                    'gateway_response' => null,
+                    'sent_at' => date('Y-m-d H:i:s')
+                ];
+            }
+
             // 4. Build API URL with properly URL-encoded sender (tel%3A%2B...)
-            // Important: Orange expects URL-encoded 'tel:+' in the path
-            $encodedSender = str_replace('tel:', 'tel%3A', str_replace('+', '%2B', $senderPhone));
+            $encodedSender = str_replace('tel:', 'tel%3A', str_replace('+', '%2B', $senderAddress));
             $configuration = json_decode($this->config->configuration, true);
 
             // Build query parameters
@@ -53,16 +73,18 @@ class OrangeCIGateway implements SmsGatewayInterface
 
             $payload = [
                 'outboundSMSMessageRequest' => [
-                    'address' => $recipientPhone,  // Single address, not array
-                    'senderAddress' => $senderPhone,
+                    'address' => $recipientPhone,
+                    'senderAddress' => $senderAddress,
                     'outboundSMSTextMessage' => [
                         'message' => $message
                     ]
                 ]
             ];
 
-            // Add senderName if provided
-            if ($senderId && $senderId !== $this->config->sender_id) {
+            // Add senderName if provided (e.g. "TICAFRIQUE")
+            // Use input senderId as name if it's different from the technical address
+            // OR if it's alphanumeric (which implies it's a name)
+            if ($senderId && $senderId !== $senderAddress && $senderId !== $this->config->sender_id) {
                 $payload['outboundSMSMessageRequest']['senderName'] = $senderId;
             }
 
@@ -109,7 +131,6 @@ class OrangeCIGateway implements SmsGatewayInterface
                 'http_code' => $httpCode,
                 'sent_at' => date('Y-m-d H:i:s')
             ];
-
         } catch (\Exception $e) {
             return [
                 'success' => false,
@@ -245,12 +266,16 @@ class OrangeCIGateway implements SmsGatewayInterface
      * Format phone number to Orange API format: tel:+XXXXXXXXXXXX
      *
      * @param string $number Phone number to format
-     * @return string Formatted phone number
+     * @return ?string Formatted phone number or null if invalid/alphanumeric
      */
-    private function formatPhoneNumber(string $number): string
+    private function formatPhoneNumber(string $number): ?string
     {
         // Remove all non-numeric characters except +
         $cleaned = preg_replace('/[^0-9+]/', '', $number);
+
+        if (empty($cleaned)) {
+            return null;
+        }
 
         // If already has tel: prefix, return as is
         if (strpos($number, 'tel:') === 0) {
@@ -261,7 +286,13 @@ class OrangeCIGateway implements SmsGatewayInterface
         if (substr($cleaned, 0, 1) !== '+') {
             $configuration = json_decode($this->config->configuration, true);
             $countryCode = $configuration['country_code'] ?? '+225';
-            $cleaned = $countryCode . ltrim($cleaned, '0'); // Remove leading 0 if present
+
+            // For Ivory Coast (+225), we should NOT remove the leading 0 for 10-digit numbers
+            if ($countryCode === '+225') {
+                $cleaned = $countryCode . $cleaned;
+            } else {
+                $cleaned = $countryCode . ltrim($cleaned, '0');
+            }
         }
 
         // Return in tel:+XXXXXXXXXXXX format

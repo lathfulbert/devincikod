@@ -92,15 +92,20 @@ class CronRunner
         if (!$this->loggingEnabled) return;
 
         try {
-            $sql = "INSERT INTO {$this->logTable} (task_class, status, output, duration, created_at) VALUES (?, ?, ?, ?, NOW())";
+            $taskId = $this->getOrCreateTaskId($task);
+            $durationMs = (int)($duration * 1000);
+
+            $sql = "INSERT INTO {$this->logTable} (task_id, started_at, finished_at, status, output, duration_ms)
+                    VALUES (?, NOW(), NOW(), ?, ?, ?)";
             $this->db->query($sql, [
-                get_class($task),
+                $taskId,
                 'success',
                 'Completed successfully',
-                $duration
+                $durationMs
             ]);
         } catch (\Throwable $e) {
             // Ignore logging errors
+            error_log("Failed to log cron success: " . $e->getMessage());
         }
     }
 
@@ -109,15 +114,55 @@ class CronRunner
         if (!$this->loggingEnabled) return;
 
         try {
-            $sql = "INSERT INTO {$this->logTable} (task_class, status, output, duration, created_at) VALUES (?, ?, ?, ?, NOW())";
+            $taskId = $this->getOrCreateTaskId($task);
+            $durationMs = (int)($duration * 1000);
+
+            $sql = "INSERT INTO {$this->logTable} (task_id, started_at, finished_at, status, error, duration_ms)
+                    VALUES (?, NOW(), NOW(), ?, ?, ?)";
             $this->db->query($sql, [
-                get_class($task),
+                $taskId,
                 'failed',
                 $e->getMessage(),
-                $duration
+                $durationMs
             ]);
         } catch (\Throwable $e) {
             // Ignore logging errors
+            error_log("Failed to log cron failure: " . $e->getMessage());
         }
+    }
+
+    /**
+     * Get or create task ID from cron_tasks table
+     */
+    private function getOrCreateTaskId(CronTaskContract $task): int
+    {
+        $className = get_class($task);
+
+        // Try to find existing task
+        $result = $this->db->query("SELECT id FROM cron_tasks WHERE class = ? LIMIT 1", [$className])->fetch();
+
+        if ($result) {
+            return (int)$result['id'];
+        }
+
+        // Extract module name and task name from class name
+        // Example: Modules\SmsCore\Cron\ProcessPendingSmsTask
+        $parts = explode('\\', $className);
+        $module = $parts[1] ?? 'Core'; // Get module name or default to 'Core'
+        $name = end($parts); // Get class name
+
+        // Create new task record
+        $this->db->query("
+            INSERT INTO cron_tasks (name, module, class, expression, description, enabled, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, 1, NOW(), NOW())
+        ", [
+            $name,
+            $module,
+            $className,
+            $task->expression(),
+            $task->description()
+        ]);
+
+        return (int)$this->db->lastInsertId();
     }
 }

@@ -50,6 +50,20 @@ class SmsCoreModule extends AbstractModule
             ['POST', '/admin/sms/pricing/update-country', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'updateCountry'], [$authMiddleware]],
             ['POST', '/admin/sms/pricing/delete-country', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'deleteCountry'], [$authMiddleware]],
             ['GET', '/admin/sms/billing', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'logs'], [$authMiddleware]],
+
+            // Sender Names Management
+            ['GET', '/sms/sender-names', [\Modules\SmsCore\Controllers\SenderNameController::class, 'index'], [$authMiddleware]],
+            ['GET', '/sms/sender-names/create', [\Modules\SmsCore\Controllers\SenderNameController::class, 'create'], [$authMiddleware]],
+            ['POST', '/sms/sender-names/store', [\Modules\SmsCore\Controllers\SenderNameController::class, 'store'], [$authMiddleware]],
+            ['GET', '/sms/sender-names/edit', [\Modules\SmsCore\Controllers\SenderNameController::class, 'edit'], [$authMiddleware]],
+            ['POST', '/sms/sender-names/update', [\Modules\SmsCore\Controllers\SenderNameController::class, 'update'], [$authMiddleware]],
+            ['POST', '/sms/sender-names/delete', [\Modules\SmsCore\Controllers\SenderNameController::class, 'delete'], [$authMiddleware]],
+            ['GET', '/sms/sender-names/assign-users', [\Modules\SmsCore\Controllers\SenderNameController::class, 'assignUsers'], [$authMiddleware]],
+            ['POST', '/sms/sender-names/save-assignments', [\Modules\SmsCore\Controllers\SenderNameController::class, 'saveAssignments'], [$authMiddleware]],
+            ['POST', '/sms/sender-names/bulk-assign-to-user', [\Modules\SmsCore\Controllers\SenderNameController::class, 'bulkAssignToUser'], [$authMiddleware]],
+
+            // Sender Names API
+            ['GET', '/api/sms/sender-names/user', [\Modules\SmsCore\Controllers\SenderNameController::class, 'apiGetUserSenderNames'], [$authMiddleware]],
         ];
     }
 
@@ -67,6 +81,7 @@ class SmsCoreModule extends AbstractModule
                     ['title' => 'Campaigns', 'url' => '/admin/sms/campaigns'],
                     ['title' => 'History', 'url' => '/admin/sms/history'],
                     ['title' => 'Statistics', 'url' => '/admin/sms/statistics'],
+                    ['title' => 'Sender Names', 'url' => '/sms/sender-names'],
                     ['title' => 'Tarification', 'url' => '/admin/sms/pricing'],
                     ['title' => 'Facturation', 'url' => '/admin/sms/billing'],
                     ['title' => 'API Keys', 'url' => '/admin/api-keys', 'icon' => 'key'],

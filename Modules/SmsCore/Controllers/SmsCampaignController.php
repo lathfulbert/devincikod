@@ -5,6 +5,7 @@ namespace Modules\SmsCore\Controllers;
 use App\Core\Application;
 use Modules\SmsCore\Models\SmsCampaign;
 use Modules\SmsCore\Models\SmsQueue;
+use Modules\SmsCore\Models\SenderName;
 use Modules\Contacts\Models\Contact;
 use Modules\Contacts\Services\FieldPersonalizationService;
 
@@ -42,10 +43,15 @@ class SmsCampaignController
         $contacts = Contact::query()->where('is_active', 1)->orderBy('first_name')->get();
         $placeholders = $this->personalizationService->getAvailablePlaceholders();
 
+        // Get user's sender names
+        $userId = $_SESSION['user']['id'] ?? null;
+        $senderNames = $userId ? SenderName::getForUser($userId) : [];
+
         echo view('smscore/sms/campaigns/create', [
             'title' => 'Nouvelle Campagne SMS',
             'contacts' => $contacts,
-            'placeholders' => $placeholders
+            'placeholders' => $placeholders,
+            'senderNames' => $senderNames
         ]);
     }
 
@@ -57,7 +63,9 @@ class SmsCampaignController
         try {
             $name = sanitize($_POST['name'] ?? '', 'string');
             $message = sanitize($_POST['message'] ?? '', 'string');
+            $senderNameId = (int)($_POST['sender_name_id'] ?? 0);
             $contactIds = $_POST['contact_ids'] ?? [];
+            $userId = $_SESSION['user_id'] ?? $_SESSION['user']['id'] ?? null;
 
             if (empty($name) || empty($message)) {
                 flash('error', 'Le nom et le message sont requis');
@@ -71,17 +79,36 @@ class SmsCampaignController
                 return;
             }
 
+            // Get and verify sender name
+            $senderName = null;
+            $sender = 'SMS';
+
+            if ($senderNameId) {
+                // Verify user has access to this sender name
+                if (!SenderName::userHasAccess($userId, $senderNameId)) {
+                    flash('error', 'Vous n\'avez pas accès à ce Sender Name');
+                    redirect('/admin/sms/campaigns/create');
+                    return;
+                }
+
+                $senderName = SenderName::find($senderNameId);
+                if ($senderName) {
+                    $sender = $senderName->name;
+                }
+            }
+
             // Create campaign
             $campaign = new SmsCampaign();
             $campaign->name = $name;
             $campaign->message = $message;
+            $campaign->sender_id = $sender;
             $campaign->contact_ids = json_encode($contactIds);
             $campaign->use_personalization = isset($_POST['use_personalization']) ? 1 : 0;
             $campaign->status = 'pending';
             $campaign->total_recipients = count($contactIds);
             $campaign->sent_count = 0;
             $campaign->failed_count = 0;
-            $campaign->created_by = $_SESSION['user_id'] ?? null;
+            $campaign->created_by = $userId;
             $campaign->save();
 
             // Queue messages for each contact
@@ -99,6 +126,7 @@ class SmsCampaignController
                 $queueItem->campaign_id = $campaign->id;
                 $queueItem->recipient = $contact->phone;
                 $queueItem->message = $personalizedMessage;
+                $queueItem->sender_id = $sender;
                 $queueItem->status = 'pending';
                 $queueItem->save();
             }
@@ -129,12 +157,17 @@ class SmsCampaignController
         $placeholders = $this->personalizationService->getAvailablePlaceholders();
         $selectedContactIds = json_decode($campaign->contact_ids ?? '[]', true);
 
+        // Get user's sender names
+        $userId = $_SESSION['user']['id'] ?? null;
+        $senderNames = $userId ? SenderName::getForUser($userId) : [];
+
         echo view('smscore/sms/campaigns/edit', [
             'title' => 'Modifier Campagne: ' . $campaign->name,
             'campaign' => $campaign,
             'contacts' => $contacts,
             'placeholders' => $placeholders,
-            'selectedContactIds' => $selectedContactIds
+            'selectedContactIds' => $selectedContactIds,
+            'senderNames' => $senderNames
         ]);
     }
 

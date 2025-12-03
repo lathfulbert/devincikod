@@ -5,6 +5,7 @@ namespace Modules\SmsCore\Controllers;
 use App\Core\Application;
 use Modules\Settings\Models\SmsGateway;
 use Modules\SmsCore\Models\SmsMessage;
+use Modules\SmsCore\Models\SenderName;
 use Modules\SmsCore\Services\SmsGatewayFactory;
 
 class SmsController
@@ -17,8 +18,27 @@ class SmsController
             // Process SMS sending
             $to = $_POST['to'] ?? '';
             $message = $_POST['message'] ?? '';
-            $sender = $_POST['sender'] ?? 'SMS';
+            $senderNameId = (int)($_POST['sender_name_id'] ?? 0);
             $gatewayCode = $_POST['gateway'] ?? 'auto';
+            $userId = $_SESSION['user']['id'] ?? null;
+
+            // Get sender name
+            $senderName = null;
+            $sender = 'SMS';
+
+            if ($senderNameId) {
+                // Verify user has access to this sender name
+                if (!SenderName::userHasAccess($userId, $senderNameId)) {
+                    $_SESSION['flash_error'] = 'Vous n\'avez pas accès à ce Sender Name';
+                    redirect('/admin/sms/send');
+                    exit;
+                }
+
+                $senderName = SenderName::find($senderNameId);
+                if ($senderName) {
+                    $sender = $senderName->name;
+                }
+            }
 
             try {
                 // Get gateway config
@@ -91,9 +111,14 @@ class SmsController
         // Get available gateways for dropdown
         $gateways = SmsGateway::where('is_active', 1)->get();
 
+        // Get user's sender names
+        $userId = $_SESSION['user']['id'] ?? null;
+        $senderNames = $userId ? SenderName::getForUser($userId) : [];
+
         echo view('smscore/sms/send', [
             'title' => 'Send SMS',
-            'gateways' => $gateways
+            'gateways' => $gateways,
+            'senderNames' => $senderNames
         ]);
     }
 
@@ -136,9 +161,28 @@ class SmsController
             try {
                 $campaignName = $_POST['campaign_name'] ?? 'Untitled Campaign';
                 $message = $_POST['message'] ?? '';
-                $sender = $_POST['sender'] ?? 'SMS';
+                $senderNameId = (int)($_POST['sender_name_id'] ?? 0);
                 $source = $_POST['source'] ?? 'manual';
                 $scheduledAt = $_POST['scheduled_at'] ?? null;
+                $userId = $_SESSION['user']['id'] ?? null;
+
+                // Get sender name
+                $senderName = null;
+                $sender = 'SMS';
+
+                if ($senderNameId) {
+                    // Verify user has access to this sender name
+                    if (!SenderName::userHasAccess($userId, $senderNameId)) {
+                        $_SESSION['flash_error'] = 'Vous n\'avez pas accès à ce Sender Name';
+                        redirect('/admin/sms/bulk');
+                        exit;
+                    }
+
+                    $senderName = SenderName::find($senderNameId);
+                    if ($senderName) {
+                        $sender = $senderName->name;
+                    }
+                }
 
                 // Parse recipients based on source
                 $recipients = [];
@@ -210,8 +254,13 @@ class SmsController
             }
         }
 
+        // Get user's sender names
+        $userId = $_SESSION['user']['id'] ?? null;
+        $senderNames = $userId ? SenderName::getForUser($userId) : [];
+
         echo view('smscore/sms/bulk', [
-            'title' => 'Send Bulk SMS'
+            'title' => 'Send Bulk SMS',
+            'senderNames' => $senderNames
         ]);
     }
 

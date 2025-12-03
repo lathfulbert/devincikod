@@ -73,7 +73,7 @@ class QueueManager
         $payload = JobSerializer::serialize($jobClass, $data);
         $payload['available_at'] = time();
 
-        return $this->driver->push($queue, ['payload' => $payload]);
+        return $this->driver->push($queue, $payload);
     }
 
     public function pushDelayed(string $jobClass, array $data, string $queue, int $delay): bool
@@ -81,7 +81,7 @@ class QueueManager
         $payload = JobSerializer::serialize($jobClass, $data);
         $payload['available_at'] = time() + $delay;
 
-        return $this->driver->push($queue, ['payload' => $payload]);
+        return $this->driver->push($queue, $payload);
     }
 
     public function getDriver(): QueueDriverContract
