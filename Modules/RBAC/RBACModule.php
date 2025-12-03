@@ -31,16 +31,16 @@ class RBACModule extends AbstractModule
         return [
             [
                 'type' => 'dropdown',
-                'title' => 'Rôles & Permissions',
+                'title' => __('rbac.roles.title') . ' & ' . __('rbac.permissions.title'),
                 'icon' => 'shield',
                 'children' => [
                     [
-                        'title' => 'Rôles',
+                        'title' => __('rbac.roles.list'),
                         'url' => '/admin/roles',
                         'permission' => 'admin.roles.view'
                     ],
                     [
-                        'title' => 'Permissions',
+                        'title' => __('rbac.permissions.list'),
                         'url' => '/admin/permissions',
                         'permission' => 'admin.permissions.view'
                     ]

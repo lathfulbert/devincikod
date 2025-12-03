@@ -99,16 +99,16 @@ class UsersModule implements ModuleContract
         return [
             [
                 'type' => 'dropdown',
-                'title' => 'Utilisateurs',
+                'title' => __('users.title'),
                 'icon' => 'users',
                 'children' => [
                     [
-                        'title' => 'Liste des utilisateurs',
+                        'title' => __('users.list'),
                         'url' => '/admin/users',
                         'permission' => 'admin.users.view'
                     ],
                     [
-                        'title' => 'Ajouter un utilisateur',
+                        'title' => __('users.create_user'),
                         'url' => '/admin/users/create',
                         'permission' => 'admin.users.create'
                     ]

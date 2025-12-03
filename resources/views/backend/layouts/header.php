@@ -28,8 +28,8 @@
     </div>
     <div class="nav-right col-xxl-7 col-xl-6 col-md-7 col-8 pull-right right-header p-0 ms-auto">
       <ul class="nav-menus">
-        
-        <li class="language-nav">
+
+        <li class="language-nav onhover-dropdown">
           <?php component('language-selector') ?>
         </li>
         <li> <span class="header-search">

@@ -23,61 +23,61 @@ class AdminModule extends AbstractModule
         return [
             [
                 'type' => 'link',
-                'title' => 'Dashboard',
+                'title' => __('admin.menu.dashboard'),
                 'icon' => 'home',
                 'url' => '/admin/dashboard',
                 'class' => 'link-nav'
             ],
             [
                 'type' => 'link',
-                'title' => 'Monitoring',
+                'title' => __('admin.menu.monitoring'),
                 'icon' => 'activity',
                 'url' => '/admin/monitoring',
                 'class' => 'link-nav'
             ],
             [
                 'type' => 'separator',
-                'label' => 'Gestion',
+                'label' => __('admin.menu.management'),
                 'class' => 'badge-light-primary'
             ],
             [
                 'type' => 'separator',
-                'label' => 'Système',
+                'label' => __('admin.menu.system'),
                 'class' => 'badge-light-secondary'
             ],
             [
                 'type' => 'dropdown',
-                'title' => 'Queue & Jobs',
+                'title' => __('admin.menu.queue_jobs'),
                 'icon' => 'activity',
                 'children' => [
-                    ['title' => 'Dashboard', 'url' => '/admin/queue'],
-                    ['title' => 'Active Jobs', 'url' => '/admin/queue/jobs'],
-                    ['title' => 'Failed Jobs', 'url' => '/admin/queue/failed'],
-                    ['title' => 'Statistics', 'url' => '/admin/queue/stats'],
+                    ['title' => __('admin.menu.dashboard'), 'url' => '/admin/queue'],
+                    ['title' => __('admin.menu.active_jobs'), 'url' => '/admin/queue/jobs'],
+                    ['title' => __('admin.menu.failed_jobs'), 'url' => '/admin/queue/failed'],
+                    ['title' => __('admin.menu.statistics'), 'url' => '/admin/queue/stats'],
                 ]
             ],
             [
                 'type' => 'dropdown',
-                'title' => 'Cron Tasks',
+                'title' => __('admin.menu.cron_tasks'),
                 'icon' => 'clock',
                 'children' => [
-                    ['title' => 'Tasks List', 'url' => '/admin/cron'],
-                    ['title' => 'Execution Logs', 'url' => '/admin/cron/logs'],
-                    ['title' => 'Statistics', 'url' => '/admin/cron/stats'],
+                    ['title' => __('admin.menu.tasks_list'), 'url' => '/admin/cron'],
+                    ['title' => __('admin.menu.execution_logs'), 'url' => '/admin/cron/logs'],
+                    ['title' => __('admin.menu.statistics'), 'url' => '/admin/cron/stats'],
                 ]
             ],
             [
                 'type' => 'dropdown',
-                'title' => 'Configuration',
+                'title' => __('admin.menu.configuration'),
                 'icon' => 'settings',
                 'children' => [
-                    ['title' => 'Modules', 'url' => '/admin/modules'],
-                    ['title' => 'Cache', 'url' => '/admin/cache'],
+                    ['title' => __('admin.menu.modules'), 'url' => '/admin/modules'],
+                    ['title' => __('admin.menu.cache'), 'url' => '/admin/cache'],
                 ]
             ],
             [
                 'type' => 'link',
-                'title' => 'Retour au site',
+                'title' => __('admin.menu.back_to_site'),
                 'icon' => 'external-link',
                 'url' => '/',
                 'class' => 'link-nav'

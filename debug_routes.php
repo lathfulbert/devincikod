@@ -1,19 +1,30 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require 'vendor/autoload.php';
+require 'Core/Support/helpers.php';
 
-use App\Core\Application;
-
-$app = new Application(dirname(__DIR__));
+$app = new \App\Core\Application(__DIR__);
 $app->boot();
 
-// DEBUG: Check how many routes are registered
-echo "Registered Routes: " . count($app->router->getRoutes()) . "\n";
-echo "Loaded Modules: " . count($app->moduleManager->getModules()) . "\n";
+echo "=== Debug Routes ===\n";
+$router = $app->router;
+$routes = $router->getRoutes();
+$found = false;
 
-// Show first 10 routes
-$routes = $app->router->getRoutes();
-echo "\nFirst 10 registered routes:\n";
-foreach (array_slice($routes, 0, 10) as $route) {
-    echo "  " . $route['method'] . " " . $route['path'] . "\n";
+foreach ($routes as $route) {
+    if ($route['path'] === '/admin/i18n/set-locale') {
+        $found = true;
+        echo "✅ FOUND: " . $route['path'] . " [" . $route['method'] . "]\n";
+    }
+}
+
+if (!$found) {
+    echo "❌ NOT FOUND: /admin/i18n/set-locale\n";
+}
+
+echo "\n=== Module Status ===\n";
+$moduleManager = $app->moduleManager;
+$modules = $moduleManager->getModules();
+foreach ($modules as $name => $module) {
+    echo "Module: $name\n";
 }

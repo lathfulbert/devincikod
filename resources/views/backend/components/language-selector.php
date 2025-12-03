@@ -1,56 +1,40 @@
 <?php
-// Charger la configuration des langues depuis le fichier centralisé
-$localeConfig = config('languages');
 
-// Si le fichier n'a pas été chargé, le charger manuellement
-if (empty($localeConfig)) {
-    $configFile = app()->getBasePath() . '/config/languages.php';
-    if (file_exists($configFile)) {
-        $localeConfig = require $configFile;
-        app()->config->set('languages', $localeConfig);
-    } else {
-        $localeConfig = [];
-    }
-}
+use App\Core\I18n\LanguageManager;
 
-$currentLocale = app_locale();
-$supportedLocales = supported_locales();
+$manager = LanguageManager::getInstance();
+$currentLocale = $manager->getLocale();
+$supportedLocales = $manager->getSupportedLocales();
 
-// Configuration de la langue courante avec fallback
-$currentConfig = $localeConfig[$currentLocale] ?? [
-    'name' => strtoupper($currentLocale),
-    'native_name' => strtoupper($currentLocale),
-    'flag' => 'flag-icon-us',
-    'short' => strtoupper($currentLocale)
+// Configuration des drapeaux
+$flags = [
+    'fr' => ['flag' => 'flag-icon-fr', 'name' => 'Français', 'short' => 'FR'],
+    'en' => ['flag' => 'flag-icon-us', 'name' => 'English', 'short' => 'EN'],
+    'ar' => ['flag' => 'flag-icon-ae', 'name' => 'لعربية', 'short' => 'AR'],
 ];
+
+$currentConfig = $flags[$currentLocale] ?? $flags['fr'];
 ?>
 
-
-
-<div class="translate_wrapper" style="position: relative; z-index: 1000;">
-    <div class="current_lang">
-        <div class="lang">
-            <i class="flag-icon <?= $currentConfig['flag'] ?>"></i>
-            <span class="lang-txt"><?= $currentConfig['short'] ?></span>
-        </div>
-    </div>
-    <div class="more_lang">
-        <?php foreach ($supportedLocales as $locale): ?>
-            <?php
-            $config = $localeConfig[$locale] ?? [
-                'name' => strtoupper($locale),
-                'flag' => 'flag-icon-us',
-                'short' => strtoupper($locale)
-            ];
-            $isSelected = ($locale === $currentLocale) ? 'selected' : '';
-            ?>
-            <div class="lang <?= $isSelected ?>" data-value="<?= $locale ?>" data-url="<?= url('?lang=' . $locale) ?>">
-                <i class="flag-icon <?= $config['flag'] ?>"></i>
-                <span class="lang-txt"><?= $config['name'] ?><?php if (isset($config['suffix'])): ?><span> <?= $config['suffix'] ?></span><?php endif; ?></span>
-            </div>
-        <?php endforeach; ?>
+<div class="media profile-media">
+    <div class="lang">
+        <i class="flag-icon <?= $currentConfig['flag'] ?>"></i>
+        <span class="lang-txt"><?= $currentConfig['short'] ?></span>
     </div>
 </div>
-
-<!-- Le script JavaScript est chargé dans le layout principal -->
-<!-- Voir: public/assets/js/i18n-language-selector.js -->
+<div class="onhover-show-div">
+    <ul class="profile-dropdown">
+        <?php foreach ($supportedLocales as $locale): ?>
+            <?php
+            $config = $flags[$locale] ?? ['flag' => 'flag-icon-us', 'name' => strtoupper($locale), 'short' => strtoupper($locale)];
+            $isSelected = ($locale === $currentLocale) ? 'selected' : '';
+            ?>
+            <li>
+                <a href="<?= url('/admin/i18n/set-locale?locale=' . $locale) ?>" class="<?= $isSelected ?>">
+                    <i class="flag-icon <?= $config['flag'] ?>"></i>
+                    <span><?= $config['name'] ?></span>
+                </a>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</div>

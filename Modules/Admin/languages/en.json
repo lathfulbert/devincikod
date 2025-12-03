@@ -1,0 +1,21 @@
+{
+  "admin": {
+    "menu": {
+      "dashboard": "Dashboard",
+      "monitoring": "Monitoring",
+      "management": "Management",
+      "system": "System",
+      "queue_jobs": "Queue & Jobs",
+      "active_jobs": "Active Jobs",
+      "failed_jobs": "Failed Jobs",
+      "statistics": "Statistics",
+      "cron_tasks": "Cron Tasks",
+      "tasks_list": "Tasks List",
+      "execution_logs": "Execution Logs",
+      "configuration": "Configuration",
+      "modules": "Modules",
+      "cache": "Cache",
+      "back_to_site": "Back to Site"
+    }
+  }
+}

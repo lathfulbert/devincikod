@@ -204,7 +204,11 @@ if (!function_exists('redirect')) {
      */
     function redirect(string $path): void
     {
-        header('Location: ' . url($path));
+        if (preg_match('/^https?:\/\//', $path)) {
+            header('Location: ' . $path);
+        } else {
+            header('Location: ' . url($path));
+        }
         exit;
     }
 }

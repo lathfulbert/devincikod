@@ -342,4 +342,22 @@ class I18nController
 
         unset($current[$lastKey]);
     }
+    /**
+     * Set the application locale.
+     */
+    public function setLocale(): void
+    {
+        $locale = $_GET['locale'] ?? null;
+
+        if ($locale && $this->manager->isLocaleSupported($locale)) {
+            $this->manager->setLocale($locale);
+            flash('success', 'Langue changée avec succès.');
+        } else {
+            flash('danger', 'Langue non supportée.');
+        }
+
+        // Redirect back
+        $referer = $_SERVER['HTTP_REFERER'] ?? '/';
+        redirect($referer);
+    }
 }

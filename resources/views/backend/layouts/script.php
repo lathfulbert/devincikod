@@ -27,8 +27,10 @@
  <!-- Theme js-->
  <script src="<?= url() ?>/assets/js/script.js"></script>
  <!-- I18n Language Selector js-->
- <script src="<?= url() ?>/assets/js/i18n-language-selector.js"></script>
+
  <script src="<?= url() ?>/assets/js/theme-customizer/customizer.js"></script>
  <!-- login js-->
  <!-- Plugin used-->
- <script>new WOW().init();</script>
+ <script>
+     new WOW().init();
+ </script>
