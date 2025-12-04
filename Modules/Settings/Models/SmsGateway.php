@@ -21,6 +21,10 @@ class SmsGateway extends Model
         'is_default',
         'priority',
         'configuration',
+        'rate_limit_per_minute',
+        'rate_limit_per_hour',
+        'rate_limit_per_day',
+        'rate_limit_enabled',
         'created_by',
         'updated_by'
     ];
@@ -28,6 +32,10 @@ class SmsGateway extends Model
     protected array $casts = [
         'is_active' => 'boolean',
         'is_default' => 'boolean',
+        'rate_limit_enabled' => 'boolean',
+        'rate_limit_per_minute' => 'integer',
+        'rate_limit_per_hour' => 'integer',
+        'rate_limit_per_day' => 'integer',
         'priority' => 'integer',
         'configuration' => 'json'
     ];

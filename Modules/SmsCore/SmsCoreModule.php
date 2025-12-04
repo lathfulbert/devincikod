@@ -28,6 +28,8 @@ class SmsCoreModule extends AbstractModule
             // SMS Management
             ['GET', '/admin/sms/send', [\Modules\SmsCore\Controllers\SmsController::class, 'send'], [$authMiddleware]],
             ['POST', '/admin/sms/send', [\Modules\SmsCore\Controllers\SmsController::class, 'send'], [$authMiddleware]],
+            ['POST', '/admin/sms/send-bulk', [\Modules\SmsCore\Controllers\SmsController::class, 'sendBulk'], [$authMiddleware]],
+            ['GET', '/admin/sms/download-template', [\Modules\SmsCore\Controllers\SmsController::class, 'downloadTemplate'], [$authMiddleware]],
             ['GET', '/admin/sms/history', [\Modules\SmsCore\Controllers\SmsController::class, 'history'], [$authMiddleware]],
             ['GET', '/admin/sms/details/{id}', [\Modules\SmsCore\Controllers\SmsController::class, 'details'], [$authMiddleware]],
             ['GET', '/admin/sms/bulk', [\Modules\SmsCore\Controllers\SmsController::class, 'bulk'], [$authMiddleware]],
@@ -50,6 +52,10 @@ class SmsCoreModule extends AbstractModule
             ['POST', '/admin/sms/pricing/update-country', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'updateCountry'], [$authMiddleware]],
             ['POST', '/admin/sms/pricing/delete-country', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'deleteCountry'], [$authMiddleware]],
             ['GET', '/admin/sms/billing', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'logs'], [$authMiddleware]],
+
+            // Wallet
+            ['GET', '/admin/wallet/topup', [\Modules\SmsCore\Controllers\WalletController::class, 'topup'], [$authMiddleware]],
+            ['POST', '/admin/wallet/process-topup', [\Modules\SmsCore\Controllers\WalletController::class, 'processTopup'], [$authMiddleware]],
 
             // Sender Names Management
             ['GET', '/sms/sender-names', [\Modules\SmsCore\Controllers\SenderNameController::class, 'index'], [$authMiddleware]],

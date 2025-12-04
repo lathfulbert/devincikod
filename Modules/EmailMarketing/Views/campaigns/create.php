@@ -38,14 +38,14 @@
                         <div class="form-group">
                             <label for="name">Campaign Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="name" name="name" required
-                                   placeholder="Enter campaign name">
+                                placeholder="Enter campaign name">
                             <small class="form-text text-muted">Internal name for identifying this campaign</small>
                         </div>
 
                         <div class="form-group">
                             <label for="subject">Email Subject <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="subject" name="subject" required
-                                   placeholder="Enter email subject">
+                                placeholder="Enter email subject">
                             <small class="form-text text-muted">The subject line recipients will see</small>
                         </div>
 
@@ -65,12 +65,12 @@
                         <div class="form-group">
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" class="custom-control-input" id="use_personalization"
-                                       name="use_personalization" value="1">
+                                    name="use_personalization" value="1">
                                 <label class="custom-control-label" for="use_personalization">
                                     Enable Personalization
                                 </label>
                             </div>
-                            <small class="form-text text-muted">Allow variable substitution like {{first_name}}</small>
+                            <small class="form-text text-muted">Allow variable substitution like &#123;&#123;first_name&#125;&#125;</small>
                         </div>
                     </div>
                 </div>
@@ -83,21 +83,21 @@
                         <div class="form-group">
                             <label for="from_name">From Name</label>
                             <input type="text" class="form-control" id="from_name" name="from_name"
-                                   placeholder="e.g., John Doe">
+                                placeholder="e.g., John Doe">
                             <small class="form-text text-muted">Leave empty to use default from settings</small>
                         </div>
 
                         <div class="form-group">
                             <label for="from_email">From Email</label>
                             <input type="email" class="form-control" id="from_email" name="from_email"
-                                   placeholder="e.g., john@example.com">
+                                placeholder="e.g., john@example.com">
                             <small class="form-text text-muted">Leave empty to use default from settings</small>
                         </div>
 
                         <div class="form-group">
                             <label for="reply_to">Reply-To Email</label>
                             <input type="email" class="form-control" id="reply_to" name="reply_to"
-                                   placeholder="e.g., support@example.com">
+                                placeholder="e.g., support@example.com">
                             <small class="form-text text-muted">Where replies will be sent</small>
                         </div>
                     </div>

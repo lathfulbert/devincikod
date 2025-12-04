@@ -10,18 +10,42 @@ class DashboardController
     {
         $app = Application::getInstance();
 
-        // Mock statistics for now
+        // Get real statistics from database
+        $totalMessages = \Modules\SmsCore\Models\SmsMessage::count();
+
+        $messagesToday = \Modules\SmsCore\Models\SmsMessage::where('created_at', '>=', date('Y-m-d 00:00:00'))
+            ->count();
+
+        $sentMessages = \Modules\SmsCore\Models\SmsMessage::where('status', 'sent')->count();
+        $successRate = $totalMessages > 0 ? round(($sentMessages / $totalMessages) * 100, 1) : 0;
+
+        // Get recent messages
+        $recentMessages = \Modules\SmsCore\Models\SmsMessage::orderBy('created_at', 'DESC')
+            ->limit(10)
+            ->get();
+
+        // Calculate total cost manually (QueryBuilder doesn't have sum())
+        $allMessages = \Modules\SmsCore\Models\SmsMessage::all();
+        $totalCost = 0;
+        foreach ($allMessages as $msg) {
+            $totalCost += $msg->cost ?? 0.03; // Default 0.03 if cost not set
+        }
+
+        // Wallet balance (você pode adaptar conforme seu sistema)
+        $walletBalance = 500.00; // TODO: Implementar sistema de wallet real
+
         $stats = [
-            'total_messages' => 1250,
-            'messages_today' => 85,
-            'success_rate' => 98.5,
-            'total_credits_used' => 156.75,
-            'active_gateways' => 2,
-            'wallet_balance' => 500.00
+            'total_messages' => $totalMessages,
+            'messages_today' => $messagesToday,
+            'success_rate' => $successRate,
+            'total_credits_used' => $totalCost,
+            'active_gateways' => \Modules\Settings\Models\SmsGateway::where('is_active', 1)->count(),
+            'wallet_balance' => $walletBalance
         ];
 
         echo view('smscore/sms/dashboard', [
             'stats' => $stats,
+            'recentMessages' => $recentMessages,
             'title' => 'SMS Dashboard'
         ]);
     }

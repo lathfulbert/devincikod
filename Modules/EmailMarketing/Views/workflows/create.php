@@ -38,13 +38,13 @@
                         <div class="form-group">
                             <label for="name">Workflow Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="name" name="name" required
-                                   placeholder="Enter workflow name">
+                                placeholder="Enter workflow name">
                         </div>
 
                         <div class="form-group">
                             <label for="description">Description</label>
                             <textarea class="form-control" id="description" name="description" rows="3"
-                                      placeholder="Describe what this workflow does"></textarea>
+                                placeholder="Describe what this workflow does"></textarea>
                         </div>
 
                         <div class="form-group">
@@ -181,7 +181,7 @@
                         <div class="form-group">
                             <label>SMS Message</label>
                             <textarea class="form-control" name="step[${stepCounter - 1}][message]" rows="3"
-                                      placeholder="Enter SMS message (supports variables like {{first_name}})"></textarea>
+                                      placeholder="Enter SMS message (supports variables like &#123;&#123;first_name&#125;&#125;)"></textarea>
                         </div>
                     </div>
 

@@ -38,20 +38,20 @@
                         <div class="form-group">
                             <label for="name">Template Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="name" name="name" required
-                                   placeholder="Enter template name">
+                                placeholder="Enter template name">
                         </div>
 
                         <div class="form-group">
                             <label for="description">Description</label>
                             <input type="text" class="form-control" id="description" name="description"
-                                   placeholder="Brief description of this template">
+                                placeholder="Brief description of this template">
                         </div>
 
                         <div class="form-group">
                             <label for="html_content">HTML Content <span class="text-danger">*</span></label>
                             <div class="alert alert-info">
                                 <small>
-                                    <strong>Tip:</strong> Use variables like <code>{{first_name}}</code>, <code>{{last_name}}</code>, <code>{{email}}</code> for personalization.
+                                    <strong>Tip:</strong> Use variables like <code>&#123;&#123;first_name&#125;&#125;</code>, <code>&#123;&#123;last_name&#125;&#125;</code>, <code>&#123;&#123;email&#125;&#125;</code> for personalization.
                                 </small>
                             </div>
                             <textarea id="html_content" name="html_content" class="form-control"></textarea>
@@ -82,7 +82,7 @@
                         <div class="form-group">
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" class="custom-control-input" id="is_active"
-                                       name="is_active" value="1" checked>
+                                    name="is_active" value="1" checked>
                                 <label class="custom-control-label" for="is_active">
                                     Active
                                 </label>
@@ -100,15 +100,15 @@
                         <p class="text-muted small">Start with a basic template:</p>
                         <div class="d-grid gap-2">
                             <button type="button" class="btn btn-sm btn-outline-primary btn-block mb-2"
-                                    onclick="loadBasicTemplate()">
+                                onclick="loadBasicTemplate()">
                                 <i data-feather="file-text"></i> Basic Newsletter
                             </button>
                             <button type="button" class="btn btn-sm btn-outline-success btn-block mb-2"
-                                    onclick="loadPromoTemplate()">
+                                onclick="loadPromoTemplate()">
                                 <i data-feather="tag"></i> Promotional
                             </button>
                             <button type="button" class="btn btn-sm btn-outline-info btn-block"
-                                    onclick="loadWelcomeTemplate()">
+                                onclick="loadWelcomeTemplate()">
                                 <i data-feather="smile"></i> Welcome Email
                             </button>
                         </div>
@@ -152,7 +152,7 @@
                 onAction: function() {
                     const variable = prompt('Enter variable name (e.g., first_name):');
                     if (variable) {
-                        editor.insertContent('{{' + variable + '}}');
+                        editor.insertContent('{' + '{' + variable + '}' + '}');
                     }
                 }
             });
@@ -171,7 +171,7 @@
 </head>
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
     <div style="background-color: #f4f4f4; padding: 20px; text-align: center;">
-        <h1 style="color: #333;">Hello {{first_name}}!</h1>
+        <h1 style="color: #333;">Hello &#123;&#123;first_name&#125;&#125;!</h1>
     </div>
     <div style="padding: 20px; background-color: #fff;">
         <h2>Welcome to Our Newsletter</h2>
@@ -197,7 +197,7 @@
 </head>
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; text-align: center; color: white;">
-        <h1 style="margin: 0; font-size: 32px;">🎉 Special Offer Just For You, {{first_name}}!</h1>
+        <h1 style="margin: 0; font-size: 32px;">🎉 Special Offer Just For You, &#123;&#123;first_name&#125;&#125;!</h1>
         <p style="font-size: 18px; margin: 10px 0;">Limited Time: 50% OFF</p>
     </div>
     <div style="padding: 30px; background-color: #fff;">
@@ -225,7 +225,7 @@
 </head>
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
     <div style="text-align: center; padding: 40px 20px; background-color: #f8f9fa;">
-        <h1 style="color: #28a745; margin: 0;">👋 Welcome, {{first_name}}!</h1>
+        <h1 style="color: #28a745; margin: 0;">👋 Welcome, &#123;&#123;first_name&#125;&#125;!</h1>
         <p style="font-size: 18px; color: #666;">We're thrilled to have you on board</p>
     </div>
     <div style="padding: 30px; background-color: #fff;">

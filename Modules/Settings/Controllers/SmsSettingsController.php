@@ -51,7 +51,12 @@ class SmsSettingsController
             'sender_id' => $_POST['sender_id'] ?? '',
             'is_active' => isset($_POST['is_active']) ? (bool)$_POST['is_active'] : false,
             'priority' => (int)($_POST['priority'] ?? 0),
-            'configuration' => json_encode($_POST['configuration'] ?? [])
+            'configuration' => json_encode($_POST['configuration'] ?? []),
+            // Rate limiting fields
+            'rate_limit_enabled' => isset($_POST['rate_limit_enabled']) ? (bool)$_POST['rate_limit_enabled'] : true,
+            'rate_limit_per_minute' => (int)($_POST['rate_limit_per_minute'] ?? 60),
+            'rate_limit_per_hour' => (int)($_POST['rate_limit_per_hour'] ?? 1000),
+            'rate_limit_per_day' => (int)($_POST['rate_limit_per_day'] ?? 10000)
         ];
 
         if (SmsGateway::create($data)) {
@@ -100,6 +105,11 @@ class SmsSettingsController
             'sender_id' => $_POST['sender_id'] ?? $gateway->sender_id,
             'is_active' => isset($_POST['is_active']) ? (bool)$_POST['is_active'] : $gateway->is_active,
             'priority' => (int)($_POST['priority'] ?? $gateway->priority),
+            // Rate limiting fields
+            'rate_limit_enabled' => isset($_POST['rate_limit_enabled']) ? (bool)$_POST['rate_limit_enabled'] : false,
+            'rate_limit_per_minute' => (int)($_POST['rate_limit_per_minute'] ?? $gateway->rate_limit_per_minute),
+            'rate_limit_per_hour' => (int)($_POST['rate_limit_per_hour'] ?? $gateway->rate_limit_per_hour),
+            'rate_limit_per_day' => (int)($_POST['rate_limit_per_day'] ?? $gateway->rate_limit_per_day)
         ];
 
         // Only update API credentials if provided

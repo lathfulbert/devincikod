@@ -30,31 +30,35 @@ class CampaignAnalyticsService
         $messages = $query->get();
 
         return [
-            'total_sent' => count(array_filter($messages, fn($m) => $m->status !== 'pending')),
-            'total_delivered' => count(array_filter($messages, fn($m) => $m->status === 'delivered')),
-            'total_opened' => count(array_filter($messages, fn($m) => $m->status === 'opened')),
-            'total_clicked' => count(array_filter($messages, fn($m) => $m->status === 'clicked')),
-            'total_bounced' => count(array_filter($messages, fn($m) => $m->status === 'bounced')),
-            'total_failed' => count(array_filter($messages, fn($m) => $m->status === 'failed')),
+            'total_emails' => count($messages),
+            'sent' => count(array_filter($messages, fn($m) => $m->status !== 'pending')),
+            'delivered' => count(array_filter($messages, fn($m) => $m->status === 'delivered')),
+            'opened' => count(array_filter($messages, fn($m) => $m->status === 'opened')),
+            'clicked' => count(array_filter($messages, fn($m) => $m->status === 'clicked')),
+            'bounced' => count(array_filter($messages, fn($m) => $m->status === 'bounced')),
+            'failed' => count(array_filter($messages, fn($m) => $m->status === 'failed')),
+            'unsubscribed' => count(array_filter($messages, fn($m) => $m->status === 'unsubscribed')),
 
-            'rates' => [
-                'delivery_rate' => $this->calculateRate(
-                    count(array_filter($messages, fn($m) => $m->status === 'delivered')),
-                    count(array_filter($messages, fn($m) => $m->status !== 'pending'))
-                ),
-                'open_rate' => $this->calculateRate(
-                    count(array_filter($messages, fn($m) => $m->status === 'opened')),
-                    count(array_filter($messages, fn($m) => $m->status === 'delivered'))
-                ),
-                'click_rate' => $this->calculateRate(
-                    count(array_filter($messages, fn($m) => $m->status === 'clicked')),
-                    count(array_filter($messages, fn($m) => $m->status === 'delivered'))
-                ),
-                'bounce_rate' => $this->calculateRate(
-                    count(array_filter($messages, fn($m) => $m->status === 'bounced')),
-                    count(array_filter($messages, fn($m) => $m->status !== 'pending'))
-                )
-            ],
+            'delivery_rate' => $this->calculateRate(
+                count(array_filter($messages, fn($m) => $m->status === 'delivered')),
+                count(array_filter($messages, fn($m) => $m->status !== 'pending'))
+            ),
+            'open_rate' => $this->calculateRate(
+                count(array_filter($messages, fn($m) => $m->status === 'opened')),
+                count(array_filter($messages, fn($m) => $m->status === 'delivered'))
+            ),
+            'click_rate' => $this->calculateRate(
+                count(array_filter($messages, fn($m) => $m->status === 'clicked')),
+                count(array_filter($messages, fn($m) => $m->status === 'delivered'))
+            ),
+            'bounce_rate' => $this->calculateRate(
+                count(array_filter($messages, fn($m) => $m->status === 'bounced')),
+                count(array_filter($messages, fn($m) => $m->status !== 'pending'))
+            ),
+            'unsubscribe_rate' => $this->calculateRate(
+                count(array_filter($messages, fn($m) => $m->status === 'unsubscribed')),
+                count(array_filter($messages, fn($m) => $m->status !== 'pending'))
+            ),
 
             'total_cost' => array_sum(array_map(fn($m) => $m->cost ?? 0, $messages))
         ];
@@ -297,19 +301,88 @@ class CampaignAnalyticsService
     }
 
     /**
+     * Obtenir l'évolution temporelle globale (par jour/heure)
+     */
+    public function getGlobalTimeSeriesData(string $interval = 'day', array $filters = []): array
+    {
+        $query = CampaignLog::whereNotNull('created_at')->orderBy('created_at');
+
+        if (isset($filters['start_date'])) {
+            $query->where('created_at', '>=', $filters['start_date']);
+        }
+        if (isset($filters['end_date'])) {
+            $query->where('created_at', '<=', $filters['end_date']);
+        }
+
+        $logs = $query->get();
+        $series = [];
+
+        foreach ($logs as $log) {
+            $timestamp = $log->created_at;
+
+            if ($interval === 'hour') {
+                $key = date('Y-m-d H:00', strtotime($timestamp));
+            } else {
+                $key = date('Y-m-d', strtotime($timestamp));
+            }
+
+            if (!isset($series[$key])) {
+                $series[$key] = [
+                    'sent' => 0,
+                    'delivered' => 0,
+                    'opened' => 0,
+                    'clicked' => 0,
+                    'failed' => 0
+                ];
+            }
+
+            $series[$key]['sent']++;
+
+            if ($log->status === 'delivered') $series[$key]['delivered']++;
+            if ($log->status === 'opened') $series[$key]['opened']++;
+            if ($log->status === 'clicked') $series[$key]['clicked']++;
+            if ($log->status === 'failed') $series[$key]['failed']++;
+        }
+
+        // Format for Chart.js
+        $labels = array_keys($series);
+        sort($labels);
+
+        $chartData = [
+            'labels' => $labels,
+            'sent' => [],
+            'delivered' => [],
+            'opened' => [],
+            'clicked' => [],
+            'failed' => []
+        ];
+
+        foreach ($labels as $label) {
+            $data = $series[$label];
+            $chartData['sent'][] = $data['sent'];
+            $chartData['delivered'][] = $data['delivered'];
+            $chartData['opened'][] = $data['opened'];
+            $chartData['clicked'][] = $data['clicked'];
+            $chartData['failed'][] = $data['failed'];
+        }
+
+        return $chartData;
+    }
+
+    /**
      * Obtenir l'évolution temporelle (par jour/heure)
      */
     public function getTimeSeriesData(int $campaignId, string $interval = 'day'): array
     {
         $logs = CampaignLog::where('campaign_id', $campaignId)
-            ->whereNotNull('sent_at')
-            ->orderBy('sent_at')
+            ->whereNotNull('created_at')
+            ->orderBy('created_at')
             ->get();
 
         $series = [];
 
         foreach ($logs as $log) {
-            $timestamp = $log->sent_at;
+            $timestamp = $log->created_at;
 
             if ($interval === 'hour') {
                 $key = date('Y-m-d H:00', strtotime($timestamp));

@@ -40,15 +40,15 @@
                         <div class="form-group">
                             <label for="name">Template Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="name" name="name" required
-                                   value="<?= htmlspecialchars($template->name) ?>"
-                                   placeholder="Enter template name">
+                                value="<?= htmlspecialchars($template->name) ?>"
+                                placeholder="Enter template name">
                         </div>
 
                         <div class="form-group">
                             <label for="description">Description</label>
                             <input type="text" class="form-control" id="description" name="description"
-                                   value="<?= htmlspecialchars($template->description ?? '') ?>"
-                                   placeholder="Brief description of this template">
+                                value="<?= htmlspecialchars($template->description ?? '') ?>"
+                                placeholder="Brief description of this template">
                         </div>
 
                         <div class="form-group">
@@ -61,11 +61,11 @@
                                     if (!empty($variables)):
                                         foreach ($variables as $var):
                                     ?>
-                                        <code class="badge badge-light">{{<?= htmlspecialchars($var) ?>}}</code>
-                                    <?php
+                                            <code class="badge badge-light">&#123;&#123;<?= htmlspecialchars($var) ?>&#125;&#125;</code>
+                                        <?php
                                         endforeach;
                                     else:
-                                    ?>
+                                        ?>
                                         <span class="text-muted">No variables found</span>
                                     <?php endif; ?>
                                 </small>
@@ -98,7 +98,7 @@
                         <div class="form-group">
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" class="custom-control-input" id="is_active"
-                                       name="is_active" value="1" <?= $template->is_active ? 'checked' : '' ?>>
+                                    name="is_active" value="1" <?= $template->is_active ? 'checked' : '' ?>>
                                 <label class="custom-control-label" for="is_active">
                                     Active
                                 </label>
@@ -130,16 +130,16 @@
                     </div>
                     <div class="card-body">
                         <a href="<?= url('/admin/email-marketing/templates/' . $template->id . '/preview') ?>"
-                           class="btn btn-info btn-block mb-2" target="_blank">
+                            class="btn btn-info btn-block mb-2" target="_blank">
                             <i data-feather="eye"></i> Preview
                         </a>
                         <button type="button" class="btn btn-primary btn-block mb-2"
-                                data-toggle="modal" data-target="#testModal">
+                            data-toggle="modal" data-target="#testModal">
                             <i data-feather="send"></i> Send Test
                         </button>
                         <form method="POST"
-                              action="<?= url('/admin/email-marketing/templates/' . $template->id . '/duplicate') ?>"
-                              style="display: inline; width: 100%;">
+                            action="<?= url('/admin/email-marketing/templates/' . $template->id . '/duplicate') ?>"
+                            style="display: inline; width: 100%;">
                             <button type="submit" class="btn btn-success btn-block mb-2">
                                 <i data-feather="copy"></i> Duplicate
                             </button>
@@ -177,7 +177,7 @@
                     <div class="form-group">
                         <label for="test_email">Recipient Email</label>
                         <input type="email" class="form-control" id="test_email" name="test_email" required
-                               placeholder="Enter test email address">
+                            placeholder="Enter test email address">
                     </div>
 
                     <?php if (!empty($variables)): ?>
@@ -190,7 +190,7 @@
                         <div class="form-group">
                             <label>Test Data (JSON)</label>
                             <textarea class="form-control" name="test_data" rows="4"
-                                      placeholder='{"first_name": "John", "last_name": "Doe"}'></textarea>
+                                placeholder='{"first_name": "John", "last_name": "Doe"}'></textarea>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -227,7 +227,7 @@
                 onAction: function() {
                     const variable = prompt('Enter variable name (e.g., first_name):');
                     if (variable) {
-                        editor.insertContent('{{' + variable + '}}');
+                        editor.insertContent('{' + '{' + variable + '}' + '}');
                     }
                 }
             });

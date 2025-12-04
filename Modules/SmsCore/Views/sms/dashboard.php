@@ -146,20 +146,48 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><?= date('H:i:s') ?></td>
-                                    <td>+1234567890</td>
-                                    <td><span class="badge badge-primary">Infobip</span></td>
-                                    <td><span class="badge badge-success">Delivered</span></td>
-                                    <td>$0.03</td>
-                                </tr>
-                                <tr>
-                                    <td><?= date('H:i:s', strtotime('-5 minutes')) ?></td>
-                                    <td>+0987654321</td>
-                                    <td><span class="badge badge-info">OrangeSMS</span></td>
-                                    <td><span class="badge badge-warning">Sent</span></td>
-                                    <td>$0.04</td>
-                                </tr>
+                                <?php if (isset($recentMessages) && count($recentMessages) > 0): ?>
+                                    <?php foreach ($recentMessages as $msg): ?>
+                                        <tr>
+                                            <td><?= date('d/m/Y H:i', strtotime($msg->created_at)) ?></td>
+                                            <td><?= htmlspecialchars(substr($msg->to, 0, 8)) ?>***</td>
+                                            <td>
+                                                <span class="badge badge-primary">
+                                                    <?= htmlspecialchars($msg->gateway ?? 'N/A') ?>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <?php
+                                                $statusClass = 'secondary';
+                                                $statusText = ucfirst($msg->status);
+                                                switch($msg->status) {
+                                                    case 'sent':
+                                                    case 'delivered':
+                                                        $statusClass = 'success';
+                                                        break;
+                                                    case 'failed':
+                                                        $statusClass = 'danger';
+                                                        break;
+                                                    case 'pending':
+                                                        $statusClass = 'warning';
+                                                        break;
+                                                }
+                                                ?>
+                                                <span class="badge badge-<?= $statusClass ?>">
+                                                    <?= htmlspecialchars($statusText) ?>
+                                                </span>
+                                            </td>
+                                            <td>$<?= number_format($msg->cost ?? 0.03, 2) ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                            <i data-feather="inbox"></i>
+                                            Aucune activité récente
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>

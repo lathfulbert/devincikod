@@ -79,6 +79,45 @@
                             <small class="text-muted">Plus élevé = plus de priorité (failover)</small>
                         </div>
 
+                        <hr class="my-4">
+                        <h6 class="mb-3"><i data-feather="zap"></i> Limites d'Envoi (Rate Limiting)</h6>
+
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="rate_limit_enabled" name="rate_limit_enabled" value="1" checked>
+                                <label class="form-check-label" for="rate_limit_enabled">
+                                    Activer les limites d'envoi
+                                </label>
+                            </div>
+                            <small class="text-muted">Protection contre le dépassement des quotas du provider</small>
+                        </div>
+
+                        <div class="row" id="rate_limit_fields">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="rate_limit_per_minute" class="form-label">SMS / Minute</label>
+                                    <input type="number" class="form-control" id="rate_limit_per_minute" name="rate_limit_per_minute" value="60" min="1">
+                                    <small class="text-muted">Max par minute</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="rate_limit_per_hour" class="form-label">SMS / Heure</label>
+                                    <input type="number" class="form-control" id="rate_limit_per_hour" name="rate_limit_per_hour" value="1000" min="1">
+                                    <small class="text-muted">Max par heure</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="rate_limit_per_day" class="form-label">SMS / Jour</label>
+                                    <input type="number" class="form-control" id="rate_limit_per_day" name="rate_limit_per_day" value="10000" min="1">
+                                    <small class="text-muted">Max par jour</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
                         <div class="mb-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" checked>
@@ -87,6 +126,12 @@
                                 </label>
                             </div>
                         </div>
+
+                        <script>
+                            document.getElementById('rate_limit_enabled').addEventListener('change', function() {
+                                document.getElementById('rate_limit_fields').style.display = this.checked ? 'flex' : 'none';
+                            });
+                        </script>
 
                         <div class="mt-4">
                             <button type="submit" class="btn btn-primary">

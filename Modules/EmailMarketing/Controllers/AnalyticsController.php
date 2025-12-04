@@ -26,7 +26,13 @@ class AnalyticsController
     public function index()
     {
         // Statistiques globales
-        $globalStats = $this->analyticsService->getGlobalEmailStats([
+        $stats = $this->analyticsService->getGlobalEmailStats([
+            'start_date' => date('Y-m-d', strtotime('-30 days')),
+            'end_date' => date('Y-m-d')
+        ]);
+
+        // Chart Data
+        $chartData = $this->analyticsService->getGlobalTimeSeriesData('day', [
             'start_date' => date('Y-m-d', strtotime('-30 days')),
             'end_date' => date('Y-m-d')
         ]);
@@ -43,7 +49,8 @@ class AnalyticsController
 
         echo view('emailmarketing/analytics/index', [
             'title' => 'Email Marketing Analytics',
-            'globalStats' => $globalStats,
+            'stats' => $stats,
+            'chartData' => $chartData,
             'topByOpenRate' => $topByOpenRate,
             'topByClickRate' => $topByClickRate,
             'campaigns' => $campaigns

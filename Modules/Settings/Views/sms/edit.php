@@ -80,6 +80,63 @@
                                 value="<?= $gateway->priority ?>" min="0" max="100">
                         </div>
 
+                        <hr class="my-4">
+                        <h6 class="mb-3"><i data-feather="zap"></i> Limites d'Envoi (Rate Limiting)</h6>
+
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="rate_limit_enabled" name="rate_limit_enabled"
+                                    value="1" <?= ($gateway->rate_limit_enabled ?? true) ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="rate_limit_enabled">
+                                    Activer les limites d'envoi
+                                </label>
+                            </div>
+                            <small class="text-muted">Protection contre le dépassement des quotas du provider</small>
+                        </div>
+
+                        <div class="row" id="rate_limit_fields">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="rate_limit_per_minute" class="form-label">SMS / Minute</label>
+                                    <input type="number" class="form-control" id="rate_limit_per_minute" name="rate_limit_per_minute"
+                                        value="<?= $gateway->rate_limit_per_minute ?? 60 ?>" min="1">
+                                    <small class="text-muted">Max par minute</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="rate_limit_per_hour" class="form-label">SMS / Heure</label>
+                                    <input type="number" class="form-control" id="rate_limit_per_hour" name="rate_limit_per_hour"
+                                        value="<?= $gateway->rate_limit_per_hour ?? 1000 ?>" min="1">
+                                    <small class="text-muted">Max par heure</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="rate_limit_per_day" class="form-label">SMS / Jour</label>
+                                    <input type="number" class="form-control" id="rate_limit_per_day" name="rate_limit_per_day"
+                                        value="<?= $gateway->rate_limit_per_day ?? 10000 ?>" min="1">
+                                    <small class="text-muted">Max par jour</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                var checkbox = document.getElementById('rate_limit_enabled');
+                                var fields = document.getElementById('rate_limit_fields');
+
+                                function toggleFields() {
+                                    fields.style.display = checkbox.checked ? 'flex' : 'none';
+                                }
+
+                                checkbox.addEventListener('change', toggleFields);
+                                toggleFields(); // Initial state
+                            });
+                        </script>
+
+                        <hr class="my-4">
+
                         <div class="mb-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="is_active" name="is_active"
