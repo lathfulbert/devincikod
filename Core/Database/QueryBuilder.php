@@ -228,14 +228,19 @@ class QueryBuilder
         $sql = $this->toSql();
         $db = Database::getInstance();
         $stmt = $db->query($sql, $this->bindings);
-        $results = $stmt->fetchAll(\PDO::FETCH_CLASS, $this->model);
+        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        // Load relations if specified
-        if (!empty($this->with) && !empty($results)) {
-            $this->loadRelations($results);
+        $models = [];
+        foreach ($results as $row) {
+            $models[] = new ($this->model)($row);
         }
 
-        return $results;
+        // Load relations if specified
+        if (!empty($this->with) && !empty($models)) {
+            $this->loadRelations($models);
+        }
+
+        return $models;
     }
 
     /**

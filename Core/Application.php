@@ -119,6 +119,12 @@ class Application extends Container
         // Initialize I18n (Internationalization)
         \App\Core\I18n\Middleware\SetLocaleMiddleware::run();
 
+        // Check Maintenance Mode (before routing)
+        if (php_sapi_name() !== 'cli') {
+            $maintenanceMiddleware = new \App\Core\Middleware\MaintenanceMiddleware();
+            $maintenanceMiddleware->handle();
+        }
+
         // Register Authorization Middleware
         $this->router->registerMiddleware('can', \Modules\RBAC\Middleware\CheckPermission::class);
         $this->router->registerMiddleware('role', \Modules\RBAC\Middleware\CheckRole::class);

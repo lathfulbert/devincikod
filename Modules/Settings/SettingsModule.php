@@ -93,6 +93,12 @@ class SettingsModule extends AbstractModule
             ['GET', '/admin/settings/wallet/gateways/{id}/test', [\Modules\Settings\Controllers\WalletSettingsController::class, 'testGateway'], [$authMiddleware]],
             ['GET', '/admin/settings/wallet/gateways/{id}/set-default', [\Modules\Settings\Controllers\WalletSettingsController::class, 'setDefault'], [$authMiddleware]],
             ['GET', '/admin/settings/wallet/gateways/{id}/toggle', [\Modules\Settings\Controllers\WalletSettingsController::class, 'toggleStatus'], [$authMiddleware]],
+
+            // Maintenance Mode
+            ['GET', '/admin/maintenance', [\Modules\Settings\Controllers\MaintenanceController::class, 'index'], [$authMiddleware]],
+            ['POST', '/admin/maintenance/update', [\Modules\Settings\Controllers\MaintenanceController::class, 'update'], [$authMiddleware]],
+            ['POST', '/admin/maintenance/toggle', [\Modules\Settings\Controllers\MaintenanceController::class, 'toggle'], [$authMiddleware]],
+            ['GET', '/admin/maintenance/remove-background', [\Modules\Settings\Controllers\MaintenanceController::class, 'removeBackgroundImage'], [$authMiddleware]],
         ];
     }
 
@@ -113,6 +119,7 @@ class SettingsModule extends AbstractModule
                     ['title' => 'Vue d\'ensemble', 'url' => '/admin/settings', 'icon' => 'grid'],
                     ['title' => 'Paramètres du site', 'url' => '/admin/settings/site', 'icon' => 'globe'],
                     ['title' => 'Thème & Apparence', 'url' => '/admin/settings/theme', 'icon' => 'droplet'],
+                    ['title' => 'Mode Maintenance', 'url' => '/admin/maintenance', 'icon' => 'tool'],
                     ['title' => 'API & Services', 'url' => '/admin/settings/api', 'icon' => 'key'],
                     ['title' => 'Configuration Mail', 'url' => '/admin/settings/mail', 'icon' => 'mail'],
                     ['title' => 'Configuration SMS', 'url' => '/admin/settings/sms', 'icon' => 'message-circle'],

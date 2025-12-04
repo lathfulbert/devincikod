@@ -20,6 +20,22 @@ abstract class Model
         }
     }
 
+    /**
+     * Hook called before creating a new record.
+     */
+    protected function beforeCreate(): void
+    {
+        //
+    }
+
+    /**
+     * Hook called before updating an existing record.
+     */
+    protected function beforeUpdate(): void
+    {
+        //
+    }
+
     public static function getTable(): string
     {
         if (isset(static::$table)) {
@@ -85,10 +101,8 @@ abstract class Model
         }
 
         if ($isUpdate) {
-            // Call beforeUpdate hook if HasAuthor trait is used
-            if (method_exists($this, 'beforeUpdate')) {
-                $this->beforeUpdate();
-            }
+            // Call beforeUpdate hook
+            $this->beforeUpdate();
 
             // Update
             $sets = [];
@@ -103,10 +117,8 @@ abstract class Model
             $sql = "UPDATE `{$table}` SET " . implode(', ', $sets) . " WHERE `{$pk}` = ?";
             $db->query($sql, $values);
         } else {
-            // Call beforeCreate hook if HasAuthor trait is used
-            if (method_exists($this, 'beforeCreate')) {
-                $this->beforeCreate();
-            }
+            // Call beforeCreate hook
+            $this->beforeCreate();
 
             // Insert
             $columns = array_keys($this->attributes);
@@ -146,7 +158,61 @@ abstract class Model
 
     public function __get($key)
     {
-        return $this->attributes[$key] ?? null;
+        return $this->getAttribute($key);
+    }
+
+    public function getAttribute($key)
+    {
+        if (!array_key_exists($key, $this->attributes)) {
+            return null;
+        }
+
+        $value = $this->attributes[$key];
+
+        if ($this->hasCast($key)) {
+            return $this->castAttribute($key, $value);
+        }
+
+        return $value;
+    }
+
+    protected function hasCast($key): bool
+    {
+        return isset($this->casts[$key]);
+    }
+
+    protected function castAttribute($key, $value)
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $type = $this->casts[$key];
+
+        switch ($type) {
+            case 'int':
+            case 'integer':
+                return (int) $value;
+            case 'real':
+            case 'float':
+            case 'double':
+                return (float) $value;
+            case 'string':
+                return (string) $value;
+            case 'bool':
+            case 'boolean':
+                return (bool) $value;
+            case 'array':
+            case 'json':
+                return json_decode($value, true);
+            case 'object':
+                return json_decode($value, false);
+            case 'datetime':
+            case 'date':
+                return $value; // TODO: Return DateTime object
+            default:
+                return $value;
+        }
     }
 
     public function __set($key, $value)

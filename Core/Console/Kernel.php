@@ -50,6 +50,8 @@ class Kernel
             $this->handleMakeCommand($argv);
         } elseif (str_starts_with($command ?? '', 'events:')) {
             $this->handleEventsCommand($argv);
+        } elseif (str_starts_with($command ?? '', 'maintenance:')) {
+            $this->handleMaintenanceCommand($argv);
         } elseif ($command === 'list' || $command === '--list' || $command === '--help') {
             $this->listCommands();
         } else {
@@ -218,6 +220,36 @@ class Kernel
         }
     }
 
+    protected function handleMaintenanceCommand(array $argv): void
+    {
+        $commandName = $argv[1] ?? '';
+        $args = array_slice($argv, 2);
+
+        $commands = [
+            'maintenance:up' => \App\Core\Console\Command\MaintenanceUpCommand::class,
+            'maintenance:down' => \App\Core\Console\Command\MaintenanceDownCommand::class,
+            'maintenance:status' => \App\Core\Console\Command\MaintenanceStatusCommand::class,
+            'maintenance:schedule' => \App\Core\Console\Command\MaintenanceScheduleCommand::class,
+        ];
+
+        if (isset($commands[$commandName])) {
+            $class = $commands[$commandName];
+            if (class_exists($class)) {
+                $cmd = new $class();
+                $cmd->execute($this->app, $args);
+            } else {
+                echo "Command class $class not found.\n";
+            }
+        } else {
+            echo "Unknown maintenance command: $commandName\n";
+            echo "Available commands:\n";
+            echo "  maintenance:up                   Activate maintenance mode\n";
+            echo "  maintenance:down                 Deactivate maintenance mode\n";
+            echo "  maintenance:status               Show maintenance status\n";
+            echo "  maintenance:schedule             Schedule maintenance period\n";
+        }
+    }
+
     protected function handleI18nCommand(array $argv): void
     {
         $fullCommand = $argv[1] ?? '';
@@ -316,6 +348,13 @@ class Kernel
         echo "\n";
         echo "Event Commands:\n";
         echo "  events:list              List all registered events and listeners\n";
+        echo "\n";
+        echo "Maintenance Commands:\n";
+        echo "  maintenance:up           Activate maintenance mode\n";
+        echo "  maintenance:up --message=\"Custom message\" --end=\"2025-12-10 06:00\"\n";
+        echo "  maintenance:down         Deactivate maintenance mode\n";
+        echo "  maintenance:status       Show current maintenance status\n";
+        echo "  maintenance:schedule --start=\"2025-12-10 02:00\" --end=\"2025-12-10 06:00\"\n";
         echo "\n";
         echo "Cache Helpers (PHP):\n";
         echo "  cache('key')             Get/Set cache values in code\n";
