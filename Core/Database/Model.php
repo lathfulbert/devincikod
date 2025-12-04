@@ -85,6 +85,11 @@ abstract class Model
         }
 
         if ($isUpdate) {
+            // Call beforeUpdate hook if HasAuthor trait is used
+            if (method_exists($this, 'beforeUpdate')) {
+                $this->beforeUpdate();
+            }
+
             // Update
             $sets = [];
             $values = [];
@@ -98,6 +103,11 @@ abstract class Model
             $sql = "UPDATE `{$table}` SET " . implode(', ', $sets) . " WHERE `{$pk}` = ?";
             $db->query($sql, $values);
         } else {
+            // Call beforeCreate hook if HasAuthor trait is used
+            if (method_exists($this, 'beforeCreate')) {
+                $this->beforeCreate();
+            }
+
             // Insert
             $columns = array_keys($this->attributes);
             $placeholders = array_fill(0, count($columns), '?');

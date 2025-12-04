@@ -3,9 +3,11 @@
 namespace Modules\SmsCore\Models;
 
 use App\Core\Database\Model;
+use App\Core\Database\Traits\HasAuthor;
 
 class SmsMessage extends Model
 {
+    use HasAuthor;
     protected static string $table = 'sms_messages';
     protected array $fillable = [
         'user_id',

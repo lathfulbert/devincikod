@@ -282,10 +282,53 @@ if (!function_exists('is_active_route')) {
     }
 }
 
+if (!function_exists('current_user')) {
+    /**
+     * Get the currently authenticated user.
+     *
+     * @return \Modules\Users\Models\User|array|null
+     */
+    function current_user()
+    {
+        // Try from auth helper
+        if (function_exists('auth')) {
+            $user = auth()->user();
+            if ($user) {
+                return $user;
+            }
+        }
+
+        // Fallback to session
+        return $_SESSION['user'] ?? null;
+    }
+}
+
+if (!function_exists('current_user_id')) {
+    /**
+     * Get the ID of the currently authenticated user.
+     *
+     * @return int|null
+     */
+    function current_user_id(): ?int
+    {
+        $user = current_user();
+
+        if (is_object($user) && isset($user->id)) {
+            return (int) $user->id;
+        }
+
+        if (is_array($user) && isset($user['id'])) {
+            return (int) $user['id'];
+        }
+
+        return null;
+    }
+}
+
 if (!function_exists('can')) {
     /**
      * Check if the current user has a given permission.
-     * 
+     *
      * @param string $permission Permission name
      * @param mixed $model Optional model instance
      * @return bool

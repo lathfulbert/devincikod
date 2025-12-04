@@ -20,15 +20,31 @@ trait SoftDeletes
     public function delete(): void
     {
         if (isset($this->attributes['id'])) {
+            // Call beforeDelete hook if HasAuthor trait is used
+            if (method_exists($this, 'beforeDelete')) {
+                $this->beforeDelete();
+            }
+
             $db = Database::getInstance();
             $table = static::getTable();
 
             // Set deleted_at timestamp instead of actually deleting
             $now = date('Y-m-d H:i:s');
-            $db->query(
-                "UPDATE `{$table}` SET `deleted_at` = ? WHERE id = ?",
-                [$now, $this->attributes['id']]
-            );
+
+            // Check if deleted_by column exists (HasAuthor trait)
+            $deletedBy = $this->attributes['deleted_by'] ?? null;
+
+            if ($deletedBy !== null) {
+                $db->query(
+                    "UPDATE `{$table}` SET `deleted_at` = ?, `deleted_by` = ? WHERE id = ?",
+                    [$now, $deletedBy, $this->attributes['id']]
+                );
+            } else {
+                $db->query(
+                    "UPDATE `{$table}` SET `deleted_at` = ? WHERE id = ?",
+                    [$now, $this->attributes['id']]
+                );
+            }
 
             $this->attributes['deleted_at'] = $now;
         }

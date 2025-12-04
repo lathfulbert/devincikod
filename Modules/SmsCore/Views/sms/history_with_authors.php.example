@@ -1,0 +1,191 @@
+<?php
+/**
+ * Exemple de vue améliorée avec Author Tracking
+ *
+ * Renommez ce fichier en history.php pour l'utiliser
+ * ou copiez les portions de code dans votre vue existante
+ */
+?>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">📱 Historique des SMS</h3>
+                    <a href="/admin/sms/send" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Envoyer un SMS
+                    </a>
+                </div>
+
+                <div class="card-body">
+                    <?php if (empty($messages)): ?>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Aucun SMS dans l'historique.
+                        </div>
+                    <?php else: ?>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th width="5%">ID</th>
+                                        <th width="15%">Destinataire</th>
+                                        <th width="25%">Message</th>
+                                        <th width="10%">Status</th>
+                                        <th width="10%">Gateway</th>
+                                        <th width="15%">Envoyé par</th>
+                                        <th width="12%">Date</th>
+                                        <th width="8%">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($messages as $sms): ?>
+                                    <tr>
+                                        <td>
+                                            <span class="badge badge-secondary">#<?= $sms->id ?></span>
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-phone text-info"></i>
+                                            <?= e($sms->to) ?>
+                                        </td>
+                                        <td>
+                                            <div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                <?= e($sms->message) ?>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <?php
+                                            $statusClass = match($sms->status) {
+                                                'sent' => 'success',
+                                                'delivered' => 'primary',
+                                                'failed' => 'danger',
+                                                'pending' => 'warning',
+                                                default => 'secondary'
+                                            };
+                                            ?>
+                                            <span class="badge badge-<?= $statusClass ?>">
+                                                <?= e(ucfirst($sms->status)) ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                <?= e($sms->gateway ?? 'N/A') ?>
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <!-- Author Tracking Info -->
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-user-circle text-primary mr-2"></i>
+                                                <div>
+                                                    <div style="font-size: 0.9rem;">
+                                                        <strong><?= e($sms->getCreatorName() ?? 'Système') ?></strong>
+                                                    </div>
+                                                    <?php if ($sms->updated_by && $sms->updated_at !== $sms->created_at): ?>
+                                                    <small class="text-info" title="Modifié par">
+                                                        <i class="fas fa-edit"></i>
+                                                        <?= e($sms->getUpdaterName()) ?>
+                                                    </small>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <small>
+                                                <?= date('d/m/Y H:i', strtotime($sms->created_at)) ?>
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="/admin/sms/details/<?= $sms->id ?>"
+                                                   class="btn btn-info btn-sm"
+                                                   title="Détails">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <?php if ($sms->isCreatedBy(current_user_id() ?? 0) || can('delete_all_sms')): ?>
+                                                <button class="btn btn-danger btn-sm"
+                                                        title="Supprimer"
+                                                        onclick="confirmDelete(<?= $sms->id ?>)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Statistiques -->
+                        <div class="card mt-3">
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-md-3">
+                                        <div class="stat-box">
+                                            <i class="fas fa-envelope fa-2x text-primary"></i>
+                                            <h4><?= count($messages) ?></h4>
+                                            <p class="text-muted">Total SMS</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-box">
+                                            <i class="fas fa-check-circle fa-2x text-success"></i>
+                                            <h4>
+                                                <?= count(array_filter($messages, fn($m) => $m->status === 'sent')) ?>
+                                            </h4>
+                                            <p class="text-muted">Envoyés</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-box">
+                                            <i class="fas fa-clock fa-2x text-warning"></i>
+                                            <h4>
+                                                <?= count(array_filter($messages, fn($m) => $m->status === 'pending')) ?>
+                                            </h4>
+                                            <p class="text-muted">En attente</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-box">
+                                            <i class="fas fa-times-circle fa-2x text-danger"></i>
+                                            <h4>
+                                                <?= count(array_filter($messages, fn($m) => $m->status === 'failed')) ?>
+                                            </h4>
+                                            <p class="text-muted">Échecs</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.stat-box {
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+}
+
+.stat-box h4 {
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.stat-box p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+</style>
+
+<script>
+function confirmDelete(id) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce SMS ?')) {
+        window.location.href = '/admin/sms/delete/' + id;
+    }
+}
+</script>

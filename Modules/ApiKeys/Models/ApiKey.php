@@ -3,10 +3,14 @@
 namespace Modules\ApiKeys\Models;
 
 use App\Core\Database\Model;
+use App\Core\Database\Traits\HasAuthor;
+use App\Core\Database\Traits\SoftDeletes;
 use Modules\Users\Models\User;
 
 class ApiKey extends Model
 {
+    use HasAuthor;
+    use SoftDeletes;
     protected static string $table = 'api_keys';
 
     /**

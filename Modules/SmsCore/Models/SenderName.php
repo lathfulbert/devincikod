@@ -3,9 +3,13 @@
 namespace Modules\SmsCore\Models;
 
 use App\Core\Database\Model;
+use App\Core\Database\Traits\HasAuthor;
+use App\Core\Database\Traits\SoftDeletes;
 
 class SenderName extends Model
 {
+    use HasAuthor;
+    use SoftDeletes;
     protected static string $table = 'sender_names';
 
     protected array $fillable = [

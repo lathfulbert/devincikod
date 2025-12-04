@@ -3,9 +3,13 @@
 namespace Modules\Contacts\Models;
 
 use App\Core\Database\Model;
+use App\Core\Database\Traits\HasAuthor;
+use App\Core\Database\Traits\SoftDeletes;
 
 class Contact extends Model
 {
+    use HasAuthor;
+    use SoftDeletes;
     protected static string $table = 'contacts';
 
     protected array $fillable = [
