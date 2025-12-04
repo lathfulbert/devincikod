@@ -3,9 +3,11 @@
 namespace Modules\Wallet\Models;
 
 use App\Core\Database\Model;
+use App\Core\Database\Traits\HasAuthor;
 
 class WalletTransaction extends Model
 {
+    use HasAuthor;
     protected static string $table = 'wallet_transactions';
 
     protected array $fillable = [
@@ -17,7 +19,9 @@ class WalletTransaction extends Model
         'balance_after',
         'description',
         'metadata',
-        'status'
+        'status',
+        'created_by',
+        'updated_by'
     ];
 
     protected array $casts = [

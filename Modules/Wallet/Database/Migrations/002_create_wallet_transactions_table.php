@@ -21,9 +21,15 @@ class CreateWalletTransactionsTable extends Migration
             $table->enum('status', ['pending', 'completed', 'failed'])->default('completed');
             $table->timestamps();
 
+            // Author tracking
+            $table->unsignedInteger('created_by')->nullable();
+            $table->unsignedInteger('updated_by')->nullable();
+
             $table->multiIndex(['wallet_id', 'type']);
             $table->index('user_id');
             $table->index('created_at');
+            $table->index('created_by');
+            $table->index('updated_by');
         });
     }
 

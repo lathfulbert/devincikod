@@ -3,9 +3,11 @@
 namespace Modules\Settings\Models;
 
 use App\Core\Database\Model;
+use App\Core\Database\Traits\HasAuthor;
 
 class WalletGateway extends Model
 {
+    use HasAuthor;
     protected static string $table = 'wallet_gateways';
 
     protected array $fillable = [

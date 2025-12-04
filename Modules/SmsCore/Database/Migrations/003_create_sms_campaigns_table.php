@@ -21,8 +21,12 @@ class CreateSmsCampaignsTable extends Migration
             $table->integer('created_by')->nullable();
             $table->timestamps();
 
+            // Author tracking columns
+            $table->unsignedInteger('updated_by')->nullable();
+
             $table->index('status');
             $table->index('created_by');
+            $table->index('updated_by');
         });
     }
 

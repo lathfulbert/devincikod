@@ -3,9 +3,11 @@
 namespace Modules\Settings\Models;
 
 use App\Core\Database\Model;
+use App\Core\Database\Traits\HasAuthor;
 
 class SmsGateway extends Model
 {
+    use HasAuthor;
     protected static string $table = 'sms_gateways';
 
     protected array $fillable = [
@@ -18,7 +20,9 @@ class SmsGateway extends Model
         'is_active',
         'is_default',
         'priority',
-        'configuration'
+        'configuration',
+        'created_by',
+        'updated_by'
     ];
 
     protected array $casts = [

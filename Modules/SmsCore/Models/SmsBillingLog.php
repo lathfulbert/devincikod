@@ -3,9 +3,12 @@
 namespace Modules\SmsCore\Models;
 
 use App\Core\Database\Model;
+use App\Core\Database\Traits\HasAuthor;
 
 class SmsBillingLog extends Model
 {
+    use HasAuthor;
+
     protected static string $table = 'sms_billing_logs';
 
     protected array $fillable = [
@@ -20,7 +23,9 @@ class SmsBillingLog extends Model
         'unit_cost',
         'total_cost',
         'currency',
-        'status'
+        'status',
+        'created_by',
+        'updated_by'
     ];
 
     protected array $casts = [

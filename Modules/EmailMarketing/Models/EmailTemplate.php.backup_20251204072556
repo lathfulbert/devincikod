@@ -2,14 +2,10 @@
 
 namespace Modules\EmailMarketing\Models;
 
-use App\Core\Database\Traits\HasAuthor;
-
 use App\Core\Database\Model;
 
 class EmailTemplate extends Model
 {
-    use HasAuthor;
-
     protected static string $table = 'email_templates';
 
     protected array $fillable = [

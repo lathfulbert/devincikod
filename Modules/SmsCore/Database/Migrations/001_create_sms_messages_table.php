@@ -27,12 +27,18 @@ class CreateSmsMessagesTable extends Migration
             $table->text('error')->nullable();
             $table->timestamps();
 
+            // Author tracking columns
+            $table->unsignedInteger('created_by')->nullable();
+            $table->unsignedInteger('updated_by')->nullable();
+
             // Indexes
             $table->index('user_id');
             $table->index('status');
             $table->index('gateway');
             $table->index('message_id');
             $table->index('created_at');
+            $table->index('created_by');
+            $table->index('updated_by');
         });
     }
 

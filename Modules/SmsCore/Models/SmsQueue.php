@@ -3,9 +3,12 @@
 namespace Modules\SmsCore\Models;
 
 use App\Core\Database\Model;
+use App\Core\Database\Traits\HasAuthor;
 
 class SmsQueue extends Model
 {
+    use HasAuthor;
+
     protected static string $table = 'sms_queue';
 
     protected array $fillable = [
@@ -17,7 +20,9 @@ class SmsQueue extends Model
         'attempts',
         'error_message',
         'scheduled_at',
-        'sent_at'
+        'sent_at',
+        'created_by',
+        'updated_by'
     ];
 
     public function markAsProcessing(): void

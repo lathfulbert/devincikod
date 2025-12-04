@@ -1,0 +1,330 @@
+<?php
+
+/**
+ * Exemple de contrôleur avec Author Tracking et contrôles d'accès
+ *
+ * Ce fichier montre comment utiliser le système Author Tracking
+ * pour ajouter des contrôles d'accès basés sur l'auteur.
+ *
+ * Pour utiliser : Renommez en SmsCampaignController.php ou copiez les méthodes
+ */
+
+namespace Modules\SmsCore\Controllers;
+
+use App\Core\Application;
+use Modules\SmsCore\Models\SmsCampaign;
+
+class SmsCampaignController
+{
+    /**
+     * Liste des campagnes avec filtrage par auteur (optionnel)
+     */
+    public function index()
+    {
+        $app = Application::getInstance();
+        $userId = current_user_id();
+
+        // Option 1: Voir toutes les campagnes (si admin)
+        if (can('view_all_campaigns')) {
+            $campaigns = SmsCampaign::orderBy('created_at', 'DESC')->get();
+        }
+        // Option 2: Voir uniquement ses propres campagnes
+        else {
+            $campaigns = SmsCampaign::where('created_by', $userId)
+                ->orderBy('created_at', 'DESC')
+                ->get();
+        }
+
+        echo view('smscore/campaigns/index', [
+            'campaigns' => $campaigns,
+            'title' => 'Mes Campagnes SMS'
+        ]);
+    }
+
+    /**
+     * Affichage des détails d'une campagne
+     */
+    public function show($id)
+    {
+        $campaign = SmsCampaign::find($id);
+
+        if (!$campaign) {
+            $_SESSION['flash_error'] = 'Campagne introuvable';
+            redirect('/admin/sms/campaigns');
+            return;
+        }
+
+        // Contrôle d'accès: Seul le créateur ou un admin peut voir
+        if (!$this->canView($campaign)) {
+            $_SESSION['flash_error'] = 'Vous n\'avez pas accès à cette campagne';
+            redirect('/admin/sms/campaigns');
+            return;
+        }
+
+        echo view('smscore/campaigns/show', [
+            'campaign' => $campaign,
+            'title' => 'Détails Campagne'
+        ]);
+    }
+
+    /**
+     * Modification d'une campagne
+     */
+    public function edit($id)
+    {
+        $campaign = SmsCampaign::find($id);
+
+        if (!$campaign) {
+            $_SESSION['flash_error'] = 'Campagne introuvable';
+            redirect('/admin/sms/campaigns');
+            return;
+        }
+
+        // Contrôle d'accès: Seul le créateur ou un admin peut modifier
+        if (!$this->canEdit($campaign)) {
+            $_SESSION['flash_error'] = 'Vous ne pouvez modifier que vos propres campagnes';
+            redirect('/admin/sms/campaigns');
+            return;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $campaign->name = $_POST['name'] ?? $campaign->name;
+            $campaign->message = $_POST['message'] ?? $campaign->message;
+            $campaign->save(); // updated_by sera automatiquement mis à jour ✅
+
+            $_SESSION['flash_success'] = 'Campagne modifiée avec succès';
+            redirect('/admin/sms/campaigns/' . $campaign->id);
+            return;
+        }
+
+        echo view('smscore/campaigns/edit', [
+            'campaign' => $campaign,
+            'title' => 'Modifier Campagne'
+        ]);
+    }
+
+    /**
+     * Suppression d'une campagne
+     */
+    public function delete($id)
+    {
+        $campaign = SmsCampaign::find($id);
+
+        if (!$campaign) {
+            $_SESSION['flash_error'] = 'Campagne introuvable';
+            redirect('/admin/sms/campaigns');
+            return;
+        }
+
+        // Contrôle d'accès: Seul le créateur ou un admin peut supprimer
+        if (!$this->canDelete($campaign)) {
+            $_SESSION['flash_error'] = 'Vous ne pouvez supprimer que vos propres campagnes';
+            redirect('/admin/sms/campaigns');
+            return;
+        }
+
+        // Empêcher la suppression si la campagne est en cours
+        if ($campaign->status === 'sending') {
+            $_SESSION['flash_error'] = 'Impossible de supprimer une campagne en cours d\'envoi';
+            redirect('/admin/sms/campaigns');
+            return;
+        }
+
+        $campaign->delete(); // deleted_by sera automatiquement rempli si SoftDeletes ✅
+
+        $_SESSION['flash_success'] = 'Campagne supprimée avec succès';
+        redirect('/admin/sms/campaigns');
+    }
+
+    /**
+     * Mes campagnes uniquement
+     */
+    public function myCampaigns()
+    {
+        $userId = current_user_id();
+
+        $campaigns = SmsCampaign::where('created_by', $userId)
+            ->orderBy('created_at', 'DESC')
+            ->get();
+
+        echo view('smscore/campaigns/my_campaigns', [
+            'campaigns' => $campaigns,
+            'title' => 'Mes Campagnes'
+        ]);
+    }
+
+    /**
+     * Statistiques par auteur
+     */
+    public function stats()
+    {
+        $userId = current_user_id();
+
+        // Statistiques de l'utilisateur connecté
+        $stats = [
+            'total_campaigns' => SmsCampaign::where('created_by', $userId)->count(),
+            'active_campaigns' => SmsCampaign::where('created_by', $userId)
+                ->where('status', 'sending')
+                ->count(),
+            'completed_campaigns' => SmsCampaign::where('created_by', $userId)
+                ->where('status', 'completed')
+                ->count(),
+        ];
+
+        echo view('smscore/campaigns/stats', [
+            'stats' => $stats,
+            'title' => 'Mes Statistiques'
+        ]);
+    }
+
+    /**
+     * Rapport d'audit (admin uniquement)
+     */
+    public function auditReport()
+    {
+        // Vérifier les permissions admin
+        if (!can('view_audit_reports')) {
+            $_SESSION['flash_error'] = 'Accès refusé';
+            redirect('/admin/dashboard');
+            return;
+        }
+
+        // Récupérer toutes les campagnes avec les auteurs
+        $campaigns = SmsCampaign::orderBy('created_at', 'DESC')->get();
+
+        // Préparer les données d'audit
+        $auditData = [];
+        foreach ($campaigns as $campaign) {
+            $auditData[] = [
+                'id' => $campaign->id,
+                'name' => $campaign->name,
+                'creator' => $campaign->getCreatorName(),
+                'creator_id' => $campaign->created_by,
+                'created_at' => $campaign->created_at,
+                'updater' => $campaign->getUpdaterName(),
+                'updater_id' => $campaign->updated_by,
+                'updated_at' => $campaign->updated_at,
+                'status' => $campaign->status
+            ];
+        }
+
+        echo view('smscore/campaigns/audit', [
+            'auditData' => $auditData,
+            'title' => 'Rapport d\'Audit'
+        ]);
+    }
+
+    // ===== Méthodes de contrôle d'accès =====
+
+    /**
+     * Vérifier si l'utilisateur peut voir cette campagne
+     */
+    private function canView(SmsCampaign $campaign): bool
+    {
+        $userId = current_user_id();
+
+        // Admin peut tout voir
+        if (can('view_all_campaigns')) {
+            return true;
+        }
+
+        // Le créateur peut voir sa propre campagne
+        return $campaign->isCreatedBy($userId);
+    }
+
+    /**
+     * Vérifier si l'utilisateur peut modifier cette campagne
+     */
+    private function canEdit(SmsCampaign $campaign): bool
+    {
+        $userId = current_user_id();
+
+        // Admin peut tout modifier
+        if (can('edit_all_campaigns')) {
+            return true;
+        }
+
+        // Le créateur peut modifier sa propre campagne
+        // SAUF si elle est terminée (règle métier)
+        if ($campaign->isCreatedBy($userId)) {
+            return $campaign->status !== 'completed';
+        }
+
+        return false;
+    }
+
+    /**
+     * Vérifier si l'utilisateur peut supprimer cette campagne
+     */
+    private function canDelete(SmsCampaign $campaign): bool
+    {
+        $userId = current_user_id();
+
+        // Admin peut tout supprimer
+        if (can('delete_all_campaigns')) {
+            return true;
+        }
+
+        // Le créateur peut supprimer sa propre campagne
+        // SAUF si elle est en cours d'envoi (règle métier)
+        if ($campaign->isCreatedBy($userId)) {
+            return $campaign->status !== 'sending';
+        }
+
+        return false;
+    }
+
+    /**
+     * Vérifier si l'utilisateur peut cloner cette campagne
+     */
+    private function canClone(SmsCampaign $campaign): bool
+    {
+        $userId = current_user_id();
+
+        // Tout le monde peut cloner une campagne qu'il peut voir
+        return $this->canView($campaign);
+    }
+
+    /**
+     * Obtenir les campagnes accessibles par l'utilisateur
+     */
+    private function getAccessibleCampaigns()
+    {
+        $userId = current_user_id();
+
+        if (can('view_all_campaigns')) {
+            return SmsCampaign::orderBy('created_at', 'DESC')->get();
+        }
+
+        return SmsCampaign::where('created_by', $userId)
+            ->orderBy('created_at', 'DESC')
+            ->get();
+    }
+
+    /**
+     * Filtrer les campagnes par auteur (pour les admin)
+     */
+    public function filterByAuthor($authorId)
+    {
+        // Vérifier les permissions
+        if (!can('view_all_campaigns')) {
+            $_SESSION['flash_error'] = 'Accès refusé';
+            redirect('/admin/sms/campaigns');
+            return;
+        }
+
+        $campaigns = SmsCampaign::where('created_by', $authorId)
+            ->orderBy('created_at', 'DESC')
+            ->get();
+
+        // Récupérer les infos de l'auteur
+        $author = \Modules\Users\Models\User::find($authorId);
+
+        echo view('smscore/campaigns/index', [
+            'campaigns' => $campaigns,
+            'title' => 'Campagnes de ' . ($author ? $author->username : 'Utilisateur #' . $authorId),
+            'filtered_by_author' => true,
+            'author' => $author
+        ]);
+    }
+}

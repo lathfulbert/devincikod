@@ -3,9 +3,11 @@
 namespace Modules\RBAC\Models;
 
 use App\Core\Database\Model;
+use App\Core\Database\Traits\HasAuthor;
 
 class Permission extends Model
 {
+    use HasAuthor;
     protected static string $table = 'permissions';
 
     public function roles(): \App\Core\Database\ORM\Relations\BelongsToMany

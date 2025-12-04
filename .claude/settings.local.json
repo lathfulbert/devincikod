@@ -9,7 +9,10 @@
       "Bash(curl:*)",
       "Bash(mysql:*)",
       "Bash(cat:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(for table in sms_billing_logs sms_campaigns sms_gateways sms_messages sms_queue)",
+      "Bash(do echo \"=== $table ===\")",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

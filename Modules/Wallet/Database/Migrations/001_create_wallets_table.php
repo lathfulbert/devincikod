@@ -16,8 +16,14 @@ class CreateWalletsTable extends Migration
             $table->enum('status', ['active', 'frozen', 'suspended'])->default('active');
             $table->timestamps();
 
+            // Author tracking
+            $table->unsignedInteger('created_by')->nullable();
+            $table->unsignedInteger('updated_by')->nullable();
+
             $table->index('user_id');
             $table->index('status');
+            $table->index('created_by');
+            $table->index('updated_by');
         });
     }
 

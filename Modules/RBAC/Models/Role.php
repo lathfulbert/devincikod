@@ -4,9 +4,13 @@ namespace Modules\RBAC\Models;
 
 use App\Core\Database\Model;
 use App\Core\Database\Database;
+use App\Core\Database\Traits\HasAuthor;
+use App\Core\Database\Traits\SoftDeletes;
 
 class Role extends Model
 {
+    use HasAuthor;
+    use SoftDeletes;
     protected static string $table = 'roles';
 
     public function permissions(): \App\Core\Database\ORM\Relations\BelongsToMany

@@ -1,0 +1,257 @@
+<?php
+/**
+ * Vue exemple : Liste des campagnes SMS avec Author Tracking
+ *
+ * Cette vue montre comment afficher les informations d'auteur
+ * en utilisant le composant author-info et les contrôles d'accès
+ */
+?>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- En-tête avec actions -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-bullhorn"></i>
+                    <?= e($title ?? 'Campagnes SMS') ?>
+                </h2>
+                <div>
+                    <?php if (can('create_campaigns')): ?>
+                    <a href="/admin/sms/campaigns/create" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nouvelle Campagne
+                    </a>
+                    <?php endif; ?>
+                    <a href="/admin/sms/campaigns/my" class="btn btn-outline-info">
+                        <i class="fas fa-user"></i> Mes Campagnes
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filtres (pour admin) -->
+            <?php if (can('view_all_campaigns')): ?>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <form method="GET" class="form-inline">
+                        <label class="mr-2">Filtrer par:</label>
+                        <select name="author_id" class="form-control mr-2">
+                            <option value="">Tous les auteurs</option>
+                            <?php
+                            // Récupérer la liste des auteurs (à implémenter dans le contrôleur)
+                            ?>
+                        </select>
+                        <select name="status" class="form-control mr-2">
+                            <option value="">Tous les statuts</option>
+                            <option value="draft">Brouillon</option>
+                            <option value="scheduled">Programmée</option>
+                            <option value="sending">En cours</option>
+                            <option value="completed">Terminée</option>
+                            <option value="failed">Échouée</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-filter"></i> Filtrer
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- Liste des campagnes -->
+            <div class="card">
+                <div class="card-body">
+                    <?php if (empty($campaigns)): ?>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            Aucune campagne trouvée.
+                            <?php if (!can('view_all_campaigns')): ?>
+                                <a href="/admin/sms/campaigns/create">Créez votre première campagne</a>.
+                            <?php endif; ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th width="5%">ID</th>
+                                        <th width="20%">Nom</th>
+                                        <th width="10%">Status</th>
+                                        <th width="10%">Destinataires</th>
+                                        <th width="10%">Envoyés</th>
+                                        <th width="20%">Créé par</th>
+                                        <th width="15%">Date</th>
+                                        <th width="10%">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($campaigns as $campaign): ?>
+                                    <tr>
+                                        <td>
+                                            <span class="badge badge-secondary">#<?= $campaign->id ?></span>
+                                        </td>
+                                        <td>
+                                            <strong><?= e($campaign->name) ?></strong>
+                                            <?php if ($campaign->isCreatedBy(current_user_id())): ?>
+                                                <span class="badge badge-sm badge-info ml-2" title="Votre campagne">
+                                                    <i class="fas fa-user"></i> Vous
+                                                </span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php
+                                            $statusClass = match($campaign->status) {
+                                                'completed' => 'success',
+                                                'sending' => 'primary',
+                                                'scheduled' => 'info',
+                                                'failed' => 'danger',
+                                                default => 'secondary'
+                                            };
+                                            ?>
+                                            <span class="badge badge-<?= $statusClass ?>">
+                                                <?= e(ucfirst($campaign->status)) ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-light">
+                                                <?= number_format($campaign->total_recipients) ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <?php
+                                            $progress = $campaign->getProgress();
+                                            $progressClass = $progress == 100 ? 'success' : 'primary';
+                                            ?>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar bg-<?= $progressClass ?>"
+                                                     role="progressbar"
+                                                     style="width: <?= $progress ?>%"
+                                                     aria-valuenow="<?= $progress ?>"
+                                                     aria-valuemin="0"
+                                                     aria-valuemax="100">
+                                                    <?= number_format($progress, 1) ?>%
+                                                </div>
+                                            </div>
+                                            <small class="text-muted">
+                                                <?= $campaign->sent_count ?> / <?= $campaign->total_recipients ?>
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <!-- Utilisation du composant author-info -->
+                                            <?php component('author-info', [
+                                                'model' => $campaign,
+                                                'layout' => 'compact',
+                                                'show_updated' => true
+                                            ]) ?>
+                                        </td>
+                                        <td>
+                                            <small>
+                                                <?= date('d/m/Y H:i', strtotime($campaign->created_at)) ?>
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <!-- Voir -->
+                                                <a href="/admin/sms/campaigns/<?= $campaign->id ?>"
+                                                   class="btn btn-info btn-sm"
+                                                   title="Détails">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+
+                                                <!-- Éditer (si autorisé) -->
+                                                <?php if ($campaign->isCreatedBy(current_user_id()) || can('edit_all_campaigns')): ?>
+                                                    <?php if ($campaign->status !== 'completed'): ?>
+                                                    <a href="/admin/sms/campaigns/<?= $campaign->id ?>/edit"
+                                                       class="btn btn-warning btn-sm"
+                                                       title="Modifier">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <?php endif; ?>
+                                                <?php endif; ?>
+
+                                                <!-- Supprimer (si autorisé) -->
+                                                <?php if ($campaign->isCreatedBy(current_user_id()) || can('delete_all_campaigns')): ?>
+                                                    <?php if ($campaign->status !== 'sending'): ?>
+                                                    <button class="btn btn-danger btn-sm"
+                                                            title="Supprimer"
+                                                            onclick="confirmDelete(<?= $campaign->id ?>, '<?= e($campaign->name) ?>')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                    <?php endif; ?>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Statistiques globales -->
+                        <div class="card mt-3">
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-md-3">
+                                        <i class="fas fa-bullhorn fa-2x text-primary mb-2"></i>
+                                        <h4><?= count($campaigns) ?></h4>
+                                        <p class="text-muted">Total Campagnes</p>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <i class="fas fa-paper-plane fa-2x text-success mb-2"></i>
+                                        <h4>
+                                            <?= count(array_filter($campaigns, fn($c) => $c->status === 'completed')) ?>
+                                        </h4>
+                                        <p class="text-muted">Complétées</p>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <i class="fas fa-spinner fa-2x text-warning mb-2"></i>
+                                        <h4>
+                                            <?= count(array_filter($campaigns, fn($c) => $c->status === 'sending')) ?>
+                                        </h4>
+                                        <p class="text-muted">En cours</p>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <i class="fas fa-clock fa-2x text-info mb-2"></i>
+                                        <h4>
+                                            <?= count(array_filter($campaigns, fn($c) => $c->status === 'scheduled')) ?>
+                                        </h4>
+                                        <p class="text-muted">Programmées</p>
+                                    </div>
+                                </div>
+
+                                <?php if (!can('view_all_campaigns')): ?>
+                                <div class="alert alert-info mt-3 mb-0">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Note:</strong> Vous voyez uniquement vos propres campagnes.
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDelete(id, name) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer la campagne "' + name + '" ?\n\nCette action est irréversible.')) {
+        window.location.href = '/admin/sms/campaigns/' + id + '/delete';
+    }
+}
+</script>
+
+<style>
+.badge-sm {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.progress {
+    border-radius: 0.25rem;
+}
+
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+</style>

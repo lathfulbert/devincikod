@@ -3,9 +3,11 @@
 namespace Modules\Settings\Models;
 
 use App\Core\Database\Model;
+use App\Core\Database\Traits\HasAuthor;
 
 class Setting extends Model
 {
+    use HasAuthor;
     protected static string $table = 'settings';
     protected array $fillable = ['key', 'value', 'type', 'setting_group', 'description', 'is_public'];
     protected array $casts = [
