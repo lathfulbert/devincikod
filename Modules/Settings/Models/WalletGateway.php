@@ -21,7 +21,9 @@ class WalletGateway extends Model
         'is_default',
         'currency',
         'transaction_fee',
-        'configuration'
+        'configuration',
+        'created_by',
+        'updated_by'
     ];
 
     protected array $casts = [

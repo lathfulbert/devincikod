@@ -19,7 +19,9 @@ class SenderName extends Model
         'is_active',
         'validation_date',
         'notes',
-        'created_by'
+        'created_by',
+        'updated_by',
+        'deleted_by'
     ];
 
     /**

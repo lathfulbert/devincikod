@@ -22,6 +22,7 @@ class SmsCampaign extends Model
         'started_at',
         'completed_at',
         'created_by',
+        'updated_by',
         'contact_ids',
         'use_personalization'
     ];

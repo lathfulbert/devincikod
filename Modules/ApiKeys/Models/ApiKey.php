@@ -13,6 +13,18 @@ class ApiKey extends Model
     use SoftDeletes;
     protected static string $table = 'api_keys';
 
+    protected array $fillable = [
+        'key',
+        'name',
+        'user_id',
+        'permissions',
+        'is_active',
+        'expires_at',
+        'created_by',
+        'updated_by',
+        'deleted_by'
+    ];
+
     /**
      * The user who owns this API key
      */

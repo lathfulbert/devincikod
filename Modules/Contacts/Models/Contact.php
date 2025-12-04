@@ -13,13 +13,17 @@ class Contact extends Model
     protected static string $table = 'contacts';
 
     protected array $fillable = [
+
         'phone',
         'first_name',
         'last_name',
         'email',
         'custom_fields',
         'tags',
-        'is_active'
+        'is_active',
+        'created_by',
+        'updated_by',
+        'deleted_by'
     ];
 
     /**

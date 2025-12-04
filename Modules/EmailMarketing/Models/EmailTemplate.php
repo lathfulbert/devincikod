@@ -13,6 +13,7 @@ class EmailTemplate extends Model
     protected static string $table = 'email_templates';
 
     protected array $fillable = [
+
         'name',
         'description',
         'subject',
@@ -24,7 +25,8 @@ class EmailTemplate extends Model
         'is_default',
         'category',
         'tags',
-        'created_by'
+        'created_by',
+        'updated_by'
     ];
 
     /**

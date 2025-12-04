@@ -10,6 +10,15 @@ class Permission extends Model
     use HasAuthor;
     protected static string $table = 'permissions';
 
+    protected array $fillable = [
+        'name',
+        'slug',
+        'module_slug',
+        'description',
+        'created_by',
+        'updated_by'
+    ];
+
     public function roles(): \App\Core\Database\ORM\Relations\BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'role_permissions', 'permission_id', 'role_id');

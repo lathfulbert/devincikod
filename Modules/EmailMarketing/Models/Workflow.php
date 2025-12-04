@@ -13,6 +13,7 @@ class Workflow extends Model
     protected static string $table = 'workflows';
 
     protected array $fillable = [
+
         'name',
         'description',
         'trigger_type',
@@ -22,7 +23,8 @@ class Workflow extends Model
         'total_executions',
         'successful_executions',
         'failed_executions',
-        'created_by'
+        'created_by',
+        'updated_by'
     ];
 
     /**

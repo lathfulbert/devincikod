@@ -9,7 +9,7 @@ class Setting extends Model
 {
     use HasAuthor;
     protected static string $table = 'settings';
-    protected array $fillable = ['key', 'value', 'type', 'setting_group', 'description', 'is_public'];
+    protected array $fillable = ['key', 'value', 'type', 'setting_group', 'description', 'is_public', 'created_by', 'updated_by'];
     protected array $casts = [
         'is_public' => 'boolean',
         'value' => 'json'

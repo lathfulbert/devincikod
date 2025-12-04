@@ -13,6 +13,7 @@ class EmailCampaign extends Model
     protected static string $table = 'email_campaigns';
 
     protected array $fillable = [
+
         'name',
         'subject',
         'template_id',
@@ -34,7 +35,8 @@ class EmailCampaign extends Model
         'created_by',
         'contact_ids',
         'segments',
-        'use_personalization'
+        'use_personalization',
+        'updated_by'
     ];
 
     /**

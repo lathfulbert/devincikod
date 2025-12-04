@@ -24,7 +24,9 @@ class SmsMessage extends Model
         'scheduled_at',
         'sent_at',
         'delivered_at',
-        'error'
+        'error',
+        'created_by',
+        'updated_by'
     ];
     protected array $casts = [
         'user_id' => 'int',
