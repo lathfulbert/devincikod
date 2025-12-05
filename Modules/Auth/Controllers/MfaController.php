@@ -115,7 +115,7 @@ class MfaController
         }
 
         $userId = $_SESSION['user_id'];
-        $methods = $this->mfaManager->getAvailableMethods($userId);
+        $methods = $this->mfaManager->getAllUserMethods($userId);
 
         echo view('auth/mfa/settings', [
             'methods' => $methods
@@ -182,11 +182,13 @@ class MfaController
                 return;
             }
 
-            // For SMS/Email - setup is complete, show success
-            $message = $result['message'] ?? 'Méthode MFA configurée avec succès';
-
+            // For SMS, redirect to verification page
             if ($methodType === 'sms') {
+                $_SESSION['sms_setup_phone'] = $result['phone'] ?? $data['phone'];
                 $message = '📱 SMS OTP activé ! Un code de vérification a été envoyé au ' . ($result['phone'] ?? 'numéro configuré');
+                $_SESSION['flash_success'] = $message;
+                redirect('/auth/mfa/setup/sms/verify');
+                return;
             } elseif ($methodType === 'email') {
                 $message = '📧 Email OTP activé ! Un code de vérification vous sera envoyé à chaque connexion';
             }
@@ -250,6 +252,68 @@ class MfaController
 
         unset($_SESSION['totp_setup']);
         $_SESSION['flash_success'] = 'TOTP configuré avec succès!';
+        redirect('/auth/mfa/settings');
+    }
+
+    /**
+     * Show SMS verification page
+     */
+    public function showSmsVerification()
+    {
+        if (!isset($_SESSION['user_id'])) {
+            redirect('/auth/login');
+            return;
+        }
+
+        echo view('auth/mfa/sms_verify', [
+            'phone' => $_SESSION['sms_setup_phone'] ?? 'votre numéro'
+        ]);
+    }
+
+    /**
+     * Verify SMS setup
+     */
+    public function verifySmsSetup()
+    {
+        if (!isset($_SESSION['user_id'])) {
+            redirect('/auth/login');
+            return;
+        }
+
+        $userId = $_SESSION['user_id'];
+        $code = $_POST['code'] ?? null;
+
+        if (!$code) {
+            $_SESSION['flash_error'] = 'Le code de vérification est requis';
+            redirect('/auth/mfa/setup/sms/verify');
+            return;
+        }
+
+        // We need to manually verify the OTP from session and update the DB
+        // because the provider's verify() method checks for is_verified=1 which is not yet true
+        $sessionKey = "sms_otp_{$userId}";
+        if (!isset($_SESSION[$sessionKey])) {
+            $_SESSION['flash_error'] = 'Session expirée. Veuillez recommencer.';
+            redirect('/auth/mfa/setup/sms');
+            return;
+        }
+
+        $otpData = $_SESSION[$sessionKey];
+        if (!hash_equals($otpData['code_hash'], hash('sha256', $code))) {
+            $_SESSION['flash_error'] = 'Code invalide.';
+            redirect('/auth/mfa/setup/sms/verify');
+            return;
+        }
+
+        // Update DB to set is_verified = 1
+        \Modules\Auth\Models\UserMfaSetup::where('user_id', $userId)
+            ->where('method_type', 'sms')
+            ->update(['is_verified' => 1]);
+
+        unset($_SESSION['sms_setup_phone']);
+        unset($_SESSION[$sessionKey]);
+
+        $_SESSION['flash_success'] = 'SMS OTP configuré et vérifié avec succès!';
         redirect('/auth/mfa/settings');
     }
 

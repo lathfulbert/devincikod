@@ -44,6 +44,24 @@ class MfaManager
     }
 
     /**
+     * Get all user MFA methods (including unverified)
+     */
+    public function getAllUserMethods(int $userId): array
+    {
+        $setups = UserMfaSetup::query()
+            ->where('user_id', $userId)
+            ->get();
+
+        return array_map(function ($setup) {
+            return [
+                'type' => $setup->method_type,
+                'is_verified' => (bool)$setup->is_verified,
+                'last_used' => $setup->last_used_at
+            ];
+        }, $setups);
+    }
+
+    /**
      * Verify MFA code
      */
     public function verify(int $userId, string $methodType, string $code): bool

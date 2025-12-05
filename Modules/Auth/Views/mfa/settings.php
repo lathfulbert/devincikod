@@ -30,22 +30,31 @@
                                     </p>
 
                                     <?php
-                                    $hasTOTP = false;
+                                    $totpStatus = 'none';
                                     foreach ($methods as $method) {
                                         if ($method['type'] === 'totp') {
-                                            $hasTOTP = true;
+                                            $totpStatus = $method['is_verified'] ? 'active' : 'pending';
                                             break;
                                         }
                                     }
                                     ?>
 
-                                    <?php if ($hasTOTP): ?>
+                                    <?php if ($totpStatus === 'active'): ?>
                                         <span class="badge bg-success mb-2">Activé</span>
                                         <form method="POST" action="<?= url('/auth/mfa/disable') ?>" class="d-inline">
                                             <?= csrf_field() ?>
                                             <input type="hidden" name="method" value="totp">
                                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Désactiver TOTP ?')">
                                                 Désactiver
+                                            </button>
+                                        </form>
+                                    <?php elseif ($totpStatus === 'pending'): ?>
+                                        <span class="badge bg-warning text-dark mb-2">En attente de vérification</span>
+                                        <form method="POST" action="<?= url('/auth/mfa/setup') ?>">
+                                            <?= csrf_field() ?>
+                                            <input type="hidden" name="method" value="totp">
+                                            <button type="submit" class="btn btn-warning w-100 mb-2">
+                                                Reprendre la configuration
                                             </button>
                                         </form>
                                     <?php else: ?>
@@ -73,22 +82,34 @@
                                     </p>
 
                                     <?php
-                                    $hasSMS = false;
+                                    $smsStatus = 'none';
                                     foreach ($methods as $method) {
                                         if ($method['type'] === 'sms') {
-                                            $hasSMS = true;
+                                            $smsStatus = $method['is_verified'] ? 'active' : 'pending';
                                             break;
                                         }
                                     }
                                     ?>
 
-                                    <?php if ($hasSMS): ?>
+                                    <?php if ($smsStatus === 'active'): ?>
                                         <span class="badge bg-success mb-2">Activé</span>
                                         <form method="POST" action="<?= url('/auth/mfa/disable') ?>" class="d-inline">
                                             <?= csrf_field() ?>
                                             <input type="hidden" name="method" value="sms">
                                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Désactiver SMS OTP ?')">
                                                 Désactiver
+                                            </button>
+                                        </form>
+                                    <?php elseif ($smsStatus === 'pending'): ?>
+                                        <span class="badge bg-warning text-dark mb-2">En attente de vérification</span>
+                                        <a href="<?= url('/auth/mfa/setup/sms/verify') ?>" class="btn btn-warning w-100 mb-2">
+                                            Vérifier le code
+                                        </a>
+                                        <form method="POST" action="<?= url('/auth/mfa/disable') ?>" class="d-inline">
+                                            <?= csrf_field() ?>
+                                            <input type="hidden" name="method" value="sms">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger w-100" onclick="return confirm('Annuler la configuration ?')">
+                                                Annuler
                                             </button>
                                         </form>
                                     <?php else: ?>
@@ -112,22 +133,31 @@
                                     </p>
 
                                     <?php
-                                    $hasEmail = false;
+                                    $emailStatus = 'none';
                                     foreach ($methods as $method) {
                                         if ($method['type'] === 'email') {
-                                            $hasEmail = true;
+                                            $emailStatus = $method['is_verified'] ? 'active' : 'pending';
                                             break;
                                         }
                                     }
                                     ?>
 
-                                    <?php if ($hasEmail): ?>
+                                    <?php if ($emailStatus === 'active'): ?>
                                         <span class="badge bg-success mb-2">Activé</span>
                                         <form method="POST" action="<?= url('/auth/mfa/disable') ?>" class="d-inline">
                                             <?= csrf_field() ?>
                                             <input type="hidden" name="method" value="email">
                                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Désactiver Email OTP ?')">
                                                 Désactiver
+                                            </button>
+                                        </form>
+                                    <?php elseif ($emailStatus === 'pending'): ?>
+                                        <span class="badge bg-warning text-dark mb-2">En attente de vérification</span>
+                                        <form method="POST" action="<?= url('/auth/mfa/disable') ?>" class="d-inline">
+                                            <?= csrf_field() ?>
+                                            <input type="hidden" name="method" value="email">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger w-100" onclick="return confirm('Annuler la configuration ?')">
+                                                Annuler
                                             </button>
                                         </form>
                                     <?php else: ?>

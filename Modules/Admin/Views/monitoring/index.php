@@ -103,6 +103,53 @@
         </div>
     </div>
 
+    <!-- Filters -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" action="<?= url('/admin/monitoring') ?>" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="filterLevel" class="form-label">Niveau</label>
+                            <select name="level" id="filterLevel" class="form-select" onchange="this.form.submit()">
+                                <option value="">Tous les niveaux</option>
+                                <?php foreach ($levels ?? [] as $level): ?>
+                                    <option value="<?= $level ?>" <?= $filterLevel === $level ? 'selected' : '' ?>>
+                                        <?= $level ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="filterChannel" class="form-label">Channel</label>
+                            <select name="channel" id="filterChannel" class="form-select" onchange="this.form.submit()">
+                                <option value="">Tous les channels</option>
+                                <?php foreach ($channels ?? [] as $channel): ?>
+                                    <option value="<?= $channel ?>" <?= $filterChannel === $channel ? 'selected' : '' ?>>
+                                        <?= $channel ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="filterDate" class="form-label">Date</label>
+                            <input type="date" name="date" id="filterDate" class="form-control"
+                                value="<?= $filterDate ?? '' ?>" onchange="this.form.submit()">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label d-block">&nbsp;</label>
+                            <?php if ($filterLevel || $filterChannel || $filterDate): ?>
+                                <a href="<?= url('/admin/monitoring') ?>" class="btn btn-secondary">
+                                    <i data-feather="x"></i> Réinitialiser
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Actions -->
     <div class="row mb-3">
         <div class="col-12 text-end">
