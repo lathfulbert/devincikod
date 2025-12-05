@@ -57,20 +57,23 @@ class MonitoringController
             $this->db->query("TRUNCATE TABLE logs");
 
             // Clear log files
-            $files = glob(storage_path('logs/*.log'));
+            $logDir = __DIR__ . '/../../../storage/logs';
+            $files = glob($logDir . '/*.log');
             foreach ($files as $file) {
-                file_put_contents($file, '');
+                if (is_file($file)) {
+                    file_put_contents($file, '');
+                }
             }
 
             // Flash success message
-            flash('success', 'Logs cleared successfully');
+            $_SESSION['flash_success'] = 'Tous les logs ont été supprimés avec succès';
         } catch (\Exception $e) {
             // Flash error message
-            flash('error', $e->getMessage());
+            $_SESSION['flash_error'] = 'Erreur lors de la suppression des logs : ' . $e->getMessage();
         }
 
         // Redirect back to monitoring page
-        header('Location: ' . url('/admin/monitoring'));
+        redirect('/admin/monitoring');
         exit;
     }
 

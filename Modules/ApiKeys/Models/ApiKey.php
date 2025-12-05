@@ -11,7 +11,9 @@ class ApiKey extends Model
 {
     use HasAuthor;
     use SoftDeletes;
+
     protected static string $table = 'api_keys';
+    protected bool $timestamps = true; // Enable timestamps
 
     protected array $fillable = [
         'key',
@@ -20,6 +22,8 @@ class ApiKey extends Model
         'permissions',
         'is_active',
         'expires_at',
+        'created_at',
+        'updated_at',
         'created_by',
         'updated_by',
         'deleted_by'

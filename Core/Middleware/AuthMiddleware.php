@@ -10,7 +10,7 @@ class AuthMiddleware
     {
         $auth = new Auth();
         if (!$auth->check()) {
-            redirect('/login');
+            redirect('/auth/login');
             return false;
         }
         return true;

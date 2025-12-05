@@ -1,8 +1,15 @@
 <?php
 
 use Modules\Users\Controllers\AdminUserController;
+use Modules\Users\Controllers\ProfileController;
 
 /** @var \App\Core\Routing\Router $router */
+
+// User Profile
+$router->get('/admin/profile', [ProfileController::class, 'show']);
+$router->post('/admin/profile/update', [ProfileController::class, 'update']);
+$router->get('/admin/profile/change-password', [ProfileController::class, 'showChangePassword']);
+$router->post('/admin/profile/change-password', [ProfileController::class, 'changePassword']);
 
 // Users Management
 $router->group(['prefix' => '/admin/users', 'middleware' => ['auth', 'can:admin.users.view']], function ($router) {

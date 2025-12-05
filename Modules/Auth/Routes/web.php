@@ -1,47 +1,35 @@
 <?php
 
+/**
+ * Auth Module Routes
+ */
+
 use Modules\Auth\Controllers\AuthController;
-use Modules\Auth\Controllers\ApiKeyController;
-use Modules\Auth\Controllers\ProfileController;
-use Modules\Auth\Controllers\PasswordResetController;
+use Modules\Auth\Controllers\MfaController;
 
 /** @var \App\Core\Routing\Router $router */
 
-$router->get('/', function () {
-    redirect('/login');
-});
+// Auth routes
+$router->get('/auth/login', [AuthController::class, 'showLogin']);
+$router->post('/auth/login', [AuthController::class, 'login']);
+$router->get('/auth/logout', [AuthController::class, 'logout']);
+$router->get('/logout', [AuthController::class, 'logout']); // Alias
+$router->get('/auth/register', [AuthController::class, 'showRegister']);
+$router->post('/auth/register', [AuthController::class, 'register']);
 
-$router->get('/login', [AuthController::class, 'login']);
-$router->post('/login', [AuthController::class, 'login']);
+// MFA routes
+$router->get('/auth/mfa/challenge', [MfaController::class, 'showChallenge']);
+$router->post('/auth/mfa/verify', [MfaController::class, 'verifyChallenge']);
+$router->post('/auth/mfa/send-otp', [MfaController::class, 'sendOtp']);
 
-$router->get('/register', [AuthController::class, 'register']);
-$router->post('/register', [AuthController::class, 'register']);
+// MFA settings (requires login)
+$router->get('/auth/mfa/settings', [MfaController::class, 'showSettings']);
+$router->post('/auth/mfa/setup', [MfaController::class, 'setup']);
+$router->get('/auth/mfa/setup/totp', [MfaController::class, 'showTotpSetup']);
+$router->get('/auth/mfa/setup/sms', [MfaController::class, 'showSmsSetup']);
+$router->post('/auth/mfa/setup/totp/verify', [MfaController::class, 'verifyTotpSetup']);
+$router->post('/auth/mfa/disable', [MfaController::class, 'disable']);
 
-$router->get('/logout', [AuthController::class, 'logout']);
-
-// Password Reset
-$router->get('/forgot-password', [PasswordResetController::class, 'forgotPassword']);
-$router->post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
-$router->get('/reset-password', [PasswordResetController::class, 'resetPassword']);
-$router->post('/reset-password', [PasswordResetController::class, 'updatePassword']);
-
-// Protected Routes
-$authMiddleware = [new \App\Core\Middleware\AuthMiddleware(), 'handle'];
-
-// Profile Management
-$router->get('/admin/profile', [ProfileController::class, 'edit'])
-    ->middleware('can:auth.profile.view');
-$router->get('/admin/profile/change-password', [ProfileController::class, 'changePassword'])
-    ->middleware('can:auth.profile.edit');
-$router->post('/admin/profile/update-password', [ProfileController::class, 'updatePassword'])
-    ->middleware('can:auth.profile.edit');
-
-// API Key Management (temporarily without permission checks - middleware blocks due to missing RBAC tables)
-$router->get('/admin/api-keys', [ApiKeyController::class, 'index'])
-    ->middleware('auth');
-$router->post('/admin/api-keys/generate', [ApiKeyController::class, 'generate'])
-    ->middleware('auth');
-$router->post('/admin/api-keys/revoke', [ApiKeyController::class, 'revoke'])
-    ->middleware('auth');
-$router->get('/admin/api-keys/docs', [ApiKeyController::class, 'docs'])
-    ->middleware('auth');
+// Auth logs (admin)
+$router->get('/admin/auth/logs', [\Modules\Auth\Controllers\AuthLogsController::class, 'index']);
+$router->get('/admin/auth/logs/user', [\Modules\Auth\Controllers\AuthLogsController::class, 'userLogs']);

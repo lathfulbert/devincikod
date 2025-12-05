@@ -43,4 +43,54 @@ class User extends Model
         }
         return false;
     }
+
+    /**
+     * Get user's MFA setups
+     */
+    public function mfaSetups()
+    {
+        return $this->hasMany(\Modules\Auth\Models\UserMfaSetup::class, 'user_id', 'id');
+    }
+
+    /**
+     * Get user's OAuth accounts
+     */
+    public function oauthAccounts()
+    {
+        return $this->hasMany(\Modules\Auth\Models\OauthAccount::class, 'user_id', 'id');
+    }
+
+    /**
+     * Get user's authentication logs
+     */
+    public function authLogs()
+    {
+        return $this->hasMany(\Modules\Auth\Models\AuthLog::class, 'user_id', 'id');
+    }
+
+    /**
+     * Check if user has enabled MFA
+     */
+    public function hasMfaEnabled(): bool
+    {
+        $setups = \Modules\Auth\Models\UserMfaSetup::query()
+            ->where('user_id', $this->id)
+            ->where('is_verified', 1)
+            ->get();
+
+        return count($setups) > 0;
+    }
+
+    /**
+     * Get user's verified MFA methods
+     */
+    public function getVerifiedMfaMethods(): array
+    {
+        $setups = \Modules\Auth\Models\UserMfaSetup::query()
+            ->where('user_id', $this->id)
+            ->where('is_verified', 1)
+            ->get();
+
+        return array_map(fn($setup) => $setup->method_type, $setups);
+    }
 }

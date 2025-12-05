@@ -44,26 +44,8 @@ class ApiKeysModule implements ModuleContract
 
     public function getRoutes(): array
     {
-        $authMiddleware = [new \App\Core\Middleware\AuthMiddleware(), 'handle'];
-
         return [
-            // API Analytics Routes (more specific routes first)
-            ['GET', '/admin/system-api-keys/analytics/chart-data', [\Modules\ApiKeys\Controllers\ApiAnalyticsController::class, 'chartData'], [$authMiddleware]],
-            ['GET', '/admin/system-api-keys/analytics/export', [\Modules\ApiKeys\Controllers\ApiAnalyticsController::class, 'export'], [$authMiddleware]],
-            ['GET', '/admin/system-api-keys/analytics', [\Modules\ApiKeys\Controllers\ApiAnalyticsController::class, 'index'], [$authMiddleware]],
-
-            // API Monitoring Routes (more specific routes first)
-            ['GET', '/admin/system-api-keys/monitoring/health-status', [\Modules\ApiKeys\Controllers\ApiMonitoringController::class, 'healthStatus'], [$authMiddleware]],
-            ['GET', '/admin/system-api-keys/monitoring/anomalies', [\Modules\ApiKeys\Controllers\ApiMonitoringController::class, 'anomalies'], [$authMiddleware]],
-            ['GET', '/admin/system-api-keys/monitoring/details', [\Modules\ApiKeys\Controllers\ApiMonitoringController::class, 'details'], [$authMiddleware]],
-            ['GET', '/admin/system-api-keys/monitoring', [\Modules\ApiKeys\Controllers\ApiMonitoringController::class, 'index'], [$authMiddleware]],
-
-            // API Keys Management Routes
-            ['POST', '/admin/system-api-keys/store', [ApiKeyController::class, 'store'], [$authMiddleware]],
-            ['POST', '/admin/system-api-keys/{id}/revoke', [ApiKeyController::class, 'revoke'], [$authMiddleware]],
-            ['POST', '/admin/system-api-keys/{id}/activate', [ApiKeyController::class, 'activate'], [$authMiddleware]],
-            ['POST', '/admin/system-api-keys/{id}/delete', [ApiKeyController::class, 'destroy'], [$authMiddleware]],
-            ['GET', '/admin/system-api-keys', [ApiKeyController::class, 'index'], [$authMiddleware]],
+            __DIR__ . '/Routes/web.php'
         ];
     }
 

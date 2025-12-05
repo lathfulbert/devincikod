@@ -21,18 +21,18 @@
 
     <!-- Show new API key once (Modal) -->
     <?php if ($newKey): ?>
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        <h5 class="alert-heading"><i data-feather="alert-triangle"></i> Important: Copy Your API Key Now!</h5>
-        <p><strong>Name:</strong> <?= htmlspecialchars($newKey['name']) ?></p>
-        <div class="input-group mb-3">
-            <input type="text" class="form-control" id="newApiKey" value="<?= htmlspecialchars($newKey['key']) ?>" readonly>
-            <button class="btn btn-primary" type="button" onclick="copyApiKey()">
-                <i data-feather="copy"></i> Copy
-            </button>
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <h5 class="alert-heading"><i data-feather="alert-triangle"></i> Important: Copy Your API Key Now!</h5>
+            <p><strong>Name:</strong> <?= htmlspecialchars($newKey['name']) ?></p>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" id="newApiKey" value="<?= htmlspecialchars($newKey['key']) ?>" readonly>
+                <button class="btn btn-primary" type="button" onclick="copyApiKey()">
+                    <i data-feather="copy"></i> Copy
+                </button>
+            </div>
+            <p class="mb-0"><small>This key will only be shown once. Make sure to copy it to a secure location.</small></p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        <p class="mb-0"><small>This key will only be shown once. Make sure to copy it to a secure location.</small></p>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
     <?php endif; ?>
 </div>
 
@@ -92,25 +92,27 @@
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <?php if ($apiKey->is_active): ?>
+                                    <?php if ($apiKey->deleted_at): ?>
+                                        <span class="badge bg-danger">Révoquée</span>
+                                    <?php elseif ($apiKey->is_active): ?>
                                         <span class="badge bg-success">Active</span>
                                     <?php else: ?>
-                                        <span class="badge bg-danger">Revoked</span>
+                                        <span class="badge bg-warning">Inactive</span>
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-end">
-                                    <?php if ($apiKey->is_active): ?>
+                                    <?php if (!$apiKey->deleted_at && $apiKey->is_active): ?>
                                         <form action="<?= url('/admin/system-api-keys/' . $apiKey->id . '/revoke') ?>"
-                                              method="POST" style="display:inline;"
-                                              onsubmit="return confirm('Revoke this API key?');">
+                                            method="POST" style="display:inline;"
+                                            onsubmit="return confirm('Revoke this API key?');">
                                             <input type="hidden" name="_csrf_token" value="<?= csrf_token() ?>">
                                             <button type="submit" class="btn btn-sm btn-warning" title="Revoke">
                                                 <i data-feather="x-circle" style="width: 14px; height: 14px;"></i>
                                             </button>
                                         </form>
-                                    <?php else: ?>
+                                    <?php elseif (!$apiKey->deleted_at && !$apiKey->is_active): ?>
                                         <form action="<?= url('/admin/system-api-keys/' . $apiKey->id . '/activate') ?>"
-                                              method="POST" style="display:inline;">
+                                            method="POST" style="display:inline;">
                                             <input type="hidden" name="_csrf_token" value="<?= csrf_token() ?>">
                                             <button type="submit" class="btn btn-sm btn-success" title="Activate">
                                                 <i data-feather="check-circle" style="width: 14px; height: 14px;"></i>
@@ -118,14 +120,16 @@
                                         </form>
                                     <?php endif; ?>
 
-                                    <form action="<?= url('/admin/system-api-keys/' . $apiKey->id . '/delete') ?>"
-                                          method="POST" style="display:inline;"
-                                          onsubmit="return confirm('Delete this API key permanently?');">
-                                        <input type="hidden" name="_csrf_token" value="<?= csrf_token() ?>">
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Delete">
-                                            <i data-feather="trash-2" style="width: 14px; height: 14px;"></i>
-                                        </button>
-                                    </form>
+                                    <?php if (!$apiKey->deleted_at): ?>
+                                        <form action="<?= url('/admin/system-api-keys/' . $apiKey->id . '/delete') ?>"
+                                            method="POST" style="display:inline;"
+                                            onsubmit="return confirm('Delete this API key permanently?');">
+                                            <input type="hidden" name="_csrf_token" value="<?= csrf_token() ?>">
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                                <i data-feather="trash-2" style="width: 14px; height: 14px;"></i>
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -163,7 +167,7 @@
                     <div class="mb-3">
                         <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
                         <input type="text" name="name" id="name" class="form-control"
-                               placeholder="e.g., Mobile App, Production API" required>
+                            placeholder="e.g., Mobile App, Production API" required>
                         <small class="form-text text-muted">A descriptive name to identify this API key</small>
                     </div>
 
@@ -180,7 +184,7 @@
                     <div class="mb-3">
                         <label for="ip_whitelist" class="form-label">IP Whitelist (Optional)</label>
                         <input type="text" name="ip_whitelist" id="ip_whitelist" class="form-control"
-                               placeholder="e.g., 192.168.1.1, 10.0.0.1">
+                            placeholder="e.g., 192.168.1.1, 10.0.0.1">
                         <small class="form-text text-muted">Comma-separated IPs. Leave empty to allow all IPs</small>
                     </div>
 

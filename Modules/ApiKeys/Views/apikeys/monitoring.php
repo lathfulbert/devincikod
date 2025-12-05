@@ -23,45 +23,45 @@
 
 <!-- Alerts Section -->
 <?php if (!empty($allAlerts)): ?>
-<div class="container-fluid mb-4">
-    <div class="row">
-        <div class="col-12">
-            <?php
-            $card_title = "<i data-feather=\"alert-triangle\"></i> Alerts Requiring Attention";
-            component('card-start');
-            ?>
+    <div class="container-fluid mb-4">
+        <div class="row">
+            <div class="col-12">
+                <?php
+                $card_title = "<i data-feather=\"alert-triangle\"></i> Alerts Requiring Attention";
+                component('card-start');
+                ?>
 
-            <?php foreach ($allAlerts as $keyId => $alertData): ?>
-                <div class="mb-3">
-                    <h5><?= htmlspecialchars($alertData['key']->name) ?></h5>
-                    <?php foreach ($alertData['alerts'] as $alert): ?>
-                        <?php
-                        $alertClass = match($alert['severity'] ?? 'medium') {
-                            'high', 'critical' => 'danger',
-                            'warning', 'medium' => 'warning',
-                            default => 'info'
-                        };
-                        ?>
-                        <div class="alert alert-<?= $alertClass ?> alert-dismissible fade show" role="alert">
-                            <strong><?= htmlspecialchars($alert['type']) ?>:</strong>
-                            <?= htmlspecialchars($alert['message']) ?>
-                            <?php if (!empty($alert['issues'])): ?>
-                                <ul class="mb-0 mt-2">
-                                    <?php foreach ($alert['issues'] as $issue): ?>
-                                        <li><?= htmlspecialchars($issue) ?></li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            <?php endif; ?>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endforeach; ?>
+                <?php foreach ($allAlerts as $keyId => $alertData): ?>
+                    <div class="mb-3">
+                        <h5><?= htmlspecialchars($alertData['key']->name) ?></h5>
+                        <?php foreach ($alertData['alerts'] as $alert): ?>
+                            <?php
+                            $alertClass = match ($alert['severity'] ?? 'medium') {
+                                'high', 'critical' => 'danger',
+                                'warning', 'medium' => 'warning',
+                                default => 'info'
+                            };
+                            ?>
+                            <div class="alert alert-<?= $alertClass ?> alert-dismissible fade show" role="alert">
+                                <strong><?= htmlspecialchars($alert['type']) ?>:</strong>
+                                <?= htmlspecialchars($alert['message']) ?>
+                                <?php if (!empty($alert['issues'])): ?>
+                                    <ul class="mb-0 mt-2">
+                                        <?php foreach ($alert['issues'] as $issue): ?>
+                                            <li><?= htmlspecialchars($issue) ?></li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                <?php endif; ?>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endforeach; ?>
 
-            <?php component('card-end'); ?>
+                <?php component('card-end'); ?>
+            </div>
         </div>
     </div>
-</div>
 <?php endif; ?>
 
 <!-- Health Status Overview -->
@@ -89,7 +89,7 @@
                         <?php foreach ($apiKeys as $key): ?>
                             <?php
                             $health = $healthStatuses[$key->id] ?? ['status' => 'unknown', 'error_rate' => 0, 'avg_response_time' => 0, 'total_requests' => 0];
-                            $statusClass = match($health['status']) {
+                            $statusClass = match ($health['status']) {
                                 'healthy' => 'success',
                                 'warning' => 'warning',
                                 'critical' => 'danger',
@@ -98,8 +98,8 @@
                             ?>
                             <tr>
                                 <td>
-                                    <strong><?= htmlspecialchars($key->name) ?></strong><br>
-                                    <small class="text-muted"><?= htmlspecialchars($key->prefix) ?></small>
+                                    <strong><?= htmlspecialchars($key->name ?? 'Unnamed') ?></strong><br>
+                                    <small class="text-muted"><?= htmlspecialchars($key->prefix ?? 'N/A') ?></small>
                                 </td>
                                 <td>
                                     <span class="badge bg-<?= $statusClass ?>">
@@ -125,7 +125,7 @@
                                 </td>
                                 <td>
                                     <a href="<?= url('/admin/system-api-keys/monitoring/details?api_key_id=' . $key->id) ?>"
-                                       class="btn btn-sm btn-outline-primary">
+                                        class="btn btn-sm btn-outline-primary">
                                         <i data-feather="eye"></i> Details
                                     </a>
                                 </td>

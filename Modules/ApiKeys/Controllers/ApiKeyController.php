@@ -21,8 +21,9 @@ class ApiKeyController
             exit;
         }
 
-        // Get user's API keys
-        $apiKeys = ApiKey::where('user_id', $userId)
+        // Get user's API keys (no soft delete anymore)
+        $apiKeys = ApiKey::query()
+            ->where('user_id', $userId)
             ->orderBy('created_at', 'DESC')
             ->get();
 
@@ -94,7 +95,7 @@ class ApiKeyController
     }
 
     /**
-     * Revoke an API key (set is_active to 0)
+     * Revoke an API key (permanent delete)
      */
     public function revoke(array $params = [])
     {
@@ -111,10 +112,14 @@ class ApiKeyController
             ->first();
 
         if ($apiKey) {
-            $apiKey->is_active = 0;
-            $apiKey->save();
+            // Permanent delete
+            if (method_exists($apiKey, 'forceDelete')) {
+                $apiKey->forceDelete(); // Permanent delete (bypass soft delete)
+            } else {
+                $apiKey->delete(); // Fallback
+            }
 
-            $_SESSION['flash_success'] = 'API key revoked successfully';
+            $_SESSION['flash_success'] = 'Clé API révoquée et supprimée avec succès';
         } else {
             $_SESSION['flash_error'] = 'API key not found';
         }
@@ -144,9 +149,39 @@ class ApiKeyController
             $apiKey->is_active = 1;
             $apiKey->save();
 
-            $_SESSION['flash_success'] = 'API key activated successfully';
+            $_SESSION['flash_success'] = 'Clé API activée avec succès';
         } else {
-            $_SESSION['flash_error'] = 'API key not found';
+            $_SESSION['flash_error'] = 'Clé API non trouvée';
+        }
+
+        redirect('/admin/system-api-keys');
+        exit;
+    }
+
+    /**
+     * Deactivate an API key (set is_active to 0)
+     */
+    public function deactivate(array $params = [])
+    {
+        $userId = $_SESSION['user_id'] ?? null;
+        $keyId = $params['id'] ?? null;
+
+        if (!$userId || !$keyId) {
+            redirect('/admin/system-api-keys');
+            exit;
+        }
+
+        $apiKey = ApiKey::where('id', $keyId)
+            ->where('user_id', $userId)
+            ->first();
+
+        if ($apiKey) {
+            $apiKey->is_active = 0;
+            $apiKey->save();
+
+            $_SESSION['flash_success'] = 'Clé API désactivée avec succès';
+        } else {
+            $_SESSION['flash_error'] = 'Clé API non trouvée';
         }
 
         redirect('/admin/system-api-keys');

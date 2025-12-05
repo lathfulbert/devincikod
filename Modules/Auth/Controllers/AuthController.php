@@ -2,140 +2,164 @@
 
 namespace Modules\Auth\Controllers;
 
-use App\Core\Application;
-use App\Core\Auth\Auth;
-use Modules\Users\Services\UserService;
+use Modules\Auth\Services\MfaManager;
+use Modules\Auth\Services\TokenManager;
+use Modules\Auth\Services\AuditLogger;
+use Modules\Auth\Providers\PasswordProvider;
+use Modules\Users\Models\User;
 
+/**
+ * Authentication Controller
+ * Handles login, logout, and registration
+ */
 class AuthController
 {
-    protected UserService $userService;
-    protected Auth $auth;
+    private MfaManager $mfaManager;
+    private TokenManager $tokenManager;
+    private AuditLogger $auditLogger;
 
     public function __construct()
     {
-        $this->auth = new Auth();
-        $this->userService = new UserService();
+        $this->mfaManager = new MfaManager();
+        $this->tokenManager = new TokenManager();
+        $this->auditLogger = new AuditLogger();
     }
 
+    /**
+     * Show login form
+     */
+    public function showLogin()
+    {
+        echo view('auth/login');
+    }
+
+    /**
+     * Handle login request
+     */
     public function login()
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Validation des données
-            $validator = validator($_POST, [
-                'username' => 'required|min:3|max:50',
-                'password' => 'required|min:6'
-            ], [
-                'username.required' => 'Le nom d\'utilisateur est obligatoire.',
-                'username.min' => 'Le nom d\'utilisateur doit contenir au moins 3 caractères.',
-                'password.required' => 'Le mot de passe est obligatoire.',
-                'password.min' => 'Le mot de passe doit contenir au moins 6 caractères.'
-            ]);
+        $identifier = $_POST['identifier'] ?? $_POST['email'] ?? $_POST['username'] ?? null;
+        $password = $_POST['password'] ?? null;
 
-            if ($validator->fails()) {
-                flash('danger', 'Veuillez corriger les erreurs de saisie.');
-                redirect_back_with_errors($validator->errors());
-                return;
-            }
-
-            $validatedData = $validator->validated();
-            $username = $validatedData['username'];
-            $password = $validatedData['password'];
-
-            // Recherche de l'utilisateur
-            $user = $this->userService->findByUsername($username);
-
-            if ($user && password_verify($password, $user->password)) {
-                $this->auth->login([
-                    'id' => $user->id,
-                    'username' => $user->username,
-                    'email' => $user->email ?? null
-                ]);
-
-                flash('success', 'Connexion réussie! Bienvenue ' . $user->username . '.');
-                redirect('/admin/dashboard');
-                return;
-            } else {
-                $errorBag = new \App\Core\Validation\ErrorBag();
-                $errorBag->add('username', 'Nom d\'utilisateur ou mot de passe incorrect.');
-                flash('danger', 'Identifiants invalides. Veuillez réessayer.');
-                redirect_back_with_errors($errorBag);
-                return;
-            }
-        }
-
-        echo view('auth/auth/login', ['title' => 'Login']);
-    }
-
-    public function register()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Validation des données
-            $validator = validator($_POST, [
-                'username' => 'required|min:3|max:50|alpha_dash|unique:users,username',
-                'email' => 'required|email|unique:users,email',
-                'first_name' => 'alpha',
-                'last_name' => 'alpha',
-                'password' => 'required|min:8|confirmed',
-                'terms' => 'required'
-            ], [
-                'username.required' => 'Le nom d\'utilisateur est obligatoire.',
-                'username.min' => 'Le nom d\'utilisateur doit contenir au moins 3 caractères.',
-                'username.alpha_dash' => 'Le nom d\'utilisateur ne peut contenir que des lettres, chiffres, tirets et underscores.',
-                'username.unique' => 'Ce nom d\'utilisateur est déjà utilisé.',
-                'email.required' => 'L\'email est obligatoire.',
-                'email.email' => 'L\'email doit être une adresse valide.',
-                'email.unique' => 'Cet email est déjà utilisé.',
-                'first_name.alpha' => 'Le prénom ne peut contenir que des lettres.',
-                'last_name.alpha' => 'Le nom ne peut contenir que des lettres.',
-                'password.required' => 'Le mot de passe est obligatoire.',
-                'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
-                'password.confirmed' => 'Les mots de passe ne correspondent pas.',
-                'terms.required' => 'Vous devez accepter les conditions d\'utilisation.'
-            ]);
-
-            if ($validator->fails()) {
-                flash('danger', 'Veuillez corriger les erreurs de saisie.');
-                redirect_back_with_errors($validator->errors());
-                return;
-            }
-
-            $validatedData = $validator->validated();
-
-            // Créer l'utilisateur
-            $user = $this->userService->createUser([
-                'username' => $validatedData['username'],
-                'email' => $validatedData['email'],
-                'first_name' => $validatedData['first_name'] ?? null,
-                'last_name' => $validatedData['last_name'] ?? null,
-                'password' => $validatedData['password']
-            ]);
-
-            // Connexion automatique après inscription
-            $this->auth->login([
-                'id' => $user->id,
-                'username' => $user->username,
-                'email' => $user->email
-            ]);
-
-            flash('success', 'Inscription réussie! Bienvenue ' . $user->username . '!');
-            redirect('/admin/dashboard');
+        if (!$identifier || !$password) {
+            $_SESSION['flash_error'] = 'Email/Username et mot de passe requis';
+            redirect('/auth/login');
             return;
         }
 
-        echo view('auth/auth/register', ['title' => 'Inscription']);
+        // Check rate limiting
+        if ($this->auditLogger->shouldRateLimit(null, null, 5)) {
+            $_SESSION['flash_error'] = 'Trop de tentatives. Réessayez plus tard.';
+            redirect('/auth/login');
+            return;
+        }
+
+        // Verify password
+        $passwordProvider = new PasswordProvider();
+        $user = $passwordProvider->verify($identifier, $password);
+
+        if (!$user) {
+            $_SESSION['flash_error'] = 'Identifiants invalides';
+            redirect('/auth/login');
+            return;
+        }
+
+        $userId = $user['id'];
+
+        // Check if MFA is required
+        if ($this->mfaManager->isRequired($userId)) {
+            // Store user ID in session for MFA verification
+            $_SESSION['mfa_user_id'] = $userId;
+            $_SESSION['mfa_required'] = true;
+
+            redirect('/auth/mfa/challenge');
+            return;
+        }
+
+        // No MFA required - complete login
+        $this->completeLogin($user);
     }
 
+    /**
+     * Complete login (set session, generate tokens)
+     */
+    private function completeLogin(array $user)
+    {
+        $_SESSION['user'] = $user;
+        $_SESSION['user_id'] = $user['id'];
+        unset($_SESSION['mfa_user_id']);
+        unset($_SESSION['mfa_required']);
+
+        // Generate API tokens for SPA/Mobile
+        $tokens = $this->tokenManager->generateTokenPair($user['id']);
+        $_SESSION['api_tokens'] = $tokens;
+
+        $_SESSION['flash_success'] = 'Welcome back!';
+        redirect('/admin/dashboard');
+    }
+
+    /**
+     * Handle logout
+     */
     public function logout()
     {
-        $this->auth->logout();
-        redirect('/login');
-        exit;
+        $userId = $_SESSION['user_id'] ?? null;
+
+        if ($userId) {
+            $this->auditLogger->logLogout($userId);
+        }
+
+        session_destroy();
+        redirect('/auth/login');
     }
 
-    public function dashboard()
+    /**
+     * Show registration form
+     */
+    public function showRegister()
     {
-        $app = Application::getInstance();
-        $user = $this->auth->user();
-        echo view('auth/auth/dashboard', ['title' => 'Dashboard', 'user' => $user]);
+        echo view('auth/register');
+    }
+
+    /**
+     * Handle registration
+     */
+    public function register()
+    {
+        $email = $_POST['email'] ?? null;
+        $password = $_POST['password'] ?? null;
+        $passwordConfirm = $_POST['password_confirm'] ?? null;
+
+        // Validation
+        if (!$email || !$password) {
+            $_SESSION['flash_error'] = 'All fields are required';
+            redirect('/auth/register');
+            return;
+        }
+
+        if ($password !== $passwordConfirm) {
+            $_SESSION['flash_error'] = 'Passwords do not match';
+            redirect('/auth/register');
+            return;
+        }
+
+        // Check if user exists
+        $existing = User::query()->where('email', $email)->first();
+        if ($existing) {
+            $_SESSION['flash_error'] = 'Email already registered';
+            redirect('/auth/register');
+            return;
+        }
+
+        // Create user
+        $user = new User();
+        $user->email = $email;
+        $user->password = password_hash($password, PASSWORD_ARGON2ID);
+        $user->is_active = 1;
+        $user->status = 'active';
+        $user->save();
+
+        $_SESSION['flash_success'] = 'Registration successful! Please login.';
+        redirect('/auth/login');
     }
 }
