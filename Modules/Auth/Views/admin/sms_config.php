@@ -13,15 +13,16 @@
                 <div class="card-body">
                     <?php component('alerts'); ?>
 
+
                     <form action="<?= url('/admin/auth/sms-config') ?>" method="POST">
                         <?= csrf_field() ?>
 
                         <div class="mb-3">
                             <label for="sender_id" class="form-label">Sender ID</label>
                             <select name="sender_id" id="sender_id" class="form-select">
-                                <option value="AUTH" <?= $currentSenderId === 'AUTH' ? 'selected' : '' ?>>AUTH (Défaut)</option>
+                                <option value="AUTH" <?= selected('AUTH', $currentSenderId ?? '') ?>>AUTH (Défaut)</option>
                                 <?php foreach ($senderNames as $sender): ?>
-                                    <option value="<?= htmlspecialchars($sender->name) ?>" <?= $currentSenderId === $sender->name ? 'selected' : '' ?>>
+                                    <option value="<?= htmlspecialchars($sender->name) ?>" <?= selected($sender->name, $currentSenderId ?? '') ?>>
                                         <?= htmlspecialchars($sender->name) ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -32,9 +33,9 @@
                         <div class="mb-3">
                             <label for="gateway_code" class="form-label">Gateway SMS</label>
                             <select name="gateway_code" id="gateway_code" class="form-select">
-                                <option value="auto" <?= $currentGateway === 'auto' ? 'selected' : '' ?>>Automatique (Gateway par défaut)</option>
+                                <option value="auto" <?= selected('auto', $currentGateway ?? '') ?>>Automatique (Gateway par défaut)</option>
                                 <?php foreach ($gateways as $gateway): ?>
-                                    <option value="<?= htmlspecialchars($gateway->provider_code) ?>" <?= $currentGateway === $gateway->provider_code ? 'selected' : '' ?>>
+                                    <option value="<?= htmlspecialchars($gateway->provider_code) ?>" <?= selected($gateway->provider_code, $currentGateway ?? '') ?>>
                                         <?= htmlspecialchars($gateway->name) ?> (<?= htmlspecialchars($gateway->provider_code) ?>)
                                     </option>
                                 <?php endforeach; ?>

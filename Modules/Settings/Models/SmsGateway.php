@@ -158,8 +158,21 @@ class SmsGateway extends Model
     private function decrypt(string $value): string
     {
         $key = self::getEncryptionKey();
-        list($encrypted, $iv) = explode('::', base64_decode($value), 2);
-        return openssl_decrypt($encrypted, 'aes-256-cbc', $key, 0, $iv);
+        $decoded = base64_decode($value, true);
+
+        // If decoding fails or doesn't contain delimiter, return original value (fallback for plain text)
+        if ($decoded === false || strpos($decoded, '::') === false) {
+            return $value;
+        }
+
+        $parts = explode('::', $decoded, 2);
+
+        if (count($parts) !== 2) {
+            return $value;
+        }
+
+        list($encrypted, $iv) = $parts;
+        return openssl_decrypt($encrypted, 'aes-256-cbc', $key, 0, $iv) ?: $value;
     }
 
     /**

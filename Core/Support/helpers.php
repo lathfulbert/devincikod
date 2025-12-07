@@ -669,6 +669,34 @@ if (!function_exists('method_field')) {
     }
 }
 
+if (!function_exists('selected')) {
+    /**
+     * Generate a selected HTML attribute.
+     *
+     * @param  mixed  $value
+     * @param  mixed  $current
+     * @return string
+     */
+    function selected($value, $current): string
+    {
+        return (string) $value === (string) $current ? 'selected="selected"' : '';
+    }
+}
+
+if (!function_exists('checked')) {
+    /**
+     * Generate a checked HTML attribute.
+     *
+     * @param  mixed  $value
+     * @param  mixed  $current
+     * @return string
+     */
+    function checked($value, $current): string
+    {
+        return (string) $value === (string) $current ? 'checked="checked"' : '';
+    }
+}
+
 /*
 |--------------------------------------------------------------------------
 | Event Helpers

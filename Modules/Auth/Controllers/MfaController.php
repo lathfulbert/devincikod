@@ -360,8 +360,11 @@ class MfaController
         }
 
         // Get current settings
-        $currentSenderId = \Modules\Settings\Models\Setting::get('auth_sms_sender_id', 'AUTH');
-        $currentGateway = \Modules\Settings\Models\Setting::get('auth_sms_gateway_id', 'auto');
+        $currentSenderId = \Modules\Settings\Models\Setting::get('auth_sms_sender_id');
+        $currentSenderId = !empty($currentSenderId) ? $currentSenderId : 'AUTH';
+
+        $currentGateway = \Modules\Settings\Models\Setting::get('auth_sms_gateway_id');
+        $currentGateway = !empty($currentGateway) ? $currentGateway : 'auto';
 
         // Get available gateways
         $gateways = \Modules\Settings\Models\SmsGateway::where('is_active', 1)->get();
@@ -396,11 +399,20 @@ class MfaController
         $senderId = $_POST['sender_id'] ?? 'AUTH';
         $gatewayCode = $_POST['gateway_code'] ?? 'auto';
 
-        // Save settings
-        \Modules\Settings\Models\Setting::set('auth_sms_sender_id', $senderId);
-        \Modules\Settings\Models\Setting::set('auth_sms_gateway_id', $gatewayCode);
+        // Save settings explicitly
+        $r1 = \Modules\Settings\Models\Setting::set('auth_sms_sender_id', $senderId, 'string', 'auth');
+        $r2 = \Modules\Settings\Models\Setting::set('auth_sms_gateway_id', $gatewayCode, 'string', 'auth');
 
-        $_SESSION['flash_success'] = 'Configuration SMS OTP mise à jour avec succès';
+        // Verification (Audit)
+        $verifySender = \Modules\Settings\Models\Setting::get('auth_sms_sender_id');
+        $verifyGateway = \Modules\Settings\Models\Setting::get('auth_sms_gateway_id');
+
+        if ($verifySender !== $senderId || $verifyGateway !== $gatewayCode) {
+            $_SESSION['flash_error'] = "Erreur: Les paramètres n'ont pas été sauvegardés correctement. (DB: $verifySender / $verifyGateway)";
+        } else {
+            $_SESSION['flash_success'] = 'Configuration SMS OTP mise à jour avec succès';
+        }
+
         redirect('/admin/auth/sms-config');
     }
 }

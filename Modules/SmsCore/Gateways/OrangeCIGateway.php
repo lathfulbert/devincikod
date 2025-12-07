@@ -263,6 +263,61 @@ class OrangeCIGateway implements SmsGatewayInterface
     }
 
     /**
+     * Get contract details (balance, expiration) from Orange API
+     * Endpoint: GET https://api.orange.com/sms/admin/v1/contracts
+     */
+    public function getContracts(): array
+    {
+        try {
+            $token = $this->getAccessToken();
+
+            if (!$token) {
+                return [
+                    'success' => false,
+                    'message' => 'Failed to obtain access token'
+                ];
+            }
+
+            $url = 'https://api.orange.com/sms/admin/v1/contracts';
+
+            $headers = [
+                'Authorization: Bearer ' . $token,
+                'Accept: application/json'
+            ];
+
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($httpCode === 200) {
+                $data = json_decode($response, true);
+                return [
+                    'success' => true,
+                    'data' => $data
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Failed to fetch contracts',
+                'http_code' => $httpCode,
+                'response' => json_decode($response, true),
+                'error' => $curlError
+            ];
+        } catch (\Throwable $e) {
+            return [
+                'success' => false,
+                'message' => 'Exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine()
+            ];
+        }
+    }
+
+    /**
      * Format phone number to Orange API format: tel:+XXXXXXXXXXXX
      *
      * @param string $number Phone number to format
@@ -295,7 +350,118 @@ class OrangeCIGateway implements SmsGatewayInterface
             }
         }
 
+
         // Return in tel:+XXXXXXXXXXXX format
         return 'tel:' . $cleaned;
+    }
+
+    /**
+     * Get usage statistics from Orange API
+     * Endpoint: GET https://api.orange.com/sms/admin/v1/statistics
+     */
+    public function getStatistics(): array
+    {
+        try {
+            $token = $this->getAccessToken();
+
+            if (!$token) {
+                return [
+                    'success' => false,
+                    'message' => 'Failed to obtain access token'
+                ];
+            }
+
+            $url = 'https://api.orange.com/sms/admin/v1/statistics';
+
+            $headers = [
+                'Authorization: Bearer ' . $token,
+                'Accept: application/json'
+            ];
+
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($httpCode === 200) {
+                $data = json_decode($response, true);
+                return [
+                    'success' => true,
+                    'data' => $data
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Failed to fetch statistics',
+                'http_code' => $httpCode,
+                'response' => json_decode($response, true),
+                'error' => $curlError
+            ];
+        } catch (\Throwable $e) {
+            return [
+                'success' => false,
+                'message' => 'Exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine()
+            ];
+        }
+    }
+
+    /**
+     * Get purchase history from Orange API
+     * Endpoint: GET https://api.orange.com/sms/admin/v1/purchaseorders
+     */
+    public function getPurchaseOrders(): array
+    {
+        try {
+            $token = $this->getAccessToken();
+
+            if (!$token) {
+                return [
+                    'success' => false,
+                    'message' => 'Failed to obtain access token'
+                ];
+            }
+
+            $url = 'https://api.orange.com/sms/admin/v1/purchaseorders';
+
+            $headers = [
+                'Authorization: Bearer ' . $token,
+                'Accept: application/json'
+            ];
+
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($httpCode === 200) {
+                $data = json_decode($response, true);
+                return [
+                    'success' => true,
+                    'data' => $data
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Failed to fetch purchase orders',
+                'http_code' => $httpCode,
+                'response' => json_decode($response, true),
+                'error' => $curlError
+            ];
+        } catch (\Throwable $e) {
+            return [
+                'success' => false,
+                'message' => 'Exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine()
+            ];
+        }
     }
 }

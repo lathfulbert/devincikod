@@ -196,10 +196,21 @@ class SmsOtpProvider implements AuthProviderInterface
                     return false;
                 }
 
-                // Get default gateway configuration
+                // Get configured Gateway ID
+                $gatewayCode = \Modules\Settings\Models\Setting::get('auth_sms_gateway_id', 'auto');
                 $gatewayConfig = null;
+
                 if (class_exists('\Modules\Settings\Models\SmsGateway')) {
-                    $gatewayConfig = \Modules\Settings\Models\SmsGateway::getDefault();
+                    if ($gatewayCode && $gatewayCode !== 'auto') {
+                        $gatewayConfig = \Modules\Settings\Models\SmsGateway::where('provider_code', $gatewayCode)
+                            ->where('is_active', 1)
+                            ->first();
+                    }
+
+                    // Fallback to default if not found or auto
+                    if (!$gatewayConfig) {
+                        $gatewayConfig = \Modules\Settings\Models\SmsGateway::getDefault();
+                    }
                 }
 
                 // Fallback to mock if no gateway configured

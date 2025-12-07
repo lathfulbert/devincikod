@@ -467,4 +467,43 @@ class SmsController
 
         return $added;
     }
+
+    /**
+     * Show Orange SMS Contracts/Balance
+     * Route: /admin/sms/contracts
+     */
+    public function contracts()
+    {
+        $app = Application::getInstance();
+
+        // Find Orange Gateway config
+        $gatewayConfig = SmsGateway::where('provider_code', 'orange_ci')->first();
+
+        if (!$gatewayConfig || !$gatewayConfig->is_active) {
+            $_SESSION['flash_error'] = 'Le gateway Orange CI n\'est pas configuré ou inactif.';
+            redirect('/admin/sms/dashboard');
+            exit;
+        }
+
+        // Create gateway instance directly to access specific method
+        $gateway = new \Modules\SmsCore\Gateways\OrangeCIGateway($gatewayConfig);
+
+        $result = $gateway->getContracts();
+
+        $contracts = [];
+        $error = null;
+
+        if ($result['success']) {
+            $contracts = $result['data'] ?? [];
+        } else {
+            $error = $result['message'] . (isset($result['error']) ? ': ' . $result['error'] : '');
+        }
+
+        echo view('SmsCore/sms/contracts', [
+            'title' => 'Contrats Orange SMS',
+            'contracts' => $contracts,
+            'error' => $error,
+            'gateway' => $gatewayConfig
+        ]);
+    }
 }

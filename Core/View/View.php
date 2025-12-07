@@ -64,7 +64,17 @@ class View
 
         // Compile and include the template
         $compiledPath = $this->engine->compile($file);
-        require $compiledPath;
+
+        try {
+            require $compiledPath;
+        } catch (\Throwable $e) {
+            file_put_contents(
+                __DIR__ . '/../../storage/logs/view_error.log',
+                "Error rendering $view: " . $e->getMessage() . "\n" .
+                    $e->getTraceAsString() . "\n"
+            );
+            throw $e;
+        }
 
         $content = ob_get_clean();
 

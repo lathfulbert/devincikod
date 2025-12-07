@@ -30,10 +30,15 @@ class SmsCoreModule extends AbstractModule
             ['POST', '/admin/sms/send', [\Modules\SmsCore\Controllers\SmsController::class, 'send'], [$authMiddleware]],
             ['POST', '/admin/sms/send-bulk', [\Modules\SmsCore\Controllers\SmsController::class, 'sendBulk'], [$authMiddleware]],
             ['GET', '/admin/sms/download-template', [\Modules\SmsCore\Controllers\SmsController::class, 'downloadTemplate'], [$authMiddleware]],
+            ['GET', '/admin/sms/contracts', [\Modules\SmsCore\Controllers\SmsController::class, 'contracts'], [$authMiddleware]],
             ['GET', '/admin/sms/history', [\Modules\SmsCore\Controllers\SmsController::class, 'history'], [$authMiddleware]],
             ['GET', '/admin/sms/details/{id}', [\Modules\SmsCore\Controllers\SmsController::class, 'details'], [$authMiddleware]],
             ['GET', '/admin/sms/bulk', [\Modules\SmsCore\Controllers\SmsController::class, 'bulk'], [$authMiddleware]],
             ['POST', '/admin/sms/bulk', [\Modules\SmsCore\Controllers\SmsController::class, 'bulk'], [$authMiddleware]],
+
+            // Provider Dashboard
+            ['GET', '/admin/sms/providers', [\Modules\SmsCore\Controllers\ProviderDashboardController::class, 'index'], [$authMiddleware]],
+            ['GET', '/admin/sms/providers/orange', [\Modules\SmsCore\Controllers\ProviderDashboardController::class, 'orange'], [$authMiddleware]],
 
             // Campaigns
             ['GET', '/admin/sms/campaigns', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'index'], [$authMiddleware]],
@@ -90,6 +95,7 @@ class SmsCoreModule extends AbstractModule
                     ['title' => 'Sender Names', 'url' => '/sms/sender-names'],
                     ['title' => 'Tarification', 'url' => '/admin/sms/pricing'],
                     ['title' => 'Facturation', 'url' => '/admin/sms/billing'],
+                    ['title' => 'Fournisseurs (Stats)', 'url' => '/admin/sms/providers', 'icon' => 'server'],
                     ['title' => 'API Keys', 'url' => '/admin/api-keys', 'icon' => 'key'],
                 ]
             ]

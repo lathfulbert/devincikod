@@ -113,6 +113,11 @@ class AuthModule implements ModuleContract
                         'title' => 'Journal d\'audit',
                         'url' => '/admin/auth/logs',
                         'permission' => 'admin.auth.logs.view'
+                    ],
+                    [
+                        'title' => 'Paramètres SMS OTP',
+                        'url' => '/admin/auth/sms-config',
+                        'permission' => 'admin.auth.settings'
                     ]
                 ]
             ]

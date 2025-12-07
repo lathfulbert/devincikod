@@ -11,8 +11,7 @@ class Setting extends Model
     protected static string $table = 'settings';
     protected array $fillable = ['key', 'value', 'type', 'setting_group', 'description', 'is_public', 'created_by', 'updated_by'];
     protected array $casts = [
-        'is_public' => 'boolean',
-        'value' => 'json'
+        'is_public' => 'boolean'
     ];
 
     // Cache duration in seconds (1 hour)
