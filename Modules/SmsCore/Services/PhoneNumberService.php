@@ -35,6 +35,11 @@ class PhoneNumberService
             $defaultCountryCode = Setting::get('sms_default_country_code', '+225');
         }
 
+        // Ensure it is not null (in case setting exists but is null)
+        if ($defaultCountryCode === null) {
+            $defaultCountryCode = '+225';
+        }
+
         // Remove + from default code for comparison
         $codeWithoutPlus = ltrim($defaultCountryCode, '+');
 

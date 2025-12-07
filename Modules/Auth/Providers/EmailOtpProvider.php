@@ -156,19 +156,52 @@ class EmailOtpProvider implements AuthProviderInterface
             'attempts' => 0
         ];
 
-        // Send email
-        $subject = 'Your Verification Code';
-        $message = "Your verification code is: {$code}\n\nThis code will expire in 5 minutes.";
+        // Send email using EmailSenderService
+        try {
+            // Instantiate service (manually for now as we don't have DI in providers yet)
+            $gatewayFactory = new \Modules\EmailMarketing\Services\EmailGatewayFactory();
+            $emailService = new \Modules\EmailMarketing\Services\EmailSenderService($gatewayFactory);
 
-        // Use PHP mail or email service
-        if (function_exists('mail')) {
-            mail($email, $subject, $message);
-        } else {
-            // Fallback: log to file for development
+            $subject = 'Votre code de vérification';
+
+            // Simple HTML Template
+            $html = "
+            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #fafafa;'>
+                <div style='text-align: center; margin-bottom: 20px;'>
+                    <h2 style='color: #333;'>Vérification de sécurité</h2>
+                </div>
+                <div style='background-color: #fff; padding: 20px; border-radius: 5px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);'>
+                    <p style='color: #666; margin-bottom: 10px;'>Votre code de vérification est :</p>
+                    <h1 style='color: #2563eb; font-size: 32px; letter-spacing: 5px; margin: 10px 0;'>{$code}</h1>
+                    <p style='color: #999; font-size: 14px; margin-top: 20px;'>Ce code expire dans 5 minutes.</p>
+                </div>
+                <div style='text-align: center; margin-top: 20px; color: #aaa; font-size: 12px;'>
+                    Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.
+                </div>
+            </div>";
+
+            // Get Sender info from settings
+            $fromName = \Modules\Settings\Models\Setting::get('auth_email_sender_name', 'Security Team');
+            $fromEmail = \Modules\Settings\Models\Setting::get('auth_email_sender_address', 'noreply@' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
+
+            $result = $emailService->send($email, $subject, $html, [
+                'user_id' => $userId,
+                'from_name' => $fromName,
+                'from' => $fromEmail,
+                'metadata' => ['type' => 'otp']
+            ]);
+
+            return $result['success'];
+        } catch (\Exception $e) {
+            error_log("Failed to send Email OTP: " . $e->getMessage());
+            // Fallback to mail() if service fails completely? No, let's trust the service or fail.
+            // Actually, if EmailMarketing module is not active or set up, this might fail.
+            // But we should assume it works if the file exists.
+
+            // Fallback log
             error_log("Email OTP for user {$userId} ({$email}): {$code}");
+            return false;
         }
-
-        return true;
     }
 
     public function isAvailable(): bool

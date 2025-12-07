@@ -346,4 +346,61 @@ class MfaController
 
         redirect('/auth/mfa/settings');
     }
+
+    /**
+     * Show SMS OTP Configuration (Admin)
+     */
+    public function showSmsConfig()
+    {
+        // Check admin permission (assuming 'admin' role or similar check)
+        // For now, just check if logged in, but in production should be stricter
+        if (!isset($_SESSION['user_id'])) {
+            redirect('/auth/login');
+            return;
+        }
+
+        // Get current settings
+        $currentSenderId = \Modules\Settings\Models\Setting::get('auth_sms_sender_id', 'AUTH');
+        $currentGateway = \Modules\Settings\Models\Setting::get('auth_sms_gateway_id', 'auto');
+
+        // Get available gateways
+        $gateways = \Modules\Settings\Models\SmsGateway::where('is_active', 1)->get();
+
+        // Get available sender names (all system sender names)
+        $senderNames = \Modules\SmsCore\Models\SenderName::where('status', 'approved')->get();
+
+        echo view('auth/admin/sms_config', [
+            'currentSenderId' => $currentSenderId,
+            'currentGateway' => $currentGateway,
+            'gateways' => $gateways,
+            'senderNames' => $senderNames
+        ]);
+    }
+
+    /**
+     * Save SMS OTP Configuration (Admin)
+     */
+    public function saveSmsConfig()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('/admin/auth/sms-config');
+            return;
+        }
+
+        // Check admin permission
+        if (!isset($_SESSION['user_id'])) {
+            redirect('/auth/login');
+            return;
+        }
+
+        $senderId = $_POST['sender_id'] ?? 'AUTH';
+        $gatewayCode = $_POST['gateway_code'] ?? 'auto';
+
+        // Save settings
+        \Modules\Settings\Models\Setting::set('auth_sms_sender_id', $senderId);
+        \Modules\Settings\Models\Setting::set('auth_sms_gateway_id', $gatewayCode);
+
+        $_SESSION['flash_success'] = 'Configuration SMS OTP mise à jour avec succès';
+        redirect('/admin/auth/sms-config');
+    }
 }

@@ -162,4 +162,112 @@ class AuthController
         $_SESSION['flash_success'] = 'Registration successful! Please login.';
         redirect('/auth/login');
     }
+    /**
+     * Redirect to OAuth Provider
+     */
+    public function oauthRedirect(string $provider)
+    {
+        try {
+            // Get provider configuration
+            $clientId = \Modules\Settings\Models\Setting::get("auth_oauth_{$provider}_client_id");
+            $clientSecret = \Modules\Settings\Models\Setting::get("auth_oauth_{$provider}_client_secret");
+
+            if (!$clientId || !$clientSecret) {
+                $_SESSION['flash_error'] = "Provider $provider not configured";
+                redirect('/auth/login');
+                return;
+            }
+
+            $config = [
+                "auth_oauth_{$provider}_client_id" => $clientId,
+                "auth_oauth_{$provider}_client_secret" => $clientSecret
+            ];
+
+            $oauthProvider = new \Modules\Auth\Providers\OauthProvider($config);
+            $authUrl = $oauthProvider->getAuthUrl($provider);
+
+            redirect($authUrl);
+        } catch (\Exception $e) {
+            $_SESSION['flash_error'] = $e->getMessage();
+            redirect('/auth/login');
+        }
+    }
+
+    /**
+     * Handle OAuth Callback
+     */
+    public function oauthCallback(string $provider)
+    {
+        $code = $_GET['code'] ?? null;
+        $state = $_GET['state'] ?? null;
+
+        if (!$code || !$state) {
+            $_SESSION['flash_error'] = 'Invalid request';
+            redirect('/auth/login');
+            return;
+        }
+
+        try {
+            $oauthProvider = new \Modules\Auth\Providers\OauthProvider();
+            $oauthUser = $oauthProvider->handleCallback($provider, $code, $state);
+
+            // Check if user exists by email
+            $existingUser = User::where('email', $oauthUser['email'])->first();
+
+            if ($existingUser) {
+                // Link account if not linked
+                $this->linkOauthAccount($existingUser->id, $oauthUser);
+
+                // Login user
+                $this->completeLogin($existingUser->toArray());
+            } else {
+                // Register new user
+                $newUser = new User();
+                $newUser->email = $oauthUser['email'];
+                $newUser->first_name = $oauthUser['name']; // Simplify name handling
+                $newUser->is_active = 1;
+                $newUser->status = 'active';
+                $newUser->email_verified_at = date('Y-m-d H:i:s'); // OAuth users are verified
+                $newUser->save();
+
+                // Link account
+                $this->linkOauthAccount($newUser->id, $oauthUser);
+
+                // Login user
+                $this->completeLogin($newUser->toArray());
+            }
+        } catch (\Exception $e) {
+            $_SESSION['flash_error'] = 'Authentication failed: ' . $e->getMessage();
+            redirect('/auth/login');
+        }
+    }
+
+    /**
+     * Link OAuth Account to User
+     */
+    private function linkOauthAccount(int $userId, array $oauthUser)
+    {
+        $existingAccount = \Modules\Auth\Models\OauthAccount::where('user_id', $userId)
+            ->where('provider', $oauthUser['provider'])
+            ->first();
+
+        $tokenData = $oauthUser['token'];
+
+        if ($existingAccount) {
+            $existingAccount->updateTokens(
+                $tokenData['access_token'],
+                $tokenData['refresh_token'] ?? null,
+                $tokenData['expires_in'] ?? null
+            );
+        } else {
+            \Modules\Auth\Models\OauthAccount::create([
+                'user_id' => $userId,
+                'provider' => $oauthUser['provider'],
+                'provider_user_id' => $oauthUser['provider_user_id'],
+                'access_token' => $tokenData['access_token'],
+                'refresh_token' => $tokenData['refresh_token'] ?? null,
+                'expires_at' => isset($tokenData['expires_in']) ? date('Y-m-d H:i:s', time() + $tokenData['expires_in']) : null
+            ]);
+        }
+    }
 }

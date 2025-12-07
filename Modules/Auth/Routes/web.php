@@ -35,3 +35,7 @@ $router->post('/auth/mfa/disable', [MfaController::class, 'disable']);
 // Auth logs (admin)
 $router->get('/admin/auth/logs', [\Modules\Auth\Controllers\AuthLogsController::class, 'index']);
 $router->get('/admin/auth/logs/user', [\Modules\Auth\Controllers\AuthLogsController::class, 'userLogs']);
+
+// SMS OTP Config (admin)
+$router->get('/admin/auth/sms-config', [MfaController::class, 'showSmsConfig']);
+$router->post('/admin/auth/sms-config', [MfaController::class, 'saveSmsConfig']);

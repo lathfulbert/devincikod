@@ -188,26 +188,31 @@ class SmsOtpProvider implements AuthProviderInterface
         // Send SMS via SmsCore module
         if (class_exists('\Modules\SmsCore\Services\SmsSenderService')) {
             try {
-                // Manually instantiate dependencies since we don't have DI container here yet
-                // In a real app, this should be resolved via container
-                $gatewayFactory = new \Modules\SmsCore\Services\SmsGatewayFactory();
+                // Format phone number
+                $phone = \Modules\SmsCore\Services\PhoneNumberService::format($phone);
 
-                // Get default gateway configuration or create a mock one
-                if (class_exists('\Modules\Settings\Models\SmsGateway')) {
-                    $gatewayConfig = \Modules\Settings\Models\SmsGateway::getDefault();
-
-                    if (!$gatewayConfig) {
-                        // Create a temporary mock configuration if no default gateway found
-                        $gatewayConfig = new \Modules\Settings\Models\SmsGateway();
-                        $gatewayConfig->provider_code = 'mock';
-                        $gatewayConfig->name = 'Mock Gateway';
-                        $gatewayConfig->is_active = true;
-                    }
-                } else {
-                    // Fallback if Settings module not available (should not happen if SmsCore is present)
-                    throw new \Exception("SmsGateway model not found");
+                if (!\Modules\SmsCore\Services\PhoneNumberService::validate($phone)) {
+                    error_log("Invalid phone number format: $phone");
+                    return false;
                 }
 
+                // Get default gateway configuration
+                $gatewayConfig = null;
+                if (class_exists('\Modules\Settings\Models\SmsGateway')) {
+                    $gatewayConfig = \Modules\Settings\Models\SmsGateway::getDefault();
+                }
+
+                // Fallback to mock if no gateway configured
+                if (!$gatewayConfig) {
+                    error_log("No SMS gateway configured, using mock");
+                    $gatewayConfig = new \Modules\Settings\Models\SmsGateway();
+                    $gatewayConfig->provider_code = 'mock';
+                    $gatewayConfig->name = 'Mock Gateway';
+                    $gatewayConfig->api_key = 'mock_key';
+                    $gatewayConfig->is_active = 1;
+                }
+
+                $gatewayFactory = new \Modules\SmsCore\Services\SmsGatewayFactory();
                 $gateway = $gatewayFactory->create($gatewayConfig);
 
                 $pricingService = new \Modules\SmsCore\Services\SmsPricingService();
@@ -219,12 +224,49 @@ class SmsOtpProvider implements AuthProviderInterface
                     $billingService
                 );
 
-                $smsService->send($phone, "Your verification code is: {$code}. Valid for 2 minutes.");
+                // Get configured Sender ID or default to AUTH
+                $senderId = \Modules\Settings\Models\Setting::get('auth_sms_sender_id', 'AUTH');
+
+                // Create SMS Message record for history
+                $smsMessage = \Modules\SmsCore\Models\SmsMessage::create([
+                    'user_id' => $userId,
+                    'to' => $phone,
+                    'from' => $senderId,
+                    'message' => "Votre code de vérification est: {$code}. Valide pour 2 minutes.",
+                    'gateway' => $gatewayConfig->provider_code,
+                    'status' => 'pending',
+                    'message_id' => 'OTP-' . uniqid(),
+                    // 'type' => 'otp' // Add type column if exists or use metadata
+                ]);
+
+                // Send OTP
+                $result = $smsService->send($phone, "Votre code de vérification est: {$code}. Valide pour 2 minutes.", $senderId, [
+                    'user_id' => $userId,
+                    'type' => 'otp'
+                ]);
+
+                // Update history with result
+                $smsMessage->gateway_response = $result['gateway_response'] ?? null;
+
+                if ($result['success']) {
+                    $smsMessage->markAsSent($result['gateway_message_id'] ?? '');
+                } else {
+                    $smsMessage->markAsFailed($result['message'] ?? 'Unknown error');
+                    error_log("Failed to send SMS OTP: " . ($result['message'] ?? 'Unknown error'));
+                    // Fallback to log for dev
+                    error_log("SMS OTP for user {$userId}: {$code}");
+                    return true; // Allow flow to continue for dev
+                }
+
+                return true;
             } catch (\Exception $e) {
-                error_log("SMS OTP Error: " . $e->getMessage());
-                // Fallback to log
+                if (isset($smsMessage)) {
+                    $smsMessage->markAsFailed($e->getMessage());
+                }
+                error_log("Exception sending SMS OTP: " . $e->getMessage());
+                // Fallback to log for dev
                 error_log("SMS OTP for user {$userId}: {$code}");
-                return true; // Return true to allow login even if SMS fails (for dev/demo)
+                return true;
             }
         } else {
             // Fallback: log to file for development

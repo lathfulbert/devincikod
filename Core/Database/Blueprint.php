@@ -291,6 +291,15 @@ class Blueprint
     }
 
     /**
+     * Add a unique index (single or multi-column)
+     */
+    public function unique(string|array $columns, string $name = null): void
+    {
+        $columns = is_array($columns) ? $columns : [$columns];
+        $this->multiUnique($columns, $name);
+    }
+
+    /**
      * Add a multi-column unique index
      */
     public function multiUnique(array $columns, string $name = null): void
@@ -372,7 +381,14 @@ class Blueprint
             }
         }
 
-        // Add foreign keys
+        // Add foreign keys from columns (fluent syntax)
+        foreach ($this->columns as $column) {
+            if ($fk = $column->getForeignKey()) {
+                $cols[] = $fk->toSql();
+            }
+        }
+
+        // Add raw foreign keys
         foreach ($this->foreigns as $foreign) {
             $cols[] = $foreign['sql'];
         }
