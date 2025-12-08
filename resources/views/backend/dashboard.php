@@ -720,7 +720,7 @@
                 <div class="card-body">
                     <h6 class="mb-3">Buy <a class="txt-info" href="#!">Pro Account </a>to Explore
                         Premium Features</h6><a class="purchase-btn btn btn-primary btn-hover-effect f-w-500"
-                        href="https://1.envato.market/3GVzd" target="_blank">Buy Now</a>
+                        href="#" target="_blank">Buy Now</a>
                 </div>
             </div>
         </div>

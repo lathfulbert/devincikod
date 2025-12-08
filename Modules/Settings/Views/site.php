@@ -65,12 +65,45 @@
                     <textarea name="site_description" id="site_description" class="form-control" rows="3"><?= htmlspecialchars($settings['site_description'] ?? '') ?></textarea>
                 </div>
 
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="mb-3">Logos et Icônes</h5>
+                    </div>
+                </div>
+
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="logo" class="form-label">Logo</label>
+                        <label for="logo" class="form-label">Logo (Light Mode)</label>
                         <input type="file" name="logo" id="logo" class="form-control" accept="image/*">
                         <?php if (!empty($settings['site_logo'])): ?>
-                            <small class="text-muted">Logo actuel : <?= htmlspecialchars($settings['site_logo']) ?></small>
+                            <div class="mt-2">
+                                <img src="<?= site_logo() ?>" alt="Logo" style="max-height: 50px;">
+                                <small class="d-block text-muted">Chemin : <?= htmlspecialchars($settings['site_logo']) ?></small>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="logo_dark" class="form-label">Logo (Dark Mode)</label>
+                        <input type="file" name="logo_dark" id="logo_dark" class="form-control" accept="image/*">
+                        <?php if (!empty($settings['site_logo_dark'])): ?>
+                            <div class="mt-2">
+                                <img src="<?= site_logo_dark() ?>" alt="Logo Dark" style="max-height: 50px;">
+                                <small class="d-block text-muted">Chemin : <?= htmlspecialchars($settings['site_logo_dark']) ?></small>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="logo_icon" class="form-label">Logo Icon (pour sidebar réduite)</label>
+                        <input type="file" name="logo_icon" id="logo_icon" class="form-control" accept="image/*">
+                        <?php if (!empty($settings['site_logo_icon'])): ?>
+                            <div class="mt-2">
+                                <img src="<?= site_logo_icon() ?>" alt="Logo Icon" style="max-height: 40px;">
+                                <small class="d-block text-muted">Chemin : <?= htmlspecialchars($settings['site_logo_icon']) ?></small>
+                            </div>
                         <?php endif; ?>
                     </div>
 
@@ -78,7 +111,10 @@
                         <label for="favicon" class="form-label">Favicon</label>
                         <input type="file" name="favicon" id="favicon" class="form-control" accept="image/*">
                         <?php if (!empty($settings['site_favicon'])): ?>
-                            <small class="text-muted">Favicon actuel : <?= htmlspecialchars($settings['site_favicon']) ?></small>
+                            <div class="mt-2">
+                                <img src="<?= site_favicon() ?>" alt="Favicon" style="max-height: 32px;">
+                                <small class="d-block text-muted">Chemin : <?= htmlspecialchars($settings['site_favicon']) ?></small>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>

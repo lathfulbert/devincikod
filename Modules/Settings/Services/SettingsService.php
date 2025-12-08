@@ -149,6 +149,96 @@ class SettingsService
     }
 
     /**
+     * Get logo URL (using FileManager)
+     */
+    public function getLogoUrl(?string $default = null): string
+    {
+        $logoPath = $this->get('site_logo', '');
+
+        if (empty($logoPath)) {
+            return $default ?? url('assets/images/logo/davinci.png');
+        }
+
+        // Si le chemin commence par 'storage/', on utilise file_url
+        if (str_starts_with($logoPath, 'storage/')) {
+            return file_url($logoPath);
+        }
+
+        // Sinon, on utilise url() directement
+        return url($logoPath);
+    }
+
+    /**
+     * Get dark logo URL (using FileManager)
+     */
+    public function getDarkLogoUrl(?string $default = null): string
+    {
+        $logoPath = $this->get('site_logo_dark', '');
+
+        if (empty($logoPath)) {
+            return $default ?? url('assets/images/logo/logo_dark.png');
+        }
+
+        if (str_starts_with($logoPath, 'storage/')) {
+            return file_url($logoPath);
+        }
+
+        return url($logoPath);
+    }
+
+    /**
+     * Get logo icon URL (using FileManager)
+     */
+    public function getLogoIconUrl(?string $default = null): string
+    {
+        $logoPath = $this->get('site_logo_icon', '');
+
+        if (empty($logoPath)) {
+            return $default ?? url('assets/images/logo/logo-icon.png');
+        }
+
+        if (str_starts_with($logoPath, 'storage/')) {
+            return file_url($logoPath);
+        }
+
+        return url($logoPath);
+    }
+
+    /**
+     * Get favicon URL (using FileManager)
+     */
+    public function getFaviconUrl(?string $default = null): string
+    {
+        $faviconPath = $this->get('site_favicon', '');
+
+        if (empty($faviconPath)) {
+            return $default ?? url('assets/images/favicon.png');
+        }
+
+        if (str_starts_with($faviconPath, 'storage/')) {
+            return file_url($faviconPath);
+        }
+
+        return url($faviconPath);
+    }
+
+    /**
+     * Get site name
+     */
+    public function getSiteName(?string $default = null): string
+    {
+        return $this->get('site_name', $default ?? 'SunuFramework');
+    }
+
+    /**
+     * Get site description
+     */
+    public function getSiteDescription(?string $default = null): string
+    {
+        return $this->get('site_description', $default ?? '');
+    }
+
+    /**
      * Get API settings
      */
     public function getApiSettings(): array

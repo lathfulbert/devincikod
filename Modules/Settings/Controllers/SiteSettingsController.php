@@ -50,6 +50,7 @@ class SiteSettingsController
         $settings = [
             'site_name' => $_POST['site_name'] ?? '',
             'site_description' => $_POST['site_description'] ?? '',
+            'site_author' => $_POST['site_author'] ?? '',
             'default_language' => $_POST['default_language'] ?? 'fr',
             'default_timezone' => $_POST['default_timezone'] ?? 'Africa/Dakar',
             'date_format' => $_POST['date_format'] ?? 'Y-m-d',
@@ -64,6 +65,38 @@ class SiteSettingsController
             $type = in_array($key, ['items_per_page']) ? 'integer' : $type;
 
             $this->settingsService->set($key, $value, $type, 'site');
+        }
+
+        // Handle logo upload
+        if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
+            $results = file_manager()->upload(['logo' => $_FILES['logo']], 'logos');
+            if (!empty($results) && $results[0]['success']) {
+                $this->settingsService->set('site_logo', $results[0]['path'], 'string', 'site');
+            }
+        }
+
+        // Handle dark logo upload
+        if (isset($_FILES['logo_dark']) && $_FILES['logo_dark']['error'] === UPLOAD_ERR_OK) {
+            $results = file_manager()->upload(['logo_dark' => $_FILES['logo_dark']], 'logos');
+            if (!empty($results) && $results[0]['success']) {
+                $this->settingsService->set('site_logo_dark', $results[0]['path'], 'string', 'site');
+            }
+        }
+
+        // Handle logo icon upload
+        if (isset($_FILES['logo_icon']) && $_FILES['logo_icon']['error'] === UPLOAD_ERR_OK) {
+            $results = file_manager()->upload(['logo_icon' => $_FILES['logo_icon']], 'logos');
+            if (!empty($results) && $results[0]['success']) {
+                $this->settingsService->set('site_logo_icon', $results[0]['path'], 'string', 'site');
+            }
+        }
+
+        // Handle favicon upload
+        if (isset($_FILES['favicon']) && $_FILES['favicon']['error'] === UPLOAD_ERR_OK) {
+            $results = file_manager()->upload(['favicon' => $_FILES['favicon']], 'logos');
+            if (!empty($results) && $results[0]['success']) {
+                $this->settingsService->set('site_favicon', $results[0]['path'], 'string', 'site');
+            }
         }
 
         $_SESSION['flash_success'] = 'Paramètres du site mis à jour avec succès.';
@@ -89,31 +122,17 @@ class SiteSettingsController
             redirect('/admin/settings/site');
         }
 
-        // Validate image
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
-        if (!in_array($file['type'], $allowedTypes)) {
-            $_SESSION['flash_error'] = 'Type de fichier non autorisé. Utilisez JPG, PNG, GIF ou SVG.';
-            redirect('/admin/settings/site');
-        }
+        // Upload using FileManager
+        $results = file_manager()->upload(['logo' => $file], 'logos');
 
-        // Create uploads directory if not exists
-        $uploadDir = dirname(dirname(dirname(dirname(__DIR__)))) . '/public/uploads/logos';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
-
-        // Generate unique filename
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $filename = 'logo-' . time() . '.' . $extension;
-        $destination = $uploadDir . '/' . $filename;
-
-        if (move_uploaded_file($file['tmp_name'], $destination)) {
-            $logoPath = '/uploads/logos/' . $filename;
+        if (!empty($results) && $results[0]['success']) {
+            $logoPath = $results[0]['path'];
             $this->settingsService->set('site_logo', $logoPath, 'string', 'site');
 
             $_SESSION['flash_success'] = 'Logo téléchargé avec succès.';
         } else {
-            $_SESSION['flash_error'] = 'Erreur lors de l\'enregistrement du fichier.';
+            $error = $results[0]['error'] ?? 'Erreur inconnue';
+            $_SESSION['flash_error'] = 'Erreur lors de l\'enregistrement du fichier : ' . $error;
         }
 
         redirect('/admin/settings/site');
@@ -138,31 +157,17 @@ class SiteSettingsController
             redirect('/admin/settings/site');
         }
 
-        // Validate icon
-        $allowedTypes = ['image/x-icon', 'image/vnd.microsoft.icon', 'image/png'];
-        if (!in_array($file['type'], $allowedTypes)) {
-            $_SESSION['flash_error'] = 'Type de fichier non autorisé. Utilisez ICO ou PNG.';
-            redirect('/admin/settings/site');
-        }
+        // Upload using FileManager
+        $results = file_manager()->upload(['favicon' => $file], 'logos');
 
-        // Create uploads directory if not exists
-        $uploadDir = dirname(dirname(dirname(dirname(__DIR__)))) . '/public/uploads/logos';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
-
-        // Generate unique filename
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $filename = 'favicon-' . time() . '.' . $extension;
-        $destination = $uploadDir . '/' . $filename;
-
-        if (move_uploaded_file($file['tmp_name'], $destination)) {
-            $faviconPath = '/uploads/logos/' . $filename;
+        if (!empty($results) && $results[0]['success']) {
+            $faviconPath = $results[0]['path'];
             $this->settingsService->set('site_favicon', $faviconPath, 'string', 'site');
 
             $_SESSION['flash_success'] = 'Favicon téléchargé avec succès.';
         } else {
-            $_SESSION['flash_error'] = 'Erreur lors de l\'enregistrement du fichier.';
+            $error = $results[0]['error'] ?? 'Erreur inconnue';
+            $_SESSION['flash_error'] = 'Erreur lors de l\'enregistrement du fichier : ' . $error;
         }
 
         redirect('/admin/settings/site');

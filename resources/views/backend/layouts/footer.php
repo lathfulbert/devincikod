@@ -3,7 +3,7 @@
      <div class="container-fluid">
          <div class="row">
              <div class="col-md-12 footer-copyright text-center">
-                 <p class="mb-0">Copyright <?php echo date("Y"); ?> © Cuba theme by LathDevinci </p>
+                 <p class="mb-0">Copyright <?php echo date("Y"); ?> © Framework Ivoirien by LathDevinci </p>
              </div>
          </div>
      </div>

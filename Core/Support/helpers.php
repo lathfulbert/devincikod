@@ -1649,6 +1649,114 @@ if (!function_exists('database_path')) {
 
 /*
 |--------------------------------------------------------------------------
+| Settings Helpers
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('settings')) {
+    /**
+     * Get the SettingsService instance or a specific setting value.
+     *
+     * @param string|null $key Setting key
+     * @param mixed $default Default value
+     * @return mixed|\Modules\Settings\Services\SettingsService
+     */
+    function settings(?string $key = null, $default = null)
+    {
+        static $settingsService = null;
+
+        if ($settingsService === null) {
+            $settingsService = new \Modules\Settings\Services\SettingsService();
+        }
+
+        if ($key === null) {
+            return $settingsService;
+        }
+
+        return $settingsService->get($key, $default);
+    }
+}
+
+if (!function_exists('site_name')) {
+    /**
+     * Get the site name from settings.
+     *
+     * @param string|null $default Default site name
+     * @return string
+     */
+    function site_name(?string $default = null): string
+    {
+        return settings()->getSiteName($default);
+    }
+}
+
+if (!function_exists('site_logo')) {
+    /**
+     * Get the site logo URL from settings.
+     *
+     * @param string|null $default Default logo URL
+     * @return string
+     */
+    function site_logo(?string $default = null): string
+    {
+        return settings()->getLogoUrl($default);
+    }
+}
+
+if (!function_exists('site_logo_dark')) {
+    /**
+     * Get the site dark logo URL from settings.
+     *
+     * @param string|null $default Default dark logo URL
+     * @return string
+     */
+    function site_logo_dark(?string $default = null): string
+    {
+        return settings()->getDarkLogoUrl($default);
+    }
+}
+
+if (!function_exists('site_logo_icon')) {
+    /**
+     * Get the site logo icon URL from settings.
+     *
+     * @param string|null $default Default logo icon URL
+     * @return string
+     */
+    function site_logo_icon(?string $default = null): string
+    {
+        return settings()->getLogoIconUrl($default);
+    }
+}
+
+if (!function_exists('site_favicon')) {
+    /**
+     * Get the site favicon URL from settings.
+     *
+     * @param string|null $default Default favicon URL
+     * @return string
+     */
+    function site_favicon(?string $default = null): string
+    {
+        return settings()->getFaviconUrl($default);
+    }
+}
+
+if (!function_exists('site_description')) {
+    /**
+     * Get the site description from settings.
+     *
+     * @param string|null $default Default description
+     * @return string
+     */
+    function site_description(?string $default = null): string
+    {
+        return settings()->getSiteDescription($default);
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
 | Error Handling Helpers
 |--------------------------------------------------------------------------
 */
