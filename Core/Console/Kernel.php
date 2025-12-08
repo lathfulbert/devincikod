@@ -52,10 +52,38 @@ class Kernel
             $this->handleEventsCommand($argv);
         } elseif (str_starts_with($command ?? '', 'maintenance:')) {
             $this->handleMaintenanceCommand($argv);
+        } elseif (str_starts_with($command ?? '', 'key:')) {
+            $this->handleKeyCommand($argv);
         } elseif ($command === 'list' || $command === '--list' || $command === '--help') {
             $this->listCommands();
         } else {
             $this->listCommands();
+        }
+    }
+
+    protected function handleKeyCommand(array $argv): void
+    {
+        $commandName = $argv[1] ?? '';
+        $args = array_slice($argv, 2);
+
+        $commands = [
+            'key:generate' => \App\Core\Console\Command\KeyGenerateCommand::class,
+        ];
+
+        if (isset($commands[$commandName])) {
+            $class = $commands[$commandName];
+            if (class_exists($class)) {
+                $cmd = new $class();
+                $cmd->execute($this->app, $args);
+            } else {
+                echo "Command class $class not found.\n";
+            }
+        } else {
+            echo "Unknown key command: $commandName\n";
+            echo "Available commands:\n";
+            echo "  key:generate         Generate a new application key\n";
+            echo "  key:generate --show  Display the key instead of modifying .env\n";
+            echo "  key:generate --force Override existing key\n";
         }
     }
 
@@ -355,6 +383,11 @@ class Kernel
         echo "  maintenance:down         Deactivate maintenance mode\n";
         echo "  maintenance:status       Show current maintenance status\n";
         echo "  maintenance:schedule --start=\"2025-12-10 02:00\" --end=\"2025-12-10 06:00\"\n";
+        echo "\n";
+        echo "Key Commands:\n";
+        echo "  key:generate             Generate a new application key\n";
+        echo "  key:generate --show      Display the key instead of modifying .env\n";
+        echo "  key:generate --force     Override existing key\n";
         echo "\n";
         echo "Cache Helpers (PHP):\n";
         echo "  cache('key')             Get/Set cache values in code\n";

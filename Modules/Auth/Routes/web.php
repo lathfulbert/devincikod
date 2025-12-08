@@ -29,6 +29,7 @@ $router->get('/auth/mfa/setup/totp', [MfaController::class, 'showTotpSetup']);
 $router->get('/auth/mfa/setup/sms', [MfaController::class, 'showSmsSetup']);
 $router->get('/auth/mfa/setup/sms/verify', [MfaController::class, 'showSmsVerification']);
 $router->post('/auth/mfa/setup/sms/verify', [MfaController::class, 'verifySmsSetup']);
+$router->post('/auth/mfa/setup/sms/resend', [MfaController::class, 'resendSmsSetupOtp']);
 $router->post('/auth/mfa/setup/totp/verify', [MfaController::class, 'verifyTotpSetup']);
 $router->post('/auth/mfa/disable', [MfaController::class, 'disable']);
 

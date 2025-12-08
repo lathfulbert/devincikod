@@ -4,6 +4,7 @@ namespace Modules\Auth\Controllers;
 
 use Modules\Auth\Services\MfaManager;
 use Modules\Auth\Services\AuditLogger;
+use Modules\Auth\Services\TrustedDeviceManager;
 
 /**
  * MFA Controller
@@ -13,11 +14,13 @@ class MfaController
 {
     private MfaManager $mfaManager;
     private AuditLogger $auditLogger;
+    private TrustedDeviceManager $trustedDeviceManager;
 
     public function __construct()
     {
         $this->mfaManager = new MfaManager();
         $this->auditLogger = new AuditLogger();
+        $this->trustedDeviceManager = new TrustedDeviceManager();
     }
 
     /**
@@ -32,6 +35,24 @@ class MfaController
 
         $userId = $_SESSION['mfa_user_id'];
         $methods = $this->mfaManager->getAvailableMethods($userId);
+
+        // Auto-send OTP for first available method (usually SMS)
+        // Only send once per session to avoid spam
+        if (!isset($_SESSION['mfa_otp_sent'])) {
+            foreach ($methods as $method) {
+                if (in_array($method['type'], ['sms', 'email'])) {
+                    try {
+                        $this->mfaManager->sendOtp($userId, $method['type']);
+                        $_SESSION['mfa_otp_sent'] = true;
+                        $_SESSION['flash_success'] = 'Code de vérification envoyé avec succès';
+                    } catch (\Exception $e) {
+                        error_log("ERROR sending OTP: " . $e->getMessage());
+                        $_SESSION['flash_error'] = $e->getMessage();
+                    }
+                    break; // Send only for the first method
+                }
+            }
+        }
 
         echo view('auth/mfa/challenge', [
             'methods' => $methods
@@ -67,12 +88,16 @@ class MfaController
             return;
         }
 
-        // MFA successful - complete login
+        // MFA successful - trust this device for 1 month
+        $this->trustedDeviceManager->trustDevice($userId);
+
+        // Complete login
         $user = \Modules\Users\Models\User::find($userId)->toArray();
         $_SESSION['user'] = $user;
         $_SESSION['user_id'] = $userId;
         unset($_SESSION['mfa_user_id']);
         unset($_SESSION['mfa_required']);
+        unset($_SESSION['mfa_otp_sent']); // Clear OTP sent flag
 
         $_SESSION['flash_success'] = 'Login successful!';
         redirect('/admin/dashboard');
@@ -83,8 +108,10 @@ class MfaController
      */
     public function sendOtp()
     {
+        header('Content-Type: application/json');
+
         if (!isset($_SESSION['mfa_required'])) {
-            echo json_encode(['success' => false, 'message' => 'Not authorized']);
+            echo json_encode(['success' => false, 'message' => 'Non autorisé. Session MFA invalide.']);
             return;
         }
 
@@ -92,16 +119,60 @@ class MfaController
         $methodType = $_POST['method'] ?? null;
 
         if (!$methodType) {
-            echo json_encode(['success' => false, 'message' => 'Method is required']);
+            echo json_encode(['success' => false, 'message' => 'Méthode requise']);
             return;
         }
 
-        $success = $this->mfaManager->sendOtp($userId, $methodType);
+        // Verify user has this method configured
+        $setup = \Modules\Auth\Models\UserMfaSetup::query()
+            ->where('user_id', $userId)
+            ->where('method_type', $methodType)
+            ->first();
 
-        echo json_encode([
-            'success' => $success,
-            'message' => $success ? 'Code sent successfully' : 'Failed to send code'
-        ]);
+        if (!$setup) {
+            echo json_encode([
+                'success' => false,
+                'message' => "Méthode '{$methodType}' non configurée pour cet utilisateur"
+            ]);
+            return;
+        }
+
+        try {
+            $success = $this->mfaManager->sendOtp($userId, $methodType);
+
+            if ($success) {
+                $value = $setup->getSecret();
+                echo json_encode([
+                    'success' => true,
+                    'message' => $methodType === 'sms'
+                        ? 'SMS envoyé avec succès à ***' . substr($value ?? '', -4)
+                        : 'Code envoyé avec succès à ' . ($value ?? 'votre adresse')
+                ]);
+            } else {
+                echo json_encode([
+                    'success' => false,
+                    'message' => "Impossible d'envoyer le code. Vérifiez la configuration du service {$methodType}."
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Safe logging with fallback
+            try {
+                if (function_exists('logger')) {
+                    logger()->error('Failed to send OTP', [
+                        'user_id' => $userId,
+                        'method' => $methodType,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            } catch (\Exception $logEx) {
+                error_log('Failed to send OTP: ' . $e->getMessage());
+            }
+
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erreur lors de l\'envoi du code: ' . $e->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -315,6 +386,55 @@ class MfaController
 
         $_SESSION['flash_success'] = 'SMS OTP configuré et vérifié avec succès!';
         redirect('/auth/mfa/settings');
+    }
+
+    /**
+     * Resend SMS OTP during setup
+     */
+    public function resendSmsSetupOtp()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Non autorisé']);
+            return;
+        }
+
+        $userId = $_SESSION['user_id'];
+
+        // Get the user's SMS setup
+        $setup = \Modules\Auth\Models\UserMfaSetup::query()
+            ->where('user_id', $userId)
+            ->where('method_type', 'sms')
+            ->first();
+
+        if (!$setup) {
+            echo json_encode(['success' => false, 'message' => 'Configuration SMS non trouvée']);
+            return;
+        }
+
+        try {
+            $phone = $setup->getSecret();
+            $provider = $this->mfaManager->getProvider('sms');
+            $result = $provider->sendOtp($userId, $phone);
+
+            if ($result) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Code renvoyé avec succès à ***' . substr($phone, -4)
+                ]);
+            } else {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Impossible d\'envoyer le code'
+                ]);
+            }
+        } catch (\Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erreur: ' . $e->getMessage()
+            ]);
+        }
     }
 
     /**

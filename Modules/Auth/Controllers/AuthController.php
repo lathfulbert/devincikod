@@ -5,6 +5,7 @@ namespace Modules\Auth\Controllers;
 use Modules\Auth\Services\MfaManager;
 use Modules\Auth\Services\TokenManager;
 use Modules\Auth\Services\AuditLogger;
+use Modules\Auth\Services\TrustedDeviceManager;
 use Modules\Auth\Providers\PasswordProvider;
 use Modules\Users\Models\User;
 
@@ -17,12 +18,14 @@ class AuthController
     private MfaManager $mfaManager;
     private TokenManager $tokenManager;
     private AuditLogger $auditLogger;
+    private TrustedDeviceManager $trustedDeviceManager;
 
     public function __construct()
     {
         $this->mfaManager = new MfaManager();
         $this->tokenManager = new TokenManager();
         $this->auditLogger = new AuditLogger();
+        $this->trustedDeviceManager = new TrustedDeviceManager();
     }
 
     /**
@@ -68,7 +71,14 @@ class AuthController
 
         // Check if MFA is required
         if ($this->mfaManager->isRequired($userId)) {
-            // Store user ID in session for MFA verification
+            // Check if this device is already trusted (valid for 1 month)
+            if ($this->trustedDeviceManager->isTrusted($userId)) {
+                // Device is trusted - skip MFA and complete login
+                $this->completeLogin($user);
+                return;
+            }
+
+            // Device not trusted - require MFA verification
             $_SESSION['mfa_user_id'] = $userId;
             $_SESSION['mfa_required'] = true;
 

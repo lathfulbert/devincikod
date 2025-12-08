@@ -226,15 +226,55 @@ class Router
      */
     protected function handleNotFound(): void
     {
-        http_response_code(404);
+        $this->handleError(404, 'Page Introuvable');
+    }
 
-        // Try to render a 404 view if it exists
-        $viewPath = dirname(dirname(dirname(__DIR__))) . '/resources/views/errors/404.php';
+    /**
+     * Handle error pages.
+     */
+    public static function handleError(int $code, string $title = 'Erreur', ?string $message = null): void
+    {
+        http_response_code($code);
+
+        // Get base path from Application if available
+        $basePath = defined('BASE_PATH') ? BASE_PATH : dirname(dirname(dirname(__DIR__)));
+
+        // Try to render error view
+        $viewPath = $basePath . '/Views/errors/' . $code . '.php';
+
         if (file_exists($viewPath)) {
-            require $viewPath;
+            // Capture error page content
+            ob_start();
+            include $viewPath;
+            $content = ob_get_clean();
+
+            // Render with layout
+            $layoutPath = $basePath . '/Views/errors/layout.php';
+            if (file_exists($layoutPath)) {
+                include $layoutPath;
+            } else {
+                echo $content;
+            }
         } else {
-            echo "404 Not Found";
+            // Fallback to basic error message
+            echo "<!DOCTYPE html>
+<html>
+<head>
+    <title>{$code} - {$title}</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; }
+        h1 { font-size: 72px; margin: 0; color: #667eea; }
+        p { font-size: 18px; color: #666; }
+    </style>
+</head>
+<body>
+    <h1>{$code}</h1>
+    <h2>{$title}</h2>
+    " . ($message ? "<p>{$message}</p>" : "") . "
+</body>
+</html>";
         }
+        exit;
     }
 
     /**

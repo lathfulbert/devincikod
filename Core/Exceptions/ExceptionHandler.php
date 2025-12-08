@@ -94,9 +94,10 @@ class ExceptionHandler
 
         http_response_code(500);
 
-        $debug = getenv('APP_DEBUG') === 'true';
+        // Use environment helpers to determine error display
+        $showDetails = isDebugMode() || config('app.show_error_details', false);
 
-        if ($debug) {
+        if ($showDetails) {
             $this->renderDebug($e);
         } else {
             $this->renderGeneric();
@@ -105,16 +106,19 @@ class ExceptionHandler
 
     protected function renderDebug(Throwable $e): void
     {
-        echo "<h1>Server Error</h1>";
-        echo "<h3>" . get_class($e) . ": " . $e->getMessage() . "</h3>";
-        echo "<p><strong>File:</strong> " . $e->getFile() . ":" . $e->getLine() . "</p>";
-        echo "<pre>" . $e->getTraceAsString() . "</pre>";
+        // Format error details for debug mode
+        $error = get_class($e) . ": " . $e->getMessage() . "\n\n";
+        $error .= "File: " . $e->getFile() . ":" . $e->getLine() . "\n\n";
+        $error .= "Stack trace:\n" . $e->getTraceAsString();
+
+        // Use the error page with debug information
+        \App\Core\Routing\Router::handleError(500, 'Erreur Serveur', $error);
     }
 
     protected function renderGeneric(): void
     {
-        echo "<h1>500 - Server Error</h1>";
-        echo "<p>Something went wrong on our servers.</p>";
+        // Use the generic 500 error page
+        \App\Core\Routing\Router::handleError(500, 'Erreur Serveur');
     }
 
     protected function isFatal($type): bool

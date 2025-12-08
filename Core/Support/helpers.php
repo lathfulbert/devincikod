@@ -115,6 +115,351 @@ if (!function_exists('env')) {
     }
 }
 
+/*
+|--------------------------------------------------------------------------
+| Environment Helpers
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('environment')) {
+    /**
+     * Get the current application environment.
+     *
+     * @return string
+     */
+    function environment(): string
+    {
+        return env('APP_ENV', 'production');
+    }
+}
+
+if (!function_exists('isDevelopment')) {
+    /**
+     * Check if the application is in development mode.
+     *
+     * @return bool
+     */
+    function isDevelopment(): bool
+    {
+        return environment() === 'development' || environment() === 'dev' || environment() === 'local';
+    }
+}
+
+if (!function_exists('isProduction')) {
+    /**
+     * Check if the application is in production mode.
+     *
+     * @return bool
+     */
+    function isProduction(): bool
+    {
+        return environment() === 'production' || environment() === 'prod';
+    }
+}
+
+if (!function_exists('isStaging')) {
+    /**
+     * Check if the application is in staging mode.
+     *
+     * @return bool
+     */
+    function isStaging(): bool
+    {
+        return environment() === 'staging' || environment() === 'stage';
+    }
+}
+
+if (!function_exists('isTesting')) {
+    /**
+     * Check if the application is in testing mode.
+     *
+     * @return bool
+     */
+    function isTesting(): bool
+    {
+        return environment() === 'testing' || environment() === 'test';
+    }
+}
+
+if (!function_exists('isDebugMode')) {
+    /**
+     * Check if debug mode is enabled.
+     *
+     * @return bool
+     */
+    function isDebugMode(): bool
+    {
+        return env('APP_DEBUG', false) === true;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Encryption Helpers
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('encrypt')) {
+    /**
+     * Encrypt the given value.
+     *
+     * @param mixed $value
+     * @param bool $serialize
+     * @return string
+     * @throws \Exception
+     */
+    function encrypt($value, bool $serialize = true): string
+    {
+        static $encrypter = null;
+
+        if ($encrypter === null) {
+            $key = env('APP_KEY');
+
+            if (empty($key)) {
+                throw new \RuntimeException('APP_KEY is not set. Run: php sunu key:generate');
+            }
+
+            // Remove base64: prefix if present
+            if (str_starts_with($key, 'base64:')) {
+                $key = base64_decode(substr($key, 7));
+            }
+
+            $encrypter = new \App\Core\Encryption\Encrypter($key, 'AES-256-CBC');
+        }
+
+        return $encrypter->encrypt($value, $serialize);
+    }
+}
+
+if (!function_exists('decrypt')) {
+    /**
+     * Decrypt the given value.
+     *
+     * @param string $payload
+     * @param bool $unserialize
+     * @return mixed
+     * @throws \Exception
+     */
+    function decrypt(string $payload, bool $unserialize = true)
+    {
+        static $encrypter = null;
+
+        if ($encrypter === null) {
+            $key = env('APP_KEY');
+
+            if (empty($key)) {
+                throw new \RuntimeException('APP_KEY is not set. Run: php sunu key:generate');
+            }
+
+            // Remove base64: prefix if present
+            if (str_starts_with($key, 'base64:')) {
+                $key = base64_decode(substr($key, 7));
+            }
+
+            $encrypter = new \App\Core\Encryption\Encrypter($key, 'AES-256-CBC');
+        }
+
+        return $encrypter->decrypt($payload, $unserialize);
+    }
+}
+
+if (!function_exists('encryptString')) {
+    /**
+     * Encrypt a string without serialization.
+     *
+     * @param string $value
+     * @return string
+     */
+    function encryptString(string $value): string
+    {
+        return encrypt($value, false);
+    }
+}
+
+if (!function_exists('decryptString')) {
+    /**
+     * Decrypt a string without unserialization.
+     *
+     * @param string $payload
+     * @return string
+     */
+    function decryptString(string $payload): string
+    {
+        return decrypt($payload, false);
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Secure Cookie Helpers
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('setSecureCookie')) {
+    /**
+     * Set an encrypted cookie.
+     *
+     * @param string $name Cookie name
+     * @param mixed $value Cookie value (will be encrypted)
+     * @param int $expire Expiration time in seconds from now (default: 1 hour)
+     * @param string $path Cookie path
+     * @param string $domain Cookie domain
+     * @param bool $secure Send only over HTTPS
+     * @param bool $httponly HTTP only (not accessible via JavaScript)
+     * @return bool
+     */
+    function setSecureCookie(
+        string $name,
+        $value,
+        int $expire = 3600,
+        string $path = '/',
+        string $domain = '',
+        ?bool $secure = null,
+        bool $httponly = true
+    ): bool {
+        // Auto-detect HTTPS
+        if ($secure === null) {
+            $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
+                      ($_SERVER['SERVER_PORT'] ?? 80) == 443 ||
+                      isProduction();
+        }
+
+        // Encrypt the value
+        try {
+            $encrypted = encrypt($value);
+
+            return setcookie(
+                $name,
+                $encrypted,
+                time() + $expire,
+                $path,
+                $domain,
+                $secure,
+                $httponly
+            );
+        } catch (\Exception $e) {
+            error_log("Failed to set secure cookie '$name': " . $e->getMessage());
+            return false;
+        }
+    }
+}
+
+if (!function_exists('getSecureCookie')) {
+    /**
+     * Get and decrypt a cookie value.
+     *
+     * @param string $name Cookie name
+     * @param mixed $default Default value if cookie doesn't exist or can't be decrypted
+     * @return mixed
+     */
+    function getSecureCookie(string $name, $default = null)
+    {
+        if (!isset($_COOKIE[$name])) {
+            return $default;
+        }
+
+        try {
+            return decrypt($_COOKIE[$name]);
+        } catch (\Exception $e) {
+            error_log("Failed to decrypt cookie '$name': " . $e->getMessage());
+            return $default;
+        }
+    }
+}
+
+if (!function_exists('deleteSecureCookie')) {
+    /**
+     * Delete a cookie.
+     *
+     * @param string $name Cookie name
+     * @param string $path Cookie path
+     * @param string $domain Cookie domain
+     * @return bool
+     */
+    function deleteSecureCookie(string $name, string $path = '/', string $domain = ''): bool
+    {
+        if (isset($_COOKIE[$name])) {
+            unset($_COOKIE[$name]);
+        }
+
+        return setcookie($name, '', time() - 3600, $path, $domain);
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Secure Session Helpers
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('sessionPut')) {
+    /**
+     * Store an encrypted value in the session.
+     *
+     * @param string $key Session key
+     * @param mixed $value Value to encrypt and store
+     * @return void
+     */
+    function sessionPut(string $key, $value): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        try {
+            $_SESSION['_encrypted'][$key] = encrypt($value);
+        } catch (\Exception $e) {
+            error_log("Failed to encrypt session value for key '$key': " . $e->getMessage());
+        }
+    }
+}
+
+if (!function_exists('sessionGet')) {
+    /**
+     * Retrieve and decrypt a value from the session.
+     *
+     * @param string $key Session key
+     * @param mixed $default Default value if key doesn't exist
+     * @return mixed
+     */
+    function sessionGet(string $key, $default = null)
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (!isset($_SESSION['_encrypted'][$key])) {
+            return $default;
+        }
+
+        try {
+            return decrypt($_SESSION['_encrypted'][$key]);
+        } catch (\Exception $e) {
+            error_log("Failed to decrypt session value for key '$key': " . $e->getMessage());
+            return $default;
+        }
+    }
+}
+
+if (!function_exists('sessionForget')) {
+    /**
+     * Remove an encrypted value from the session.
+     *
+     * @param string $key Session key
+     * @return void
+     */
+    function sessionForget(string $key): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (isset($_SESSION['_encrypted'][$key])) {
+            unset($_SESSION['_encrypted'][$key]);
+        }
+    }
+}
+
 if (!function_exists('component')) {
     /**
      * Include an admin component from resources/views/backend/components/
@@ -1299,5 +1644,65 @@ if (!function_exists('database_path')) {
         $basePath = dirname(dirname(__DIR__)) . '/database';
 
         return $path ? $basePath . '/' . ltrim($path, '/') : $basePath;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Error Handling Helpers
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('abort')) {
+    /**
+     * Throw an HttpException with the given data.
+     *
+     * @param int $code HTTP status code
+     * @param string|null $message Optional error message
+     * @return void
+     */
+    function abort(int $code, ?string $message = null): void
+    {
+        \App\Core\Routing\Router::handleError($code, match($code) {
+            401 => 'Non Authentifié',
+            403 => 'Accès Interdit',
+            404 => 'Page Introuvable',
+            500 => 'Erreur Serveur',
+            default => 'Erreur',
+        }, $message);
+    }
+}
+
+if (!function_exists('abort_if')) {
+    /**
+     * Throw an HttpException if the given condition is true.
+     *
+     * @param bool $condition
+     * @param int $code
+     * @param string|null $message
+     * @return void
+     */
+    function abort_if(bool $condition, int $code, ?string $message = null): void
+    {
+        if ($condition) {
+            abort($code, $message);
+        }
+    }
+}
+
+if (!function_exists('abort_unless')) {
+    /**
+     * Throw an HttpException unless the given condition is true.
+     *
+     * @param bool $condition
+     * @param int $code
+     * @param string|null $message
+     * @return void
+     */
+    function abort_unless(bool $condition, int $code, ?string $message = null): void
+    {
+        if (!$condition) {
+            abort($code, $message);
+        }
     }
 }

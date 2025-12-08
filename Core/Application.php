@@ -28,6 +28,11 @@ class Application extends Container
 
         $this->basePath = $basePath;
 
+        // Define BASE_PATH constant for global access (used by error pages, etc.)
+        if (!defined('BASE_PATH')) {
+            define('BASE_PATH', $basePath);
+        }
+
         // Load Helpers
         require_once __DIR__ . '/Support/helpers.php';
         require_once __DIR__ . '/Support/authorization_helpers.php';
@@ -36,6 +41,9 @@ class Application extends Container
 
         // Load .env
         (new \App\Core\Support\DotEnv($basePath . '/.env'))->load();
+
+        // Validate APP_KEY (required for encryption)
+        $this->validateAppKey();
 
         // Bind Core Services
         $this->singleton(Config::class, function () {
@@ -221,5 +229,116 @@ class Application extends Container
         $uri = '/' . ltrim($uri, '/');
 
         $this->router->dispatch($method, $uri);
+    }
+
+    /**
+     * Validate that APP_KEY is set and not empty.
+     *
+     * @throws \RuntimeException
+     */
+    protected function validateAppKey(): void
+    {
+        // Skip validation for console commands
+        if (php_sapi_name() === 'cli') {
+            $argv = $_SERVER['argv'] ?? [];
+            // Allow key:generate command to run without APP_KEY
+            if (isset($argv[1]) && str_starts_with($argv[1], 'key:')) {
+                return;
+            }
+        }
+
+        $appKey = getenv('APP_KEY');
+
+        if (empty($appKey)) {
+            $this->displayMissingKeyError();
+            exit(1);
+        }
+
+        // Validate key format (should be base64:... for AES-256-CBC)
+        if (!str_starts_with($appKey, 'base64:')) {
+            $this->displayInvalidKeyError();
+            exit(1);
+        }
+
+        // Validate key length (should be 32 bytes for AES-256-CBC)
+        $key = base64_decode(substr($appKey, 7));
+        if (mb_strlen($key, '8bit') !== 32) {
+            $this->displayInvalidKeyError();
+            exit(1);
+        }
+    }
+
+    /**
+     * Display error message when APP_KEY is missing.
+     */
+    protected function displayMissingKeyError(): void
+    {
+        if (php_sapi_name() === 'cli') {
+            echo "\033[31m╔══════════════════════════════════════════════════════════════╗\n";
+            echo "║                                                              ║\n";
+            echo "║  \033[1m⚠  ERREUR: APP_KEY non définie\033[0m\033[31m                          ║\n";
+            echo "║                                                              ║\n";
+            echo "╠══════════════════════════════════════════════════════════════╣\n";
+            echo "║                                                              ║\n";
+            echo "║  La clé d'application (APP_KEY) est requise pour la          ║\n";
+            echo "║  sécurité de votre application (chiffrement, sessions).      ║\n";
+            echo "║                                                              ║\n";
+            echo "║  \033[33mPour générer une clé, exécutez :\033[0m\033[31m                         ║\n";
+            echo "║                                                              ║\n";
+            echo "║      \033[1;32mphp sunu key:generate\033[0m\033[31m                                  ║\n";
+            echo "║                                                              ║\n";
+            echo "╚══════════════════════════════════════════════════════════════╝\033[0m\n\n";
+        } else {
+            http_response_code(500);
+            echo "<!DOCTYPE html>";
+            echo "<html><head><meta charset='utf-8'><title>Erreur - APP_KEY manquante</title>";
+            echo "<style>body{font-family:Arial,sans-serif;background:#f5f5f5;padding:50px;text-align:center}";
+            echo ".error-box{background:#fff;border-left:5px solid #dc3545;padding:30px;max-width:600px;margin:0 auto;box-shadow:0 2px 10px rgba(0,0,0,0.1)}";
+            echo "h1{color:#dc3545;margin-top:0}code{background:#f8f9fa;padding:10px;display:block;margin:20px 0;border-radius:5px}</style></head>";
+            echo "<body><div class='error-box'>";
+            echo "<h1>⚠ Erreur de Configuration</h1>";
+            echo "<p><strong>La clé d'application (APP_KEY) n'est pas définie.</strong></p>";
+            echo "<p>La clé APP_KEY est requise pour la sécurité de votre application (chiffrement, sessions, cookies).</p>";
+            echo "<p>Pour générer une clé, exécutez la commande suivante :</p>";
+            echo "<code>php sunu key:generate</code>";
+            echo "</div></body></html>";
+        }
+    }
+
+    /**
+     * Display error message when APP_KEY is invalid.
+     */
+    protected function displayInvalidKeyError(): void
+    {
+        if (php_sapi_name() === 'cli') {
+            echo "\033[31m╔══════════════════════════════════════════════════════════════╗\n";
+            echo "║                                                              ║\n";
+            echo "║  \033[1m⚠  ERREUR: APP_KEY invalide\033[0m\033[31m                             ║\n";
+            echo "║                                                              ║\n";
+            echo "╠══════════════════════════════════════════════════════════════╣\n";
+            echo "║                                                              ║\n";
+            echo "║  La clé d'application (APP_KEY) est invalide.                ║\n";
+            echo "║  Format attendu: base64:... (32 bytes décodés)               ║\n";
+            echo "║                                                              ║\n";
+            echo "║  \033[33mPour générer une nouvelle clé, exécutez :\033[0m\033[31m               ║\n";
+            echo "║                                                              ║\n";
+            echo "║      \033[1;32mphp sunu key:generate --force\033[0m\033[31m                        ║\n";
+            echo "║                                                              ║\n";
+            echo "╚══════════════════════════════════════════════════════════════╝\033[0m\n\n";
+        } else {
+            http_response_code(500);
+            echo "<!DOCTYPE html>";
+            echo "<html><head><meta charset='utf-8'><title>Erreur - APP_KEY invalide</title>";
+            echo "<style>body{font-family:Arial,sans-serif;background:#f5f5f5;padding:50px;text-align:center}";
+            echo ".error-box{background:#fff;border-left:5px solid #dc3545;padding:30px;max-width:600px;margin:0 auto;box-shadow:0 2px 10px rgba(0,0,0,0.1)}";
+            echo "h1{color:#dc3545;margin-top:0}code{background:#f8f9fa;padding:10px;display:block;margin:20px 0;border-radius:5px}</style></head>";
+            echo "<body><div class='error-box'>";
+            echo "<h1>⚠ Erreur de Configuration</h1>";
+            echo "<p><strong>La clé d'application (APP_KEY) est invalide.</strong></p>";
+            echo "<p>Format attendu: <code>base64:...</code> (32 bytes décodés pour AES-256-CBC)</p>";
+            echo "<p>Pour générer une nouvelle clé, exécutez la commande suivante :</p>";
+            echo "<code>php sunu key:generate --force</code>";
+            echo "</div></body></html>";
+        }
     }
 }

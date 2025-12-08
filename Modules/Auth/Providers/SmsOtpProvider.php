@@ -229,6 +229,16 @@ class SmsOtpProvider implements AuthProviderInterface
                 $pricingService = new \Modules\SmsCore\Services\SmsPricingService();
                 $billingService = new \Modules\SmsCore\Services\SmsBillingService();
 
+                // Check balance before sending
+                $message = "Votre code de vérification est: {$code}. Valide pour 2 minutes.";
+                $pricingData = $pricingService->calculateCost($phone, $gatewayConfig->provider_code, 'text');
+                $segments = $pricingService->calculateSegments($message);
+                $estimatedCost = $pricingData['unit_cost'] * $segments;
+
+                if (!$billingService->checkBalance($userId, $estimatedCost)) {
+                    throw new \Exception("Solde SMS insuffisant. Coût estimé: {$estimatedCost} {$pricingData['currency']}. Veuillez recharger votre compte.");
+                }
+
                 $smsService = new \Modules\SmsCore\Services\SmsSenderService(
                     $gateway,
                     $pricingService,
@@ -264,9 +274,18 @@ class SmsOtpProvider implements AuthProviderInterface
                 } else {
                     $smsMessage->markAsFailed($result['message'] ?? 'Unknown error');
                     error_log("Failed to send SMS OTP: " . ($result['message'] ?? 'Unknown error'));
-                    // Fallback to log for dev
+
+                    // Check if it's an insufficient balance error
+                    $errorMessage = $result['message'] ?? '';
+                    if (stripos($errorMessage, 'insufficient balance') !== false ||
+                        stripos($errorMessage, 'solde insuffisant') !== false ||
+                        stripos($errorMessage, 'balance insuffisante') !== false) {
+                        throw new \Exception("Solde SMS insuffisant. Veuillez recharger votre compte SMS.");
+                    }
+
+                    // For other errors, log code for dev and throw exception
                     error_log("SMS OTP for user {$userId}: {$code}");
-                    return true; // Allow flow to continue for dev
+                    throw new \Exception("Échec d'envoi du SMS: " . $errorMessage);
                 }
 
                 return true;
@@ -275,9 +294,16 @@ class SmsOtpProvider implements AuthProviderInterface
                     $smsMessage->markAsFailed($e->getMessage());
                 }
                 error_log("Exception sending SMS OTP: " . $e->getMessage());
-                // Fallback to log for dev
+
+                // Check if it's an insufficient balance error
+                if (stripos($e->getMessage(), 'solde') !== false ||
+                    stripos($e->getMessage(), 'insufficient balance') !== false) {
+                    throw $e; // Re-throw to be caught by caller
+                }
+
+                // For other errors, log code for dev
                 error_log("SMS OTP for user {$userId}: {$code}");
-                return true;
+                throw $e; // Re-throw all exceptions instead of returning true
             }
         } else {
             // Fallback: log to file for development

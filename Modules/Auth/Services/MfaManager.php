@@ -38,6 +38,7 @@ class MfaManager
         return array_map(function ($setup) {
             return [
                 'type' => $setup->method_type,
+                'value' => $setup->getSecret(), // Add the value (phone/email)
                 'last_used' => $setup->last_used_at
             ];
         }, $setups);
@@ -138,13 +139,54 @@ class MfaManager
         $provider = $this->getProvider($methodType);
 
         if (!$provider) {
+            $this->log('warning', "MFA provider not found for method: {$methodType}");
             return false;
         }
 
-        if (method_exists($provider, 'sendOtp')) {
-            return $provider->sendOtp($userId);
+        if (!method_exists($provider, 'sendOtp')) {
+            $this->log('warning', "Provider " . get_class($provider) . " does not have sendOtp method");
+            return false;
         }
 
-        return false;
+        try {
+            $result = $provider->sendOtp($userId);
+
+            if ($result) {
+                $this->log('info', "OTP sent successfully", [
+                    'user_id' => $userId,
+                    'method' => $methodType
+                ]);
+            } else {
+                $this->log('warning', "OTP send returned false", [
+                    'user_id' => $userId,
+                    'method' => $methodType
+                ]);
+            }
+
+            return $result;
+        } catch (\Exception $e) {
+            $this->log('error', "Exception while sending OTP", [
+                'user_id' => $userId,
+                'method' => $methodType,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Safe logging helper
+     */
+    private function log(string $level, string $message, array $context = []): void
+    {
+        try {
+            if (function_exists('logger')) {
+                logger()->$level($message, $context);
+            }
+        } catch (\Exception $e) {
+            // Fallback to error_log if logger fails
+            error_log("[MFA {$level}] {$message} " . json_encode($context));
+        }
     }
 }
