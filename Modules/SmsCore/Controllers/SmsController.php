@@ -128,7 +128,7 @@ class SmsController
         $userId = $_SESSION['user']['id'] ?? null;
         $senderNames = $userId ? SenderName::getForUser($userId) : [];
 
-        echo view('smscore/sms/send', [
+        echo view('SmsCore/sms/send', [
             'title' => 'Send SMS',
             'gateways' => $gateways,
             'senderNames' => $senderNames
@@ -142,7 +142,7 @@ class SmsController
         // Get real SMS history from database
         $messages = SmsMessage::orderBy('created_at', 'DESC')->get();
 
-        echo view('smscore/sms/history', [
+        echo view('SmsCore/sms/history', [
             'messages' => $messages,
             'title' => 'SMS History'
         ]);
@@ -160,7 +160,7 @@ class SmsController
             exit;
         }
 
-        echo view('smscore/sms/details', [
+        echo view('SmsCore/sms/details', [
             'sms' => $sms,
             'title' => 'SMS Details'
         ]);

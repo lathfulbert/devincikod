@@ -43,7 +43,7 @@ class DashboardController
             'wallet_balance' => $walletBalance
         ];
 
-        echo view('smscore/sms/dashboard', [
+        echo view('SmsCore/sms/dashboard', [
             'stats' => $stats,
             'recentMessages' => $recentMessages,
             'title' => 'SMS Dashboard'
@@ -66,7 +66,7 @@ class DashboardController
             'failed' => [5, 5, 5, 5, 5, 5, 5]
         ];
 
-        echo view('smscore/sms/statistics', [
+        echo view('SmsCore/sms/statistics', [
             'chartData' => $chartData,
             'from' => $from,
             'to' => $to,

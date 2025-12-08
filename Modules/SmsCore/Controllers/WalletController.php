@@ -16,7 +16,7 @@ class WalletController
         // Mock wallet balance for now (should be fetched from DB)
         $balance = 500.00;
 
-        echo view('smscore/wallet/topup', [
+        echo view('SmsCore/wallet/topup', [
             'title' => 'Recharger le compte',
             'balance' => $balance
         ]);

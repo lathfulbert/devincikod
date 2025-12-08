@@ -27,7 +27,7 @@ class SmsCampaignController
 
         $campaigns = SmsCampaign::orderBy('created_at', 'desc')->get();
 
-        echo view('smscore/sms/campaigns/index', [
+        echo view('SmsCore/sms/campaigns/index', [
             'campaigns' => $campaigns,
             'title' => 'SMS Campaigns'
         ]);
@@ -47,7 +47,7 @@ class SmsCampaignController
         $userId = $_SESSION['user']['id'] ?? null;
         $senderNames = $userId ? SenderName::getForUser($userId) : [];
 
-        echo view('smscore/sms/campaigns/create', [
+        echo view('SmsCore/sms/campaigns/create', [
             'title' => 'Nouvelle Campagne SMS',
             'contacts' => $contacts,
             'placeholders' => $placeholders,
@@ -161,7 +161,7 @@ class SmsCampaignController
         $userId = $_SESSION['user']['id'] ?? null;
         $senderNames = $userId ? SenderName::getForUser($userId) : [];
 
-        echo view('smscore/sms/campaigns/edit', [
+        echo view('SmsCore/sms/campaigns/edit', [
             'title' => 'Modifier Campagne: ' . $campaign->name,
             'campaign' => $campaign,
             'contacts' => $contacts,
@@ -248,7 +248,7 @@ class SmsCampaignController
             ->orderBy('created_at', 'desc')
             ->get();
 
-        echo view('smscore/sms/campaigns/show', [
+        echo view('SmsCore/sms/campaigns/show', [
             'campaign' => $campaign,
             'queueItems' => $queueItems,
             'title' => 'Campaign: ' . $campaign->name

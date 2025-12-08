@@ -75,7 +75,7 @@
                                             <td>
                                                 <span class="badge badge-light-primary">Completed</span>
                                             </td>
-                                            <td><?= date('M d, Y H:i', strtotime($trx['created_at'])) ?></td>
+                                            <td><?= !empty($trx['created_at']) ? date('M d, Y H:i', strtotime($trx['created_at'])) : '-' ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php endif; ?>

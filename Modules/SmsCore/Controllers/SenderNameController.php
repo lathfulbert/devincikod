@@ -22,7 +22,7 @@ class SenderNameController
     {
         $senderNames = SenderName::orderBy('created_at', 'desc')->get();
 
-        echo view('smscore/sms/sender-names/index', [
+        echo view('SmsCore/sms/sender-names/index', [
             'title' => 'Sender Names Management',
             'senderNames' => $senderNames
         ]);
@@ -33,7 +33,7 @@ class SenderNameController
      */
     public function create()
     {
-        echo view('smscore/sms/sender-names/create', [
+        echo view('SmsCore/sms/sender-names/create', [
             'title' => 'Add New Sender Name'
         ]);
     }
@@ -102,7 +102,7 @@ class SenderNameController
             exit;
         }
 
-        echo view('smscore/sms/sender-names/edit', [
+        echo view('SmsCore/sms/sender-names/edit', [
             'title' => 'Edit Sender Name',
             'senderName' => $senderName
         ]);
@@ -180,7 +180,7 @@ class SenderNameController
         $assignedUsers = $senderName->getAssignedUsers();
         $assignedUserIds = array_column($assignedUsers, 'id');
 
-        echo view('smscore/sms/sender-names/assign', [
+        echo view('SmsCore/sms/sender-names/assign', [
             'title' => 'Assign Users - ' . $senderName->name,
             'senderName' => $senderName,
             'users' => $users,

@@ -73,7 +73,7 @@
                                                 ?>
                                                 <span class="badge badge-<?= $statusClass ?>"><?= ucfirst($wallet['status']) ?></span>
                                             </td>
-                                            <td><?= date('d/m/Y H:i', strtotime($wallet['created_at'])) ?></td>
+                                            <td><?= !empty($wallet['created_at']) ? date('d/m/Y H:i', strtotime($wallet['created_at'])) : '-' ?></td>
                                             <td>
                                                 <form method="POST" action="<?= url('/admin/wallet/topup') ?>" class="d-inline">
                                                     <?= csrf_field() ?>
