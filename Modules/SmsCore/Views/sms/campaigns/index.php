@@ -30,7 +30,18 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5>Liste des Campagnes SMS</h5>
+                    <div>
+                        <h5>Liste des Campagnes SMS</h5>
+                        <?php if ($isAdmin ?? false): ?>
+                            <span class="badge badge-success">
+                                <i data-feather="shield"></i> Mode Admin - Toutes les campagnes
+                            </span>
+                        <?php else: ?>
+                            <span class="badge badge-info">
+                                <i data-feather="user"></i> Mes campagnes uniquement
+                            </span>
+                        <?php endif; ?>
+                    </div>
                     <a href="<?= url('/admin/sms/bulk') ?>" class="btn btn-primary">
                         <i data-feather="plus"></i> Nouvelle Campagne
                     </a>

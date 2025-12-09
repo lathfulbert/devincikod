@@ -12,7 +12,7 @@ class AIController
         $app = Application::getInstance();
         $agents = AIManager::getInstance()->getAllAgents();
 
-        echo view('ai/ai/index', [
+        echo view('AI/ai/index', [
             'title' => 'Gestion AI',
             'agents' => $agents
         ]);
@@ -52,7 +52,7 @@ class AIController
             }
         }
 
-        echo view('ai/ai/settings', [
+        echo view('AI/ai/settings', [
             'title' => 'Configuration AI',
             'settings' => $settings
         ]);
@@ -92,7 +92,7 @@ class AIController
         // Placeholder for logs
         $logs = [];
 
-        echo view('ai/ai/logs', [
+        echo view('AI/ai/logs', [
             'title' => 'Historique AI',
             'logs' => $logs
         ]);
@@ -142,7 +142,7 @@ class AIController
             }
         }
 
-        echo view('ai/ai/test', [
+        echo view('AI/ai/test', [
             'title' => 'Test AI',
             'response' => $response,
             'model' => $model

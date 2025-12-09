@@ -25,7 +25,11 @@ class DotEnv
             $name = trim($name);
             $value = trim($value);
 
-            if (!array_key_exists($name, $_SERVER) && !array_key_exists($name, $_ENV)) {
+            // Set environment variables, overwriting empty values
+            $shouldSet = !array_key_exists($name, $_SERVER) || empty($_SERVER[$name]);
+            $shouldSet = $shouldSet || (!array_key_exists($name, $_ENV) || empty($_ENV[$name]));
+
+            if ($shouldSet) {
                 putenv(sprintf('%s=%s', $name, $value));
                 $_ENV[$name] = $value;
                 $_SERVER[$name] = $value;

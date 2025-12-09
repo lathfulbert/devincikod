@@ -91,3 +91,12 @@ Admin, Auth, API, Modules externes doivent utiliser ces interfaces, jamais direc
 •	Système de permissions auto-extensible par les modules
 •	Structure propre, cohérente, future-proof
 
+
+
+Build the RBAC Admin UI (Option 2)?
+Implement Permission Caching (Option 3)?
+Create Template Helpers (Option 4)?
+
+
+grouper ses menu sou APIKey :Api Analytics,Api Monitoring,System API Keys
+

@@ -103,6 +103,9 @@ class CronRunner
                 'Completed successfully',
                 $durationMs
             ]);
+
+            // Update last_run_at in cron_tasks
+            $this->updateTaskRunTime($taskId);
         } catch (\Throwable $e) {
             // Ignore logging errors
             error_log("Failed to log cron success: " . $e->getMessage());
@@ -164,5 +167,22 @@ class CronRunner
         ]);
 
         return (int)$this->db->lastInsertId();
+    }
+
+    /**
+     * Update last_run_at timestamp in cron_tasks
+     */
+    private function updateTaskRunTime(int $taskId): void
+    {
+        try {
+            $this->db->query("
+                UPDATE cron_tasks
+                SET last_run_at = NOW(),
+                    updated_at = NOW()
+                WHERE id = ?
+            ", [$taskId]);
+        } catch (\Throwable $e) {
+            error_log("Failed to update task run time: " . $e->getMessage());
+        }
     }
 }

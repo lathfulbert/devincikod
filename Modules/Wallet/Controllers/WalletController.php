@@ -23,7 +23,7 @@ class WalletController
         $app = Application::getInstance();
         $wallets = $this->walletService->getAllWallets();
 
-        echo view('wallet/wallet/index', [
+        echo view('Wallet/wallet/index', [
             'wallets' => $wallets,
             'title' => 'Wallet Management'
         ]);
@@ -35,17 +35,21 @@ class WalletController
     public function topup($userId = null)
     {
         $app = Application::getInstance();
-        $userId = $userId ?? ($_GET['user_id'] ?? null);
+
+        // Si pas d'userId fourni, utiliser l'utilisateur connecté
+        if (!$userId) {
+            $userId = $_GET['user_id'] ?? $_SESSION['user']['id'] ?? $_SESSION['user_id'] ?? null;
+        }
 
         if (!$userId) {
             $_SESSION['flash_error'] = 'User ID is required';
-            redirect('/admin/wallet');
+            redirect('/admin/dashboard');
             exit;
         }
 
         $wallet = $this->walletService->getWallet($userId);
 
-        echo view('wallet/wallet/topup', [
+        echo view('Wallet/wallet/topup', [
             'wallet' => $wallet,
             'userId' => $userId,
             'title' => 'Top-up Wallet'
@@ -57,24 +61,26 @@ class WalletController
      */
     public function processTopup()
     {
-        $userId = $_POST['user_id'] ?? null;
+        // Si pas d'userId dans POST, utiliser l'utilisateur connecté
+        $userId = $_POST['user_id'] ?? $_SESSION['user']['id'] ?? $_SESSION['user_id'] ?? null;
         $amount = $_POST['amount'] ?? 0;
-        $description = $_POST['description'] ?? 'Admin credit';
+        $description = $_POST['description'] ?? 'Top-up via payment gateway';
+        $method = $_POST['method'] ?? 'paypal';
 
         if (!$userId || $amount <= 0) {
             $_SESSION['flash_error'] = 'Invalid user ID or amount';
-            redirect('/admin/wallet');
+            redirect('/admin/wallet/topup');
             exit;
         }
 
         try {
-            $this->walletService->addCredit($userId, $amount, $description);
-            $_SESSION['flash_success'] = "Successfully added {$amount} XOF to wallet";
+            $this->walletService->addCredit($userId, $amount, $description . ' (' . $method . ')');
+            $_SESSION['flash_success'] = "Successfully added {$amount} XOF to your wallet";
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Failed to add credit: ' . $e->getMessage();
         }
 
-        redirect('/admin/wallet');
+        redirect('/admin/sms');
         exit;
     }
 
@@ -113,7 +119,7 @@ class WalletController
         $transactions = $this->walletService->getTransactions($userId, 50);
         $wallet = $this->walletService->getWallet($userId);
 
-        echo view('wallet/wallet/transactions', [
+        echo view('Wallet/wallet/transactions', [
             'transactions' => $transactions,
             'wallet' => $wallet,
             'title' => 'Wallet Transactions'

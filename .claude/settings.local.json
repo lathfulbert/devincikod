@@ -13,7 +13,8 @@
       "Bash(for table in sms_billing_logs sms_campaigns sms_gateways sms_messages sms_queue)",
       "Bash(do echo \"=== $table ===\")",
       "Bash(done)",
-      "Bash(tail:*)"
+      "Bash(tail:*)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []

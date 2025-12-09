@@ -3,6 +3,7 @@
 namespace Modules\SmsCore\Controllers;
 
 use App\Core\Application;
+use App\Core\Authorization\Traits\AuthorizesOwnership;
 use Modules\SmsCore\Models\SmsCampaign;
 use Modules\SmsCore\Models\SmsQueue;
 use Modules\SmsCore\Models\SenderName;
@@ -11,25 +12,34 @@ use Modules\Contacts\Services\FieldPersonalizationService;
 
 class SmsCampaignController
 {
+    use AuthorizesOwnership;
+
     protected FieldPersonalizationService $personalizationService;
 
     public function __construct()
     {
+        $this->initializeOwnershipPolicy();
         $this->personalizationService = new FieldPersonalizationService();
     }
 
     /**
      * List all campaigns
+     * Admin: toutes les campagnes
+     * Autres: seulement leurs campagnes
      */
     public function index()
     {
         $app = Application::getInstance();
 
-        $campaigns = SmsCampaign::orderBy('created_at', 'desc')->get();
+        // Filtrer par propriétaire (admin voit tout)
+        $query = SmsCampaign::query()->orderBy('created_at', 'desc');
+        $query = $this->scopeByOwnership($query, 'created_by');
+        $campaigns = $query->get();
 
         echo view('SmsCore/sms/campaigns/index', [
             'campaigns' => $campaigns,
-            'title' => 'SMS Campaigns'
+            'title' => 'SMS Campaigns',
+            'isAdmin' => $this->isAdmin()
         ]);
     }
 
@@ -153,6 +163,9 @@ class SmsCampaignController
             return;
         }
 
+        // Vérifier l'autorisation
+        $this->authorizeUpdate($campaign, 'created_by', '/admin/sms/campaigns');
+
         $contacts = Contact::query()->where('is_active', 1)->orderBy('first_name')->get();
         $placeholders = $this->personalizationService->getAvailablePlaceholders();
         $selectedContactIds = json_decode($campaign->contact_ids ?? '[]', true);
@@ -182,6 +195,9 @@ class SmsCampaignController
             redirect('/admin/sms/campaigns');
             return;
         }
+
+        // Vérifier l'autorisation
+        $this->authorizeUpdate($campaign, 'created_by', '/admin/sms/campaigns');
 
         try {
             $campaign->name = sanitize($_POST['name'] ?? '', 'string');
@@ -243,6 +259,9 @@ class SmsCampaignController
             exit;
         }
 
+        // Vérifier l'autorisation
+        $this->authorizeView($campaign, 'created_by', '/admin/sms/campaigns');
+
         // Get queue items for this campaign
         $queueItems = SmsQueue::where('campaign_id', $id)
             ->orderBy('created_at', 'desc')
@@ -251,7 +270,9 @@ class SmsCampaignController
         echo view('SmsCore/sms/campaigns/show', [
             'campaign' => $campaign,
             'queueItems' => $queueItems,
-            'title' => 'Campaign: ' . $campaign->name
+            'title' => 'Campaign: ' . $campaign->name,
+            'canEdit' => $this->canUpdate($campaign, 'created_by'),
+            'canDelete' => $this->canDelete($campaign, 'created_by')
         ]);
     }
 
@@ -267,6 +288,9 @@ class SmsCampaignController
             redirect('/admin/sms/campaigns');
             exit;
         }
+
+        // Vérifier l'autorisation
+        $this->authorizeDelete($campaign, 'created_by', '/admin/sms/campaigns');
 
         // Delete associated queue items
         $pdo = \App\Core\Database\Database::getInstance()->getPdo();

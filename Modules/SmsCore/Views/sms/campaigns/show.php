@@ -98,6 +98,27 @@
                             <dd class="col-sm-6"><?= date('d/m/Y H:i', strtotime($campaign->completed_at)) ?></dd>
                         <?php endif; ?>
                     </dl>
+
+                    <div class="mt-3">
+                        <?php if ($canEdit ?? false): ?>
+                            <a href="<?= url('/admin/sms/campaigns/' . $campaign->id . '/edit') ?>" class="btn btn-warning btn-block mb-2">
+                                <i data-feather="edit"></i> Modifier la Campagne
+                            </a>
+                        <?php endif; ?>
+
+                        <?php if ($canDelete ?? false): ?>
+                            <form method="POST" action="<?= url('/admin/sms/campaigns/' . $campaign->id . '/delete') ?>">
+                                <?= csrf_field() ?>
+                                <button type="submit" class="btn btn-danger btn-block" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette campagne ?')">
+                                    <i data-feather="trash-2"></i> Supprimer la Campagne
+                                </button>
+                            </form>
+                        <?php endif; ?>
+
+                        <a href="<?= url('/admin/sms/campaigns') ?>" class="btn btn-secondary btn-block mt-2">
+                            <i data-feather="arrow-left"></i> Retour à la liste
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

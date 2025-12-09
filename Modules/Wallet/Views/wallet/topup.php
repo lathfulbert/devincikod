@@ -31,13 +31,15 @@
                 <div class="card-body">
                     <form action="<?= url('/admin/wallet/topup') ?>" method="POST">
                         <?= csrf_field() ?>
+                        <input type="hidden" name="user_id" value="<?= $userId ?>">
 
                         <div class="mb-3">
-                            <label class="form-label">Amount (USD)</label>
+                            <label class="form-label">Amount (XOF)</label>
                             <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input class="form-control" type="number" name="amount" min="10" step="0.01" required>
+                                <span class="input-group-text">XOF</span>
+                                <input class="form-control" type="number" name="amount" min="100" step="1" required placeholder="Minimum 100 XOF">
                             </div>
+                            <small class="text-muted">Minimum top-up: 100 XOF</small>
                         </div>
 
                         <div class="mb-3">
@@ -71,14 +73,19 @@
                 </div>
                 <div class="card-body">
                     <div class="text-center">
-                        <h1 class="display-4 text-primary">$500.00</h1>
+                        <h1 class="display-4 text-primary"><?= number_format($wallet->balance ?? 0, 2) ?> XOF</h1>
                         <p class="text-muted">Available Credits</p>
                         <hr>
                         <ul class="list-unstyled text-start">
                             <li><i data-feather="check" class="text-success me-2"></i> Instant Crediting</li>
                             <li><i data-feather="check" class="text-success me-2"></i> Secure Transactions</li>
-                            <li><i data-feather="check" class="text-success me-2"></i> Invoice Generated</li>
+                            <li><i data-feather="check" class="text-success me-2"></i> Transaction History</li>
                         </ul>
+                        <div class="mt-3">
+                            <a href="<?= url('/admin/sms') ?>" class="btn btn-secondary btn-sm">
+                                <i data-feather="arrow-left"></i> Back to Dashboard
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

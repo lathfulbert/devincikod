@@ -247,7 +247,7 @@ class Application extends Container
             }
         }
 
-        $appKey = getenv('APP_KEY');
+        $appKey = $_ENV['APP_KEY'] ?? $_SERVER['APP_KEY'] ?? getenv('APP_KEY');
 
         if (empty($appKey)) {
             $this->displayMissingKeyError();

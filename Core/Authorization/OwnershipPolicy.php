@@ -22,7 +22,21 @@ class OwnershipPolicy
             return false;
         }
 
-        // Vérifier le rôle admin
+        // Si l'utilisateur est un tableau (from session)
+        if (is_array($user)) {
+            // Vérifier les rôles dans le tableau
+            if (isset($user['roles'])) {
+                foreach ($user['roles'] as $role) {
+                    if (in_array($role['slug'] ?? '', ['admin', 'super_admin'])) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        // Si l'utilisateur est un objet
+        // Vérifier le rôle admin via méthode hasRole
         if (method_exists($user, 'hasRole')) {
             return $user->hasRole('admin') || $user->hasRole('super_admin');
         }

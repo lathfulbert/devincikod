@@ -31,24 +31,31 @@ class ProcessPendingSmsTask extends CronTask
     public function handle(): void
     {
         // Get pending SMS (limit to 50 per run to avoid overload)
-        $pendingSms = SmsQueue::where('status', 'pending')
-            ->where('scheduled_at', '<=', date('Y-m-d H:i:s'))
-            ->orderBy('scheduled_at', 'asc')
-            ->limit(50)
-            ->get();
+        $db = \App\Core\Database\Database::getInstance()->getPdo();
+        $now = date('Y-m-d H:i:s');
 
-        if (empty($pendingSms)) {
+        $stmt = $db->prepare("
+            SELECT * FROM sms_queue
+            WHERE status = 'pending'
+            AND (scheduled_at IS NULL OR scheduled_at <= ?)
+            ORDER BY scheduled_at ASC, created_at ASC
+            LIMIT 50
+        ");
+        $stmt->execute([$now]);
+        $pendingData = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        if (empty($pendingData)) {
             return;
         }
 
         $queueManager = QueueManager::getInstance();
         $processed = 0;
 
-        foreach ($pendingSms as $sms) {
+        foreach ($pendingData as $data) {
             // Dispatch job to queue
             $queueManager->push(
                 SendBulkSmsJob::class,
-                ['queueId' => $sms->id],
+                ['queueId' => $data['id']],
                 'default'
             );
             $processed++;

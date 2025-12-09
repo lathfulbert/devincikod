@@ -48,6 +48,7 @@ class SmsQueueService
         $added = 0;
         $userId = $options['user_id'] ?? ($_SESSION['user']['id'] ?? null);
         $campaignId = $options['campaign_id'] ?? null;
+        $gateway = $options['gateway'] ?? 'auto';
 
         foreach ($recipients as $recipient) {
             try {
@@ -56,6 +57,7 @@ class SmsQueueService
                     'recipient' => $recipient,
                     'message' => $message,
                     'sender_id' => $sender,
+                    'gateway' => $gateway,
                     'status' => 'pending',
                     'attempts' => 0,
                     'scheduled_at' => $options['scheduled_at'] ?? null,
@@ -81,15 +83,29 @@ class SmsQueueService
     {
         $delay = (int) Setting::get('sms_queue_delay', 1);
 
-        // Get pending SMS from queue
-        $pendingSms = SmsQueue::where('status', 'pending')
-            ->where(function($query) {
-                $query->whereNull('scheduled_at')
-                      ->orWhere('scheduled_at', '<=', date('Y-m-d H:i:s'));
-            })
-            ->orderBy('created_at', 'ASC')
-            ->limit($batchSize)
-            ->get();
+        // Get pending SMS from queue (both unscheduled and scheduled that are due)
+        $db = \App\Core\Database\Database::getInstance()->getPdo();
+        $now = date('Y-m-d H:i:s');
+
+        $stmt = $db->prepare("
+            SELECT * FROM sms_queue
+            WHERE status = 'pending'
+            AND (scheduled_at IS NULL OR scheduled_at <= ?)
+            ORDER BY scheduled_at ASC, created_at ASC
+            LIMIT ?
+        ");
+        $stmt->execute([$now, $batchSize]);
+        $pendingData = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        // Convert to model instances
+        $pendingSms = [];
+        foreach ($pendingData as $data) {
+            $sms = new SmsQueue();
+            foreach ($data as $key => $value) {
+                $sms->$key = $value;
+            }
+            $pendingSms[] = $sms;
+        }
 
         $results = [
             'processed' => 0,
@@ -184,6 +200,11 @@ class SmsQueueService
 
             $results['processed']++;
 
+            // Update campaign stats if this SMS belongs to a campaign
+            if (!empty($sms->campaign_id)) {
+                self::updateCampaignStats($sms->campaign_id);
+            }
+
             // Delay between sends to avoid rate limiting
             if ($delay > 0 && $results['processed'] < count($pendingSms)) {
                 sleep($delay);
@@ -191,6 +212,65 @@ class SmsQueueService
         }
 
         return $results;
+    }
+
+    /**
+     * Update campaign statistics and status
+     *
+     * @param int $campaignId Campaign ID
+     * @return void
+     */
+    public static function updateCampaignStats(int $campaignId): void
+    {
+        try {
+            $db = \App\Core\Database\Database::getInstance()->getPdo();
+
+            // Get campaign stats from sms_queue
+            $stmt = $db->prepare("
+                SELECT
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'sent' THEN 1 ELSE 0 END) as sent,
+                    SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed,
+                    SUM(CASE WHEN status IN ('pending', 'processing') THEN 1 ELSE 0 END) as pending
+                FROM sms_queue
+                WHERE campaign_id = ?
+            ");
+            $stmt->execute([$campaignId]);
+            $stats = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$stats) {
+                return;
+            }
+
+            // Update campaign
+            $campaign = \Modules\SmsCore\Models\SmsCampaign::find($campaignId);
+            if (!$campaign) {
+                return;
+            }
+
+            $campaign->sent_count = (int) $stats['sent'];
+            $campaign->failed_count = (int) $stats['failed'];
+
+            // Determine campaign status
+            if ($stats['pending'] == 0) {
+                // All messages processed
+                if ($campaign->status !== 'completed') {
+                    $campaign->markAsCompleted();
+                }
+            } elseif ($stats['sent'] > 0 || $stats['failed'] > 0) {
+                // Some messages processed, some pending
+                if ($campaign->status === 'scheduled' || $campaign->status === 'draft') {
+                    $campaign->markAsStarted();
+                } else {
+                    $campaign->save();
+                }
+            } else {
+                // No messages processed yet, just update counts
+                $campaign->save();
+            }
+        } catch (\Exception $e) {
+            error_log("Failed to update campaign stats for campaign $campaignId: " . $e->getMessage());
+        }
     }
 
     /**
@@ -203,13 +283,13 @@ class SmsQueueService
     {
         // Query the billing logs to count sent SMS in different time windows
         $now = date('Y-m-d H:i:s');
+        $db = \App\Core\Database\Database::getInstance()->getPdo();
 
         // Count SMS sent in last minute
-        $sentLastMinute = \App\Core\Database\DB::query(
-            "SELECT COUNT(*) as count FROM sms_billing_logs
-             WHERE gateway = ? AND created_at >= DATE_SUB(?, INTERVAL 1 MINUTE)",
-            [$gateway->provider_code, $now]
-        )->fetch(\PDO::FETCH_ASSOC)['count'] ?? 0;
+        $stmt = $db->prepare("SELECT COUNT(*) as count FROM sms_billing_logs
+             WHERE gateway = ? AND created_at >= DATE_SUB(?, INTERVAL 1 MINUTE)");
+        $stmt->execute([$gateway->provider_code, $now]);
+        $sentLastMinute = $stmt->fetch(\PDO::FETCH_ASSOC)['count'] ?? 0;
 
         if ($gateway->rate_limit_per_minute && $sentLastMinute >= $gateway->rate_limit_per_minute) {
             return [
@@ -219,11 +299,10 @@ class SmsQueueService
         }
 
         // Count SMS sent in last hour
-        $sentLastHour = \App\Core\Database\DB::query(
-            "SELECT COUNT(*) as count FROM sms_billing_logs
-             WHERE gateway = ? AND created_at >= DATE_SUB(?, INTERVAL 1 HOUR)",
-            [$gateway->provider_code, $now]
-        )->fetch(\PDO::FETCH_ASSOC)['count'] ?? 0;
+        $stmt = $db->prepare("SELECT COUNT(*) as count FROM sms_billing_logs
+             WHERE gateway = ? AND created_at >= DATE_SUB(?, INTERVAL 1 HOUR)");
+        $stmt->execute([$gateway->provider_code, $now]);
+        $sentLastHour = $stmt->fetch(\PDO::FETCH_ASSOC)['count'] ?? 0;
 
         if ($gateway->rate_limit_per_hour && $sentLastHour >= $gateway->rate_limit_per_hour) {
             return [
@@ -233,11 +312,10 @@ class SmsQueueService
         }
 
         // Count SMS sent in last day
-        $sentLastDay = \App\Core\Database\DB::query(
-            "SELECT COUNT(*) as count FROM sms_billing_logs
-             WHERE gateway = ? AND created_at >= DATE_SUB(?, INTERVAL 1 DAY)",
-            [$gateway->provider_code, $now]
-        )->fetch(\PDO::FETCH_ASSOC)['count'] ?? 0;
+        $stmt = $db->prepare("SELECT COUNT(*) as count FROM sms_billing_logs
+             WHERE gateway = ? AND created_at >= DATE_SUB(?, INTERVAL 1 DAY)");
+        $stmt->execute([$gateway->provider_code, $now]);
+        $sentLastDay = $stmt->fetch(\PDO::FETCH_ASSOC)['count'] ?? 0;
 
         if ($gateway->rate_limit_per_day && $sentLastDay >= $gateway->rate_limit_per_day) {
             return [

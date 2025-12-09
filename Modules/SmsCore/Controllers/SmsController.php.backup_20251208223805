@@ -2,8 +2,6 @@
 
 namespace Modules\SmsCore\Controllers;
 
-use App\Core\Authorization\Traits\AuthorizesOwnership;
-
 use App\Core\Application;
 use Modules\Settings\Models\SmsGateway;
 use Modules\SmsCore\Models\SmsMessage;
@@ -15,14 +13,7 @@ use Modules\SmsCore\Services\SmsQueueService;
 
 class SmsController
 {
-    use AuthorizesOwnership;
-
-    
-    public function __construct()
-    {
-        $this->initializeOwnershipPolicy();
-    }
-public function send()
+    public function send()
     {
         $app = Application::getInstance();
 
@@ -148,15 +139,12 @@ public function send()
     {
         $app = Application::getInstance();
 
-        // Filtrer par propriétaire (admin voit tout)
-        $query = SmsMessage::query()->orderBy('created_at', 'DESC');
-        $query = $this->scopeByOwnership($query, 'user_id');
-        $messages = $query->get();
+        // Get real SMS history from database
+        $messages = SmsMessage::orderBy('created_at', 'DESC')->get();
 
         echo view('SmsCore/sms/history', [
             'messages' => $messages,
-            'title' => 'SMS History',
-            'isAdmin' => $this->isAdmin()
+            'title' => 'SMS History'
         ]);
     }
 
@@ -171,9 +159,6 @@ public function send()
             redirect('/admin/sms/history');
             exit;
         }
-
-        // Vérifier l'autorisation
-        $this->authorizeView($sms, 'user_id', '/admin/sms/history');
 
         echo view('SmsCore/sms/details', [
             'sms' => $sms,

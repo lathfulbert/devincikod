@@ -31,8 +31,16 @@ class DashboardController
             $totalCost += $msg->cost ?? 0.03; // Default 0.03 if cost not set
         }
 
-        // Wallet balance (você pode adaptar conforme seu sistema)
-        $walletBalance = 500.00; // TODO: Implementar sistema de wallet real
+        // Get real wallet balance for current user
+        $userId = $_SESSION['user']['id'] ?? $_SESSION['user_id'] ?? null;
+        $walletBalance = 0.00;
+
+        if ($userId) {
+            $wallet = \Modules\Wallet\Models\Wallet::where('user_id', $userId)->first();
+            if ($wallet) {
+                $walletBalance = $wallet->balance ?? 0.00;
+            }
+        }
 
         $stats = [
             'total_messages' => $totalMessages,

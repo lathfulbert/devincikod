@@ -29,6 +29,15 @@
                     <div class="row">
                         <div class="col-md-6">
                             <h5>SMS History</h5>
+                            <?php if ($isAdmin ?? false): ?>
+                                <span class="badge badge-success">
+                                    <i data-feather="eye"></i> Vue Admin - Tous les SMS
+                                </span>
+                            <?php else: ?>
+                                <span class="badge badge-info">
+                                    <i data-feather="user"></i> Mes SMS uniquement
+                                </span>
+                            <?php endif; ?>
                         </div>
                         <div class="col-md-6 text-end">
                             <a href="<?= url('/admin/sms/send') ?>" class="btn btn-sm btn-primary">
@@ -48,6 +57,9 @@
                                     <th>Gateway</th>
                                     <th>Status</th>
                                     <th>Cost</th>
+                                    <?php if ($isAdmin ?? false): ?>
+                                        <th>Utilisateur</th>
+                                    <?php endif; ?>
                                     <th>Date</th>
                                     <th>Actions</th>
                                 </tr>
@@ -76,6 +88,9 @@
                                                 <?php endif; ?>
                                             </td>
                                             <td>$<?= number_format($msg->cost ?? 0, 2) ?></td>
+                                            <?php if ($isAdmin ?? false): ?>
+                                                <td><?= htmlspecialchars($msg->getCreatorName() ?? 'Système') ?></td>
+                                            <?php endif; ?>
                                             <td><?= date('M d, H:i', strtotime($msg->created_at)) ?></td>
                                             <td>
                                                 <a href="<?= url('/admin/sms/details/' . $msg->id) ?>" class="btn btn-sm btn-outline-primary">

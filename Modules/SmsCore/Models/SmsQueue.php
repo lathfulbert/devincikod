@@ -16,6 +16,7 @@ class SmsQueue extends Model
         'recipient',
         'message',
         'sender_id',
+        'gateway',
         'status',
         'attempts',
         'error_message',

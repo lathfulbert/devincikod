@@ -33,7 +33,7 @@ class AuthController
      */
     public function showLogin()
     {
-        echo view('auth/login');
+        echo view('auth/auth/login');
     }
 
     /**

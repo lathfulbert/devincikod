@@ -10,6 +10,7 @@ use Modules\SmsCore\Services\SmsGatewayFactory;
 use Modules\SmsCore\Services\SmsPricingService;
 use Modules\SmsCore\Services\SmsBillingService;
 use Modules\SmsCore\Services\SmsSenderService;
+use Modules\SmsCore\Services\SmsQueueService;
 
 class SendBulkSmsJob extends Job
 {
@@ -73,19 +74,11 @@ class SendBulkSmsJob extends Job
 
             if ($result['success']) {
                 // Mark as sent
-                $queueItem->update([
-                    'status' => 'sent',
-                    'sent_at' => date('Y-m-d H:i:s')
-                ]);
+                $queueItem->markAsSent();
 
-                // Update campaign stats
+                // Update campaign stats using centralized method
                 if ($queueItem->campaign_id) {
-                    $campaign = SmsCampaign::find($queueItem->campaign_id);
-                    if ($campaign) {
-                        $campaign->update([
-                            'sent_count' => $campaign->sent_count + 1
-                        ]);
-                    }
+                    SmsQueueService::updateCampaignStats($queueItem->campaign_id);
                 }
             } else {
                 throw new \Exception($result['message'] ?? 'Unknown error');
@@ -93,24 +86,17 @@ class SendBulkSmsJob extends Job
 
         } catch (\Exception $e) {
             // Mark as failed
-            $attempts = $queueItem->attempts + 1;
-            $queueItem->update([
-                'status' => $attempts >= 3 ? 'failed' : 'pending', // Retry up to 3 times
-                'attempts' => $attempts,
-                'error_message' => $e->getMessage()
-            ]);
+            $queueItem->markAsFailed($e->getMessage());
 
-            // Update campaign stats
-            if ($queueItem->campaign_id && $attempts >= 3) {
-                $campaign = SmsCampaign::find($queueItem->campaign_id);
-                if ($campaign) {
-                    $campaign->update([
-                        'failed_count' => $campaign->failed_count + 1
-                    ]);
-                }
+            // Update campaign stats using centralized method
+            if ($queueItem->campaign_id) {
+                SmsQueueService::updateCampaignStats($queueItem->campaign_id);
             }
 
-            throw $e; // Re-throw for job retry mechanism
+            // Only throw if we haven't exceeded max attempts (for retry)
+            if ($queueItem->attempts < 3) {
+                throw $e;
+            }
         }
     }
 }

@@ -99,6 +99,19 @@ class SettingsModule extends AbstractModule
             ['POST', '/admin/maintenance/update', [\Modules\Settings\Controllers\MaintenanceController::class, 'update'], [$authMiddleware]],
             ['POST', '/admin/maintenance/toggle', [\Modules\Settings\Controllers\MaintenanceController::class, 'toggle'], [$authMiddleware]],
             ['GET', '/admin/maintenance/remove-background', [\Modules\Settings\Controllers\MaintenanceController::class, 'removeBackgroundImage'], [$authMiddleware]],
+
+            // Health Check / System Monitoring (Admin only)
+            ['GET', '/admin/health', [\Modules\Settings\Controllers\HealthCheckController::class, 'index'], [$authMiddleware]],
+
+            // API publique de monitoring (pas d'auth pour monitoring externe)
+            ['GET', '/api/health', [\Modules\Settings\Controllers\HealthCheckController::class, 'apiCheck'], []],
+            ['GET', '/api/health/badge', [\Modules\Settings\Controllers\HealthCheckController::class, 'badge'], []],
+
+            // Log Viewer (Admin only)
+            ['GET', '/admin/logs/cron', [\Modules\Settings\Controllers\LogsController::class, 'cronLogs'], [$authMiddleware]],
+            ['GET', '/admin/logs/health', [\Modules\Settings\Controllers\LogsController::class, 'healthLogs'], [$authMiddleware]],
+            ['GET', '/admin/logs/sms-queue', [\Modules\Settings\Controllers\LogsController::class, 'smsQueueLogs'], [$authMiddleware]],
+            ['POST', '/admin/logs/clear', [\Modules\Settings\Controllers\LogsController::class, 'clearLog'], [$authMiddleware]],
         ];
     }
 
@@ -120,6 +133,8 @@ class SettingsModule extends AbstractModule
                     ['title' => 'Paramètres du site', 'url' => '/admin/settings/site', 'icon' => 'globe'],
                     ['title' => 'Thème & Apparence', 'url' => '/admin/settings/theme', 'icon' => 'droplet'],
                     ['title' => 'Mode Maintenance', 'url' => '/admin/maintenance', 'icon' => 'tool'],
+                    ['title' => 'Monitoring Système', 'url' => '/admin/health', 'icon' => 'activity'],
+                    ['title' => 'Logs Système', 'url' => '/admin/logs/cron', 'icon' => 'file-text'],
                     ['title' => 'API & Services', 'url' => '/admin/settings/api', 'icon' => 'key'],
                     ['title' => 'Configuration Mail', 'url' => '/admin/settings/mail', 'icon' => 'mail'],
                     ['title' => 'Configuration SMS', 'url' => '/admin/settings/sms', 'icon' => 'message-circle'],
