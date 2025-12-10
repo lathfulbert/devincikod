@@ -3,6 +3,7 @@
 namespace App\Core\Middleware;
 
 use Modules\Users\Models\User;
+use Modules\ApiKeys\Models\ApiKey;
 
 class ApiAuthMiddleware
 {
@@ -11,36 +12,72 @@ class ApiAuthMiddleware
      *
      * Expects Authorization header: Bearer {api_key}
      * or api_key parameter in query string or POST data
-     * 
+     *
      * @param mixed $request Request data (array from Router)
      * @param callable $next Next middleware/handler
      * @return mixed
      */
     public function handle($request, $next)
     {
-        $apiKey = $this->extractApiKey();
+        $apiKeyString = $this->extractApiKey();
 
-        if (!$apiKey) {
+        // Debug log
+        error_log("ApiAuthMiddleware: Extracted key = " . ($apiKeyString ? substr($apiKeyString, 0, 20) . '...' : 'NULL'));
+
+        if (!$apiKeyString) {
             $this->sendUnauthorizedResponse('API key required');
             return false;
         }
 
-        // Find user by API key
-        $user = User::where('api_key', $apiKey)
+        // Find API key in api_keys table
+        $apiKey = ApiKey::where('key', $apiKeyString)
             ->where('is_active', 1)
             ->first();
 
-        if (!$user) {
+        // Debug log
+        error_log("ApiAuthMiddleware: Key found in DB = " . ($apiKey ? 'YES (ID=' . $apiKey->id . ')' : 'NO'));
+
+        if (!$apiKey) {
             $this->sendUnauthorizedResponse('Invalid API key');
             return false;
+        }
+
+        // Check if API key is valid (not expired)
+        if (!$apiKey->isValid()) {
+            $this->sendUnauthorizedResponse('API key expired or inactive');
+            return false;
+        }
+
+        // Check IP whitelist if configured
+        $clientIp = $_SERVER['REMOTE_ADDR'] ?? '';
+        if (!$apiKey->isIpAllowed($clientIp)) {
+            $this->sendUnauthorizedResponse('IP address not allowed');
+            return false;
+        }
+
+        // Get the user associated with this API key
+        $user = $apiKey->user()->first();
+
+        if (!$user || !$user->is_active) {
+            $this->sendUnauthorizedResponse('User account inactive');
+            return false;
+        }
+
+        // Update last used timestamp
+        $apiKey->recordUsage();
+
+        // Ensure session is started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
 
         // Store authenticated user in session for RBAC middlewares
         $_SESSION['api_user_id'] = $user->id;
         $_SESSION['user_id'] = $user->id; // For RBAC compatibility
 
-        // Store user in request for controller access
+        // Store user and API key in request for controller access
         $_REQUEST['api_user'] = $user;
+        $_REQUEST['api_key'] = $apiKey;
 
         return $next($request);
     }

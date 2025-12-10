@@ -3,6 +3,17 @@
 @section('title', 'Ma Clé API')
 
 @section('content')
+
+<div class="container-fluid">
+    <?php
+    // Breadcrumb
+    $breadcrumb = [
+        ['label' => 'Dashboard', 'url' => '/admin/dashboard'],
+        ['label' => 'API Keys']
+    ];
+    component('breadcrumb', $breadcrumb);
+    ?>
+</div>
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -39,9 +50,7 @@
                                         <div class="col-md-6">
                                             <p class="mb-1"><strong>Nom :</strong> <?= $apiKey->name ?? 'Personal API Key' ?></p>
 
-                                            <!-- DEBUG -->
-                                            <p class="mb-1 text-danger"><strong>DEBUG created_at RAW:</strong> <?= var_export($apiKey->created_at, true) ?></p>
-
+                                         
                                             <p class="mb-1"><strong>Créée le :</strong>
                                                 <?= $apiKey->created_at ? date('d/m/Y H:i', strtotime($apiKey->created_at)) : 'N/A' ?>
                                             </p>

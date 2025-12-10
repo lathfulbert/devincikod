@@ -11,7 +11,7 @@
         ['label' => 'Dashboard', 'url' => '/admin/dashboard'],
         ['label' => 'API Keys']
     ];
-    component('breadcrumb');
+    component('breadcrumb', $breadcrumb);
     ?>
 </div>
 

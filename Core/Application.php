@@ -137,14 +137,32 @@ class Application extends Container
         $this->router->registerMiddleware('can', \Modules\RBAC\Middleware\CheckPermission::class);
         $this->router->registerMiddleware('role', \Modules\RBAC\Middleware\CheckRole::class);
         $this->router->registerMiddleware('can_any', \Modules\RBAC\Middleware\CheckAnyPermission::class);
-        $this->router->registerMiddleware('api_auth', \App\Core\Middleware\ApiAuthMiddleware::class);
+
+        // API Middleware (inspired by Laravel Sanctum) - for token-based authentication
+        $this->router->registerMiddleware('api', \App\Core\Middleware\ApiMiddleware::class);
+
+        // Legacy alias for backward compatibility
+        $this->router->registerMiddleware('api_auth', \App\Core\Middleware\ApiMiddleware::class);
+
         $this->router->registerMiddleware('secure_upload', \App\Core\Files\Middleware\SecureUploadMiddleware::class);
 
-        // Load Global Routes
+        // Load Global Web Routes
         $routesPath = $this->basePath . '/routes/web.php';
         if (file_exists($routesPath)) {
             $router = $this->router;
             require $routesPath;
+        }
+
+        // Load Global API Routes (with /api prefix and api middleware - like Laravel Sanctum)
+        $apiRoutesPath = $this->basePath . '/routes/api.php';
+        if (file_exists($apiRoutesPath)) {
+            $router = $this->router;
+            $router->group([
+                'prefix' => '/api',
+                'middleware' => ['api']
+            ], function ($router) use ($apiRoutesPath) {
+                require $apiRoutesPath;
+            });
         }
 
         $this->moduleManager->discover();

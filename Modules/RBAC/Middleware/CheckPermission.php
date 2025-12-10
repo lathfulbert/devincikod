@@ -16,6 +16,11 @@ class CheckPermission
 
     public function handle($request, $next, $permission)
     {
+        // Ensure session is started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         // Récupérer l'utilisateur depuis la session
         if (!isset($_SESSION['user_id'])) {
             http_response_code(403);

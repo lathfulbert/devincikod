@@ -13,28 +13,15 @@ use Modules\Wallet\Services\WalletService;
 class SmsApiController
 {
     /**
-     * Authenticate API request
+     * Get authenticated user from middleware context
+     *
+     * The ApiMiddleware handles authentication and stores the user in the request context.
+     * This method retrieves that authenticated user.
      */
-    private function authenticate()
+    private function getAuthenticatedUser()
     {
-        $apiKey = $this->extractApiKey();
-
-        if (!$apiKey) {
-            $this->sendUnauthorizedResponse('API key required');
-            return null;
-        }
-
-        // Find user by API key
-        $user = \Modules\Users\Models\User::where('api_key', $apiKey)
-            ->where('is_active', 1)
-            ->first();
-
-        if (!$user) {
-            $this->sendUnauthorizedResponse('Invalid API key');
-            return null;
-        }
-
-        return $user;
+        // Get user from middleware context
+        return $_REQUEST['auth_user'] ?? $_REQUEST['api_user'] ?? null;
     }
 
     /**
@@ -98,9 +85,10 @@ class SmsApiController
     {
         header('Content-Type: application/json');
 
-        // Authenticate
-        $user = $this->authenticate();
+        // Get authenticated user (authentication is handled by ApiMiddleware)
+        $user = $this->getAuthenticatedUser();
         if (!$user) {
+            $this->sendUnauthorizedResponse('Authentication required');
             return;
         }
 
@@ -215,9 +203,10 @@ class SmsApiController
     {
         header('Content-Type: application/json');
 
-        // Authenticate
-        $user = $this->authenticate();
+        // Get authenticated user (authentication is handled by ApiMiddleware)
+        $user = $this->getAuthenticatedUser();
         if (!$user) {
+            $this->sendUnauthorizedResponse('Authentication required');
             return;
         }
 
@@ -305,9 +294,10 @@ class SmsApiController
     {
         header('Content-Type: application/json');
 
-        // Authenticate
-        $user = $this->authenticate();
+        // Get authenticated user (authentication is handled by ApiMiddleware)
+        $user = $this->getAuthenticatedUser();
         if (!$user) {
+            $this->sendUnauthorizedResponse('Authentication required');
             return;
         }
 

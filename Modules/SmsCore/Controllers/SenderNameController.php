@@ -266,7 +266,9 @@ class SenderNameController
     {
         header('Content-Type: application/json');
 
-        $userId = $_SESSION['user']['id'] ?? 0;
+        // Get authenticated user from middleware context
+        $user = $_REQUEST['auth_user'] ?? $_REQUEST['api_user'] ?? null;
+        $userId = $user ? $user->id : ($_SESSION['user_id'] ?? 0);
 
         if (!$userId) {
             echo json_encode(['success' => false, 'message' => 'Unauthorized']);

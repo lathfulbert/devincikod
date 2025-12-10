@@ -16,7 +16,12 @@
       "Bash(tail:*)",
       "Bash(ls:*)",
       "Bash(python fix_card_components.py:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(dir:*)",
+      "Bash(net stop Apache2.4)",
+      "Bash(net start:*)",
+      "Bash(python:*)",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File test_api_complete.ps1)"
     ],
     "deny": [],
     "ask": []

@@ -79,7 +79,7 @@
                 <div class="card-body">
                     <div class="d-flex">
                         <div class="flex-grow-1">
-                            <h2 class="mb-0">$<?= number_format($stats['wallet_balance'], 2) ?></h2>
+                            <h2 class="mb-0"><?= number_format($stats['wallet_balance'], 0) ?></h2>
                             <p class="text-muted mb-0">Wallet Balance</p>
                         </div>
                         <div class="flex-shrink-0 align-self-center">
@@ -177,7 +177,7 @@
                                                     <?= htmlspecialchars($statusText) ?>
                                                 </span>
                                             </td>
-                                            <td>$<?= number_format($msg->cost ?? 0.03, 2) ?></td>
+                                            <td><?= number_format($msg->cost ?? 0.03, 2) ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>

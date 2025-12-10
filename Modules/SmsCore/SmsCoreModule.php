@@ -16,10 +16,8 @@ class SmsCoreModule extends AbstractModule
         $authMiddleware = [new \App\Core\Middleware\AuthMiddleware(), 'handle'];
 
         return [
-            // API Routes (Secured with API Auth + RBAC)
-            ['POST', '/api/v1/sms/send', [\Modules\SmsCore\Controllers\SmsApiController::class, 'send'], ['api_auth', 'can:sms.send']],
-            ['GET', '/api/v1/sms/history', [\Modules\SmsCore\Controllers\SmsApiController::class, 'history'], ['api_auth', 'can:sms.history.view']],
-            ['GET', '/api/v1/sms/balance', [\Modules\SmsCore\Controllers\SmsApiController::class, 'balance'], ['api_auth', 'can:sms.stats.view']],
+            // NOTE: API Routes are now defined in routes/api.php (Laravel Sanctum style)
+            // This provides better separation and automatic /api prefix + middleware
 
             // Dashboard
             ['GET', '/admin/sms', [\Modules\SmsCore\Controllers\DashboardController::class, 'index'], [$authMiddleware]],
@@ -73,8 +71,9 @@ class SmsCoreModule extends AbstractModule
             ['POST', '/sms/sender-names/save-assignments', [\Modules\SmsCore\Controllers\SenderNameController::class, 'saveAssignments'], [$authMiddleware]],
             ['POST', '/sms/sender-names/bulk-assign-to-user', [\Modules\SmsCore\Controllers\SenderNameController::class, 'bulkAssignToUser'], [$authMiddleware]],
 
-            // Sender Names API
-            ['GET', '/api/sms/sender-names/user', [\Modules\SmsCore\Controllers\SenderNameController::class, 'apiGetUserSenderNames'], [$authMiddleware]],
+            // API Documentation
+            ['GET', '/admin/sms/api/docs', [\Modules\SmsCore\Controllers\ApiDocsController::class, 'index'], [$authMiddleware]],
+            ['GET', '/admin/sms/api/keys', [\Modules\SmsCore\Controllers\ApiDocsController::class, 'keys'], [$authMiddleware]],
         ];
     }
 
@@ -96,7 +95,9 @@ class SmsCoreModule extends AbstractModule
                     ['title' => 'Tarification', 'url' => '/admin/sms/pricing'],
                     ['title' => 'Facturation', 'url' => '/admin/sms/billing'],
                     ['title' => 'Fournisseurs (Stats)', 'url' => '/admin/sms/providers', 'icon' => 'server'],
-                    ['title' => 'API Keys', 'url' => '/admin/api-keys', 'icon' => 'key'],
+                    ['title' => '---', 'url' => '#'], // Separator
+                    ['title' => 'Documentation API', 'url' => '/admin/sms/api/docs', 'icon' => 'book'],
+                    ['title' => 'Mes clés API', 'url' => '/admin/api-keys', 'icon' => 'key'],
                 ]
             ]
         ];
