@@ -25,8 +25,7 @@
     <div class="row">
         <div class="col-12">
             <?php
-            $card_title = "Paramètres du Site";
-            component('card-start');
+            component('card-start', ['card_title' => "Paramètres du Site"]);
             ?>
 
             <form action="<?= url('/admin/settings/site/update') ?>" method="POST" enctype="multipart/form-data">

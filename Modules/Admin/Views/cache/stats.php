@@ -36,6 +36,7 @@
                         </div>
                         <div class="col-md-6 text-end">
                             <form method="POST" action="<?= url('/admin/cache/clear') ?>" onsubmit="return confirm('Êtes-vous sûr de vouloir vider tout le cache ?');" style="display:inline;">
+                                <?= csrf_field() ?>
                                 <button type="submit" class="btn btn-danger btn-sm">
                                     <i data-feather="trash-2"></i> Vider le cache
                                 </button>
@@ -62,10 +63,13 @@
                                     <h3 class="mb-0"><?= $stats['total_files'] ?></h3>
                                 </div>
                             </div>
+                        <?php endif; ?>
+
+                        <?php if (isset($stats['total_size_readable'])): ?>
                             <div class="col-md-3">
                                 <div class="bg-light p-3 rounded text-center">
                                     <h6 class="text-muted mb-2">Taille</h6>
-                                    <h3 class="mb-0"><?= $stats['total_size'] ?></h3>
+                                    <h3 class="mb-0"><?= $stats['total_size_readable'] ?></h3>
                                 </div>
                             </div>
                         <?php endif; ?>

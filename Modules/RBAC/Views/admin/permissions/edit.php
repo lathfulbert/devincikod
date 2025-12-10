@@ -25,8 +25,7 @@
     <div class="row">
         <div class="col-lg-8 offset-lg-2">
             <?php
-            $card_title = "Éditer la permission : " . htmlspecialchars($permission->name);
-            component('card-start');
+            component('card-start', ['card_title' => "Éditer la permission : " . htmlspecialchars($permission->name)]);
             ?>
 
             <form action="<?= url('/admin/permissions/' . $permission->id . '/update') ?>" method="POST">

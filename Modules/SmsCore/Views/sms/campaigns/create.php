@@ -27,8 +27,7 @@
             <!-- Formulaire principal -->
             <div class="col-lg-8">
                 <?php
-                $card_title = "Informations de la campagne";
-                component('card-start');
+                component('card-start', ['card_title' => "Informations de la campagne"]);
                 ?>
 
                 <div class="mb-3">
@@ -84,8 +83,7 @@
                 <?php component('card-end'); ?>
 
                 <?php
-                $card_title = "Sélection des destinataires";
-                component('card-start');
+                component('card-start', ['card_title' => "Sélection des destinataires"]);
                 ?>
 
                 <div class="mb-3">
@@ -154,8 +152,7 @@
             <!-- Sidebar - Placeholders & Preview -->
             <div class="col-lg-4">
                 <?php
-                $card_title = "Placeholders disponibles";
-                component('card-start');
+                component('card-start', ['card_title' => "Placeholders disponibles"]);
                 ?>
 
                 <p class="text-muted small">Cliquez pour insérer dans le message</p>
@@ -187,8 +184,7 @@
                 <?php component('card-end'); ?>
 
                 <?php
-                $card_title = "Preview";
-                component('card-start');
+                component('card-start', ['card_title' => "Preview"]);
                 ?>
 
                 <div id="previewSection" style="display: none;">

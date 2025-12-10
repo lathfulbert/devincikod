@@ -33,8 +33,7 @@
     <div class="row">
         <div class="col-12">
             <?php
-            $card_title = "Liste des Utilisateurs";
-            component('card-start');
+            component('card-start', ['card_title' => "Liste des Utilisateurs"]);
             ?>
 
             <table id="usersTable" class="table table-striped table-hover">

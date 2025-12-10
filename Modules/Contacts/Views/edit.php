@@ -23,8 +23,7 @@
     <div class="row">
         <div class="col-lg-8 offset-lg-2">
             <?php
-            $card_title = "Modifier le contact : " . htmlspecialchars($contact->getFullName());
-            component('card-start');
+            component('card-start', ['card_title' => "Modifier le contact : " . htmlspecialchars($contact->getFullName())]);
             ?>
 
             <form action="<?= url('/admin/contacts/' . $contact->id . '/update') ?>" method="POST">

@@ -34,9 +34,7 @@
     <div class="row">
         <div class="col-12">
             <?php
-            $card_title = "Champs Personnalisés";
-            $card_subtitle = "Définissez des champs illimités pour personnaliser vos contacts";
-            component('card-start');
+            component('card-start', ['card_title' => "Champs Personnalisés"]);
             ?>
 
             <div class="alert alert-info">

@@ -25,8 +25,7 @@
     <div class="row">
         <div class="col-12">
             <?php
-            $card_title = "API Keys Configuration";
-            component('card-start');
+            component('card-start', ['card_title' => "API Keys Configuration"]);
             ?>
 
             <form action="<?= url('/admin/settings/api/update') ?>" method="POST">

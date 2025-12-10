@@ -39,9 +39,12 @@
             <a href="<?= url('/admin/cache/stats') ?>" class="btn btn-info">
                 <i data-feather="bar-chart-2"></i> Statistiques
             </a>
-            <a href="<?= url('/admin/cache/clear-all') ?>" class="btn btn-warning" onclick="return confirm('Vider tout le cache ?')">
-                <i data-feather="trash-2"></i> Vider tout
-            </a>
+            <form method="POST" action="<?= url('/admin/cache/clear') ?>" style="display: inline;" onsubmit="return confirm('Vider tout le cache ?')">
+                <?= csrf_field() ?>
+                <button type="submit" class="btn btn-warning">
+                    <i data-feather="trash-2"></i> Vider tout
+                </button>
+            </form>
         </div>
     </div>
 
@@ -49,9 +52,7 @@
         <!-- Card: Configuration Générale -->
         <div class="col-lg-12">
             <?php
-            $card_title = "Configuration du Cache";
-            $card_actions = '';
-            component('card-start');
+            component('card-start', ['card_title' => "Configuration du Cache", 'card_actions' => '']);
             ?>
 
             <form method="POST" action="<?= url('/admin/cache/update') ?>" id="cacheConfigForm">
@@ -223,8 +224,6 @@
             <?php component('card-end'); ?>
         </div>
     </div>
-
-</div>
 </div>
 
 @endsection

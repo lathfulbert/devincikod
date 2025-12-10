@@ -14,7 +14,9 @@
       "Bash(do echo \"=== $table ===\")",
       "Bash(done)",
       "Bash(tail:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(python fix_card_components.py:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []

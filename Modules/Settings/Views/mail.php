@@ -25,8 +25,7 @@
     <div class="row">
         <div class="col-12">
             <?php
-            $card_title = "Configuration Mail";
-            component('card-start');
+            component('card-start', ['card_title' => "Configuration Mail"]);
             ?>
 
             <form action="<?= url('/admin/settings/mail/update') ?>" method="POST">

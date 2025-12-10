@@ -12,7 +12,7 @@
         ['label' => 'Utilisateurs', 'url' => '/admin/users'],
         ['label' => 'Créer']
     ];
-    component('breadcrumb');
+    component('breadcrumb', $breadcrumb);
     ?>
 </div>
 
@@ -26,7 +26,7 @@
         <div class="col-lg-8 offset-lg-2">
             <?php
             $card_title = "Créer un nouvel utilisateur";
-            component('card-start');
+            component('card-start',['card_title' => $card_title ]);
             ?>
 
             <form action="<?= url('/admin/users/store') ?>" method="POST">

@@ -24,8 +24,7 @@
     <div class="row">
         <div class="col-12">
             <?php
-            $card_title = "Mes Clés API";
-            component('card-start');
+            component('card-start', ['card_title' => "Mes Clés API"]);
             ?>
 
             <div class="alert alert-info">

@@ -13,11 +13,9 @@
  *   include __DIR__ . '/components/breadcrumb.php';
  */
 
-if (!isset($breadcrumb) || empty($breadcrumb)) {
-    return;
-}
+$breadcrumb = $breadcrumb ?? [];
 ?>
-<div class="container-fluid">
+
     <div class="page-title">
         <div class="row">
             <div class="col-6">
@@ -43,6 +41,6 @@ if (!isset($breadcrumb) || empty($breadcrumb)) {
             </div>
         </div>
     </div>
-</div>
+
 
 

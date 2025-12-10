@@ -25,8 +25,7 @@
     <div class="row">
         <div class="col-lg-8 offset-lg-2">
             <?php
-            $card_title = "Éditer le rôle : " . htmlspecialchars($role->name);
-            component('card-start');
+            component('card-start', ['card_title' => "Éditer le rôle : " . htmlspecialchars($role->name)]);
             ?>
 
             <form action="<?= url('/admin/roles/' . $role->id . '/update') ?>" method="POST">

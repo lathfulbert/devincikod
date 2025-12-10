@@ -27,8 +27,7 @@
         <div class="row">
             <div class="col-lg-8">
                 <?php
-                $card_title = "Informations du champ";
-                component('card-start');
+                component('card-start', ['card_title' => "Informations du champ"]);
                 ?>
 
                 <div class="mb-3">
@@ -99,8 +98,7 @@
 
             <div class="col-lg-4">
                 <?php
-                $card_title = "Actions";
-                component('card-start');
+                component('card-start', ['card_title' => "Actions"]);
                 ?>
 
                 <button type="submit" class="btn btn-primary w-100 mb-2">
@@ -114,8 +112,7 @@
                 <?php component('card-end'); ?>
 
                 <?php
-                $card_title = "Informations";
-                component('card-start');
+                component('card-start', ['card_title' => "Informations"]);
                 ?>
 
                 <div class="alert alert-info mb-0">

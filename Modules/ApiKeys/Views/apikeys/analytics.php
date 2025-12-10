@@ -146,8 +146,7 @@
         <div class="row">
             <div class="col-md-8">
                 <?php
-                $card_title = "Request Timeline";
-                component('card-start');
+                component('card-start', ['card_title' => "Request Timeline"]);
                 ?>
                 <canvas id="timeSeriesChart" height="80"></canvas>
                 <?php component('card-end'); ?>
@@ -155,8 +154,7 @@
 
             <div class="col-md-4">
                 <?php
-                $card_title = "Status Code Distribution";
-                component('card-start');
+                component('card-start', ['card_title' => "Status Code Distribution"]);
                 ?>
                 <canvas id="statusChart" height="160"></canvas>
                 <?php component('card-end'); ?>
@@ -169,8 +167,7 @@
         <div class="row">
             <div class="col-12">
                 <?php
-                $card_title = "Endpoint Statistics";
-                component('card-start');
+                component('card-start', ['card_title' => "Endpoint Statistics"]);
                 ?>
 
                 <table class="table table-striped table-hover">
@@ -222,8 +219,7 @@
         <div class="row">
             <div class="col-12">
                 <?php
-                $card_title = "Recent API Requests";
-                component('card-start');
+                component('card-start', ['card_title' => "Recent API Requests"]);
                 ?>
 
                 <table id="logsTable" class="table table-striped table-sm">

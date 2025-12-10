@@ -45,9 +45,15 @@ $router->post('/admin/modules/install', [ModuleController::class, 'install'])
 $router->get('/admin/cache', [CacheController::class, 'index'])
     ->middleware('can:admin.settings.view')
     ->name('admin.cache.index');
+$router->get('/admin/cache/stats', [CacheController::class, 'stats'])
+    ->middleware('can:admin.settings.view')
+    ->name('admin.cache.stats');
 $router->post('/admin/cache/update', [CacheController::class, 'update'])
     ->middleware('can:admin.settings.edit')
     ->name('admin.cache.update');
+$router->post('/admin/cache/test-driver', [CacheController::class, 'testDriver'])
+    ->middleware('can:admin.settings.view')
+    ->name('admin.cache.test-driver');
 $router->post('/admin/cache/clear', [CacheController::class, 'clear'])
     ->middleware('can:admin.settings.edit')
     ->name('admin.cache.clear');

@@ -64,8 +64,7 @@
     <div class="row">
         <div class="col-12">
             <?php
-            $card_title = "Liste des Permissions";
-            component('card-start');
+            component('card-start', ['card_title' => "Liste des Permissions"]);
             ?>
 
             <table id="permissionsTable" class="table table-striped table-hover">

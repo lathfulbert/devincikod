@@ -20,8 +20,7 @@
     <div class="row">
         <div class="col-12">
             <?php
-            $card_title = "Documentation de l'API";
-            component('card-start');
+            component('card-start', ['card_title' => "Documentation de l'API"]);
             ?>
 
             <div class="alert alert-info">

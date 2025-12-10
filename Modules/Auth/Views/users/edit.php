@@ -25,8 +25,7 @@
     <div class="row">
         <div class="col-lg-8 offset-lg-2">
             <?php
-            $card_title = "Éditer l'utilisateur : " . htmlspecialchars($user->username);
-            component('card-start');
+            component('card-start', ['card_title' => "Éditer l'utilisateur : " . htmlspecialchars($user->username)]);
             ?>
 
             <form action="<?= url('/admin/users/' . $user->id . '/update') ?>" method="POST">

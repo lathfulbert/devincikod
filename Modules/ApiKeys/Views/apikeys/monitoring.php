@@ -27,8 +27,7 @@
         <div class="row">
             <div class="col-12">
                 <?php
-                $card_title = "<i data-feather=\"alert-triangle\"></i> Alerts Requiring Attention";
-                component('card-start');
+                component('card-start', ['card_title' => "<i data-feather=\"alert-triangle\"></i> Alerts Requiring Attention"]);
                 ?>
 
                 <?php foreach ($allAlerts as $keyId => $alertData): ?>
@@ -69,8 +68,7 @@
     <div class="row">
         <div class="col-12">
             <?php
-            $card_title = "API Keys Health Status";
-            component('card-start');
+            component('card-start', ['card_title' => "API Keys Health Status"]);
             ?>
 
             <table class="table table-hover">

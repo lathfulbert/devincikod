@@ -16,7 +16,7 @@ $actions = $card_actions ?? '';
 $footer = $card_footer ?? false;
 ?>
 
-<div class="card">
+<div class="card create-project-form custom-input">
     <?php if ($title || $actions): ?>
         <div class="card-header pb-0">
             <div class="row">

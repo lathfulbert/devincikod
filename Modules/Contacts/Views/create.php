@@ -23,8 +23,7 @@
     <div class="row">
         <div class="col-lg-8 offset-lg-2">
             <?php
-            $card_title = "Créer un nouveau contact";
-            component('card-start');
+            component('card-start', ['card_title' => "Créer un nouveau contact"]);
             ?>
 
             <form action="<?= url('/admin/contacts/store') ?>" method="POST">
