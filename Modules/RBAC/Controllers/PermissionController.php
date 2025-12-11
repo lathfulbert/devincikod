@@ -31,7 +31,7 @@ class PermissionController
         }
 
         if ($roleId) {
-            $conditions[] = "p.id IN (SELECT permission_id FROM permission_role WHERE role_id = ?)";
+            $conditions[] = "p.id IN (SELECT permission_id FROM role_permissions WHERE role_id = ?)";
             $params[] = $roleId;
         }
 

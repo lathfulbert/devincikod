@@ -124,6 +124,15 @@ class Application extends Container
         $dbConfig = $this->config->get("database.connections.{$defaultConnection}", []);
         \App\Core\Database\Database::getInstance()->connect($dbConfig);
 
+        // Set Timezone from Settings
+        try {
+            $timezone = get_timezone();
+            date_default_timezone_set($timezone);
+        } catch (\Exception $e) {
+            // Fallback to Africa/Abidjan if settings not available
+            date_default_timezone_set('Africa/Abidjan');
+        }
+
         // Initialize I18n (Internationalization)
         \App\Core\I18n\Middleware\SetLocaleMiddleware::run();
 

@@ -1,6 +1,6 @@
 @extends('backend.layouts.master')
 
-@section('title', $title ?? 'Nouvelle Campagne SMS')
+@section('title', $title ?? 'Modifier Campagne SMS')
 
 @section('content')
 
@@ -9,9 +9,9 @@
     $breadcrumb = [
         ['label' => 'Dashboard', 'url' => '/admin/dashboard'],
         ['label' => 'Campagnes SMS', 'url' => '/admin/sms/campaigns'],
-        ['label' => 'Créer']
+        ['label' => 'Modifier']
     ];
-    component('breadcrumb');
+    component('breadcrumb', ['breadcrumb' => $breadcrumb]);
     ?>
 </div>
 
@@ -20,7 +20,7 @@
 </div>
 
 <div class="container-fluid">
-    <form action="<?= url('/admin/sms/campaigns/store') ?>" method="POST" id="campaignForm">
+    <form action="<?= url('/admin/sms/campaigns/' . $campaign->id . '/update') ?>" method="POST" id="campaignForm">
         <?= csrf_field() ?>
 
         <div class="row">
@@ -33,12 +33,12 @@
                 <div class="mb-3">
                     <label for="name" class="form-label">Nom de la campagne <span class="text-danger">*</span></label>
                     <input type="text" name="name" id="name" class="form-control"
-                        value="<?= old('name') ?>" required autofocus>
+                        value="<?= htmlspecialchars($campaign->name ?? '') ?>" required autofocus>
                 </div>
 
                 <div class="mb-3">
                     <label for="message" class="form-label">Message <span class="text-danger">*</span></label>
-                    <textarea name="message" id="message" class="form-control" rows="6" required><?= old('message') ?></textarea>
+                    <textarea name="message" id="message" class="form-control" rows="6" required><?= htmlspecialchars($campaign->message ?? '') ?></textarea>
                     <small class="form-text text-muted">
                         <strong>Caractères:</strong> <span id="charCount">0</span> / 160
                         | <strong>SMS:</strong> <span id="smsCount">0</span>
@@ -51,7 +51,8 @@
                         <option value="">-- Select Sender Name --</option>
                         <?php if (isset($senderNames) && !empty($senderNames)): ?>
                             <?php foreach ($senderNames as $senderName): ?>
-                                <option value="<?= $senderName->id ?>">
+                                <option value="<?= $senderName->id ?>"
+                                    <?= ($campaign->sender_name_id == $senderName->id) ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($senderName->name) ?>
                                     <?php if ($senderName->operator): ?>
                                         (<?= htmlspecialchars($senderName->operator) ?>)
@@ -62,18 +63,13 @@
                             <option value="" disabled>No sender names assigned to you</option>
                         <?php endif; ?>
                     </select>
-                    <small class="form-text text-muted">
-                        Select the sender name that will appear on recipients' phones.
-                        <?php if (empty($senderNames)): ?>
-                            <span class="text-warning">Please contact your administrator to assign sender names to your account.</span>
-                        <?php endif; ?>
-                    </small>
                 </div>
 
                 <div class="mb-3">
                     <div class="form-check">
                         <input type="checkbox" name="use_personalization" id="use_personalization"
-                            class="form-check-input" value="1" checked>
+                            class="form-check-input" value="1"
+                            <?= ($campaign->use_personalization ?? 1) ? 'checked' : '' ?>>
                         <label class="form-check-label" for="use_personalization">
                             Activer la personnalisation (placeholders)
                         </label>
@@ -84,9 +80,16 @@
                     <label for="scheduled_at" class="form-label">
                         Programmer l'envoi (optionnel)
                     </label>
+                    <?php
+                    // Format scheduled_at for datetime-local input (YYYY-MM-DDTHH:MM)
+                    $scheduledValue = '';
+                    if (!empty($campaign->scheduled_at)) {
+                        $scheduledValue = date('Y-m-d\TH:i', strtotime($campaign->scheduled_at));
+                    }
+                    ?>
                     <input type="datetime-local" name="scheduled_at" id="scheduled_at"
                         class="form-control"
-                        value="<?= old('scheduled_at') ?>">
+                        value="<?= htmlspecialchars($scheduledValue) ?>">
                     <small class="form-text text-muted">
                         Laissez vide pour envoyer immédiatement. La date et l'heure doivent être dans le futur.
                     </small>
@@ -141,6 +144,7 @@
                                                     value="<?= $contact->id ?>"
                                                     class="contact-checkbox"
                                                     data-phone="<?= htmlspecialchars($contact->phone) ?>"
+                                                    <?= in_array($contact->id, $selectedContactIds ?? []) ? 'checked' : '' ?>
                                                     onchange="updateCount()">
                                             </td>
                                             <td><?= htmlspecialchars($contact->getFullName()) ?></td>
@@ -220,9 +224,9 @@
 
                 <div class="mt-3">
                     <button type="submit" class="btn btn-primary btn-lg w-100">
-                        <i data-feather="send"></i> Créer et Envoyer la Campagne
+                        <i data-feather="save"></i> Mettre à Jour la Campagne
                     </button>
-                    <a href="<?= url('/admin/sms/campaigns') ?>" class="btn btn-secondary w-100 mt-2">
+                    <a href="<?= url('/admin/sms/campaigns/' . $campaign->id) ?>" class="btn btn-secondary w-100 mt-2">
                         <i data-feather="x"></i> Annuler
                     </a>
                 </div>
@@ -246,14 +250,15 @@
     const charCount = document.getElementById('charCount');
     const smsCount = document.getElementById('smsCount');
 
-    messageTextarea.addEventListener('input', function() {
-        const length = this.value.length;
+    // Initial count
+    function updateCharCount() {
+        const length = messageTextarea.value.length;
         charCount.textContent = length;
         smsCount.textContent = Math.ceil(length / 160) || 0;
-
-        // Enable preview if message and contacts
         updatePreviewButton();
-    });
+    }
+
+    messageTextarea.addEventListener('input', updateCharCount);
 
     // Contact selection
     function updateCount() {
@@ -294,7 +299,7 @@
         textarea.selectionStart = textarea.selectionEnd = start + placeholder.length;
 
         // Trigger input event
-        messageTextarea.dispatchEvent(new Event('input'));
+        updateCharCount();
     }
 
     // Preview
@@ -339,6 +344,15 @@
             });
     }
 
+    // Form validation
+    document.getElementById('campaignForm').addEventListener('submit', function(e) {
+        const checked = document.querySelectorAll('.contact-checkbox:checked').length;
+        if (checked === 0) {
+            e.preventDefault();
+            alert('Veuillez sélectionner au moins un contact');
+        }
+    });
+
     // Scheduled date validation
     const scheduledInput = document.getElementById('scheduled_at');
     const scheduledError = document.getElementById('scheduledDateError');
@@ -374,15 +388,8 @@
         }
     });
 
-    // Form validation
+    // Form validation on submit
     document.getElementById('campaignForm').addEventListener('submit', function(e) {
-        const checked = document.querySelectorAll('.contact-checkbox:checked').length;
-        if (checked === 0) {
-            e.preventDefault();
-            alert('Veuillez sélectionner au moins un contact');
-            return false;
-        }
-
         // Validate scheduled date if provided
         if (scheduledInput.value) {
             const selectedDate = new Date(scheduledInput.value);
@@ -402,5 +409,6 @@
     // Initialize
     setMinDateTime();
     updateCount();
+    updateCharCount();
 </script>
 @endsection

@@ -18,9 +18,16 @@ class WalletModule extends AbstractModule
         return [
             // Wallet Management
             ['GET', '/admin/wallet', [\Modules\Wallet\Controllers\WalletController::class, 'index'], [$authMiddleware]],
+            ['GET', '/admin/wallet/topup', [\Modules\Wallet\Controllers\WalletController::class, 'topup'], [$authMiddleware]],
             ['POST', '/admin/wallet/topup', [\Modules\Wallet\Controllers\WalletController::class, 'processTopup'], [$authMiddleware]],
             ['POST', '/admin/wallet/debit', [\Modules\Wallet\Controllers\WalletController::class, 'processDebit'], [$authMiddleware]],
             ['GET', '/admin/wallet/transactions/{id}', [\Modules\Wallet\Controllers\WalletController::class, 'transactions'], [$authMiddleware]],
+
+            // Topup Requests
+            ['GET', '/admin/wallet/requests', [\Modules\Wallet\Controllers\WalletController::class, 'requests'], [$authMiddleware]],
+            ['GET', '/admin/wallet/admin-requests', [\Modules\Wallet\Controllers\WalletController::class, 'adminRequests'], [$authMiddleware]],
+            ['POST', '/admin/wallet/approve/{id}', [\Modules\Wallet\Controllers\WalletController::class, 'approveRequest'], [$authMiddleware]],
+            ['POST', '/admin/wallet/reject/{id}', [\Modules\Wallet\Controllers\WalletController::class, 'rejectRequest'], [$authMiddleware]],
         ];
     }
 

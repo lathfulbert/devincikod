@@ -1814,3 +1814,52 @@ if (!function_exists('abort_unless')) {
         }
     }
 }
+
+/*
+|--------------------------------------------------------------------------
+| Settings Helpers
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('setting')) {
+    /**
+     * Get a setting value from the database
+     *
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    function setting(string $key, $default = null)
+    {
+        try {
+            $settingsService = new \Modules\Settings\Services\SettingsService();
+            return $settingsService->get($key, $default);
+        } catch (\Exception $e) {
+            return $default;
+        }
+    }
+}
+
+if (!function_exists('get_timezone')) {
+    /**
+     * Get the application timezone from settings
+     *
+     * @return string
+     */
+    function get_timezone(): string
+    {
+        return setting('default_timezone', 'Africa/Abidjan');
+    }
+}
+
+if (!function_exists('app_timezone')) {
+    /**
+     * Alias for get_timezone()
+     *
+     * @return string
+     */
+    function app_timezone(): string
+    {
+        return get_timezone();
+    }
+}

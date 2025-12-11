@@ -89,6 +89,20 @@ class SmsCampaignController
                 return;
             }
 
+            // Validate scheduled date if provided
+            $scheduledAt = null;
+            if (!empty($_POST['scheduled_at'])) {
+                $scheduledAt = sanitize($_POST['scheduled_at'], 'string');
+                $scheduledTimestamp = strtotime($scheduledAt);
+
+                // Verify the date is in the future
+                if ($scheduledTimestamp <= time()) {
+                    flash('error', 'La date et l\'heure programmées doivent être dans le futur');
+                    redirect('/admin/sms/campaigns/create');
+                    return;
+                }
+            }
+
             // Get and verify sender name
             $senderName = null;
             $sender = 'SMS';
@@ -114,7 +128,9 @@ class SmsCampaignController
             $campaign->sender_id = $sender;
             $campaign->contact_ids = json_encode($contactIds);
             $campaign->use_personalization = isset($_POST['use_personalization']) ? 1 : 0;
-            $campaign->status = 'pending';
+            $campaign->scheduled_at = $scheduledAt;
+            // Set status based on whether it's scheduled or immediate
+            $campaign->status = $scheduledAt ? 'scheduled' : 'pending';
             $campaign->total_recipients = count($contactIds);
             $campaign->sent_count = 0;
             $campaign->failed_count = 0;
@@ -141,7 +157,11 @@ class SmsCampaignController
                 $queueItem->save();
             }
 
-            flash('success', 'Campagne créée avec succès ! ' . count($contactIds) . ' messages en attente.');
+            $successMessage = 'Campagne créée avec succès ! ' . count($contactIds) . ' messages en attente.';
+            if ($scheduledAt) {
+                $successMessage .= ' Envoi programmé le ' . date('d/m/Y à H:i', strtotime($scheduledAt)) . '.';
+            }
+            flash('success', $successMessage);
             redirect('/admin/sms/campaigns/' . $campaign->id);
         } catch (\Exception $e) {
             flash('error', 'Erreur: ' . $e->getMessage());
@@ -200,9 +220,30 @@ class SmsCampaignController
         $this->authorizeUpdate($campaign, 'created_by', '/admin/sms/campaigns');
 
         try {
+            // Validate scheduled date if provided
+            $scheduledAt = null;
+            if (!empty($_POST['scheduled_at'])) {
+                $scheduledAt = sanitize($_POST['scheduled_at'], 'string');
+                $scheduledTimestamp = strtotime($scheduledAt);
+
+                // Verify the date is in the future
+                if ($scheduledTimestamp <= time()) {
+                    flash('error', 'La date et l\'heure programmées doivent être dans le futur');
+                    redirect('/admin/sms/campaigns/' . $id . '/edit');
+                    return;
+                }
+            }
+
             $campaign->name = sanitize($_POST['name'] ?? '', 'string');
             $campaign->message = sanitize($_POST['message'] ?? '', 'string');
             $campaign->use_personalization = isset($_POST['use_personalization']) ? 1 : 0;
+            $campaign->scheduled_at = $scheduledAt;
+            // Update status if scheduled date is set
+            if ($scheduledAt && $campaign->status === 'pending') {
+                $campaign->status = 'scheduled';
+            } elseif (!$scheduledAt && $campaign->status === 'scheduled') {
+                $campaign->status = 'pending';
+            }
             $campaign->save();
 
             flash('success', 'Campagne mise à jour avec succès');

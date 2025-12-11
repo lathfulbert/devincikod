@@ -46,7 +46,7 @@ class SmsCoreModule extends AbstractModule
             ['GET', '/admin/sms/campaigns/{id}/edit', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'edit'], [$authMiddleware]],
             ['POST', '/admin/sms/campaigns/{id}/update', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'update'], [$authMiddleware]],
             ['POST', '/admin/sms/campaigns/preview', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'preview'], [$authMiddleware]],
-            ['GET', '/admin/sms/campaigns/{id}/delete', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'delete'], [$authMiddleware]],
+            ['POST', '/admin/sms/campaigns/{id}/delete', [\Modules\SmsCore\Controllers\SmsCampaignController::class, 'delete'], [$authMiddleware]],
 
             // Billing & Pricing
             ['GET', '/admin/sms/pricing', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'index'], [$authMiddleware]],
@@ -56,9 +56,7 @@ class SmsCoreModule extends AbstractModule
             ['POST', '/admin/sms/pricing/delete-country', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'deleteCountry'], [$authMiddleware]],
             ['GET', '/admin/sms/billing', [\Modules\SmsCore\Controllers\SmsPricingController::class, 'logs'], [$authMiddleware]],
 
-            // Wallet
-            ['GET', '/admin/wallet/topup', [\Modules\SmsCore\Controllers\WalletController::class, 'topup'], [$authMiddleware]],
-            ['POST', '/admin/wallet/process-topup', [\Modules\SmsCore\Controllers\WalletController::class, 'processTopup'], [$authMiddleware]],
+            // NOTE: Wallet routes are now handled by the Wallet Module (Modules\Wallet\WalletModule)
 
             // Sender Names Management
             ['GET', '/sms/sender-names', [\Modules\SmsCore\Controllers\SenderNameController::class, 'index'], [$authMiddleware]],
