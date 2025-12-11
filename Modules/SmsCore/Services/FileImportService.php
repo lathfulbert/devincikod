@@ -214,16 +214,193 @@ class FileImportService
     }
 
     /**
+     * Import file with full column detection and data extraction
+     * Returns array with headers and all data rows
+     *
+     * @param array $file PHP $_FILES array element
+     * @return array ['headers' => [...], 'data' => [[...], [...]]]
+     * @throws \Exception If file processing fails
+     */
+    public static function importWithColumns(array $file): array
+    {
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            throw new \Exception('Erreur lors du téléchargement du fichier: ' . self::getUploadErrorMessage($file['error']));
+        }
+
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        switch ($extension) {
+            case 'csv':
+                return self::importCSVWithColumns($file['tmp_name']);
+
+            case 'xlsx':
+            case 'xls':
+                return self::importExcelWithColumns($file['tmp_name'], $extension);
+
+            default:
+                throw new \Exception('Format de fichier non supporté: ' . $extension);
+        }
+    }
+
+    /**
+     * Import CSV with full column detection
+     *
+     * @param string $filePath Path to CSV file
+     * @return array ['headers' => [...], 'data' => [[...], [...]]]
+     */
+    private static function importCSVWithColumns(string $filePath): array
+    {
+        $handle = fopen($filePath, 'r');
+
+        if (!$handle) {
+            throw new \Exception('Impossible d\'ouvrir le fichier CSV');
+        }
+
+        $headers = [];
+        $data = [];
+        $isFirstRow = true;
+
+        while (($row = fgetcsv($handle, 1000, ',')) !== false) {
+            if ($isFirstRow) {
+                $isFirstRow = false;
+
+                // Check if first row is header
+                if (!empty($row[0]) && !self::looksLikePhoneNumber($row[0])) {
+                    // First row is header
+                    $headers = array_map('trim', $row);
+                    continue;
+                } else {
+                    // First row is data, generate generic headers
+                    for ($i = 0; $i < count($row); $i++) {
+                        $headers[] = 'Colonne' . ($i + 1);
+                    }
+                }
+            }
+
+            // Store row data
+            if (!empty($row[0])) {
+                $rowData = [];
+                foreach ($row as $index => $value) {
+                    $header = $headers[$index] ?? 'Colonne' . ($index + 1);
+                    $rowData[$header] = trim($value);
+                }
+                $data[] = $rowData;
+            }
+        }
+
+        fclose($handle);
+
+        return [
+            'headers' => $headers,
+            'data' => $data
+        ];
+    }
+
+    /**
+     * Import Excel with full column detection
+     *
+     * @param string $filePath Path to Excel file
+     * @param string $extension File extension (xlsx or xls)
+     * @return array ['headers' => [...], 'data' => [[...], [...]]]
+     */
+    private static function importExcelWithColumns(string $filePath, string $extension): array
+    {
+        // Check if PhpSpreadsheet is available
+        if (!class_exists('PhpOffice\PhpSpreadsheet\IOFactory')) {
+            // Fallback: treat as CSV
+            return self::importCSVWithColumns($filePath);
+        }
+
+        try {
+            $spreadsheet = IOFactory::load($filePath);
+            $worksheet = $spreadsheet->getActiveSheet();
+
+            $headers = [];
+            $data = [];
+            $isFirstRow = true;
+
+            foreach ($worksheet->getRowIterator() as $row) {
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = trim($cell->getValue());
+                }
+
+                // Skip empty rows
+                if (empty($rowData[0])) {
+                    continue;
+                }
+
+                if ($isFirstRow) {
+                    $isFirstRow = false;
+
+                    // Check if first row is header
+                    if (!self::looksLikePhoneNumber($rowData[0])) {
+                        // First row is header
+                        $headers = $rowData;
+                        continue;
+                    } else {
+                        // First row is data, generate generic headers
+                        for ($i = 0; $i < count($rowData); $i++) {
+                            $headers[] = 'Colonne' . ($i + 1);
+                        }
+                    }
+                }
+
+                // Store row data as associative array
+                $assocData = [];
+                foreach ($rowData as $index => $value) {
+                    $header = $headers[$index] ?? 'Colonne' . ($i + 1);
+                    $assocData[$header] = $value;
+                }
+                $data[] = $assocData;
+            }
+
+            return [
+                'headers' => $headers,
+                'data' => $data
+            ];
+        } catch (\Exception $e) {
+            throw new \Exception('Erreur lors de la lecture du fichier Excel: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Replace variables in message template with actual data
+     * Variables format: {{column_name}}
+     *
+     * @param string $template Message template
+     * @param array $data Row data as associative array
+     * @return string Message with variables replaced
+     */
+    public static function replaceVariables(string $template, array $data): string
+    {
+        $message = $template;
+
+        // Replace each variable
+        foreach ($data as $key => $value) {
+            // Support both {{key}} and {{KEY}} formats
+            $message = str_replace('{{' . $key . '}}', $value, $message);
+            $message = str_replace('{{' . strtolower($key) . '}}', $value, $message);
+            $message = str_replace('{{' . strtoupper($key) . '}}', $value, $message);
+        }
+
+        return $message;
+    }
+
+    /**
      * Generate a CSV template file
-     * 
+     *
      * @return string CSV content
      */
     public static function generateTemplate(): string
     {
-        return "Téléphone,Nom\n" .
-            "0708090102,Jean Dupont\n" .
-            "0709101112,Marie Martin\n" .
-            "+221771234567,Amadou Diallo\n" .
-            "+33612345678,Pierre Lefebvre\n";
+        return "Téléphone,Nom,Prenom,Montant\n" .
+            "0708090102,Dupont,Jean,1000\n" .
+            "0709101112,Martin,Marie,2500\n" .
+            "+221771234567,Diallo,Amadou,1500\n" .
+            "+33612345678,Lefebvre,Pierre,3000\n";
     }
 }

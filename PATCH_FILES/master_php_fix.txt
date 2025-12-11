@@ -1,0 +1,11 @@
+FICHIER: resources/views/backend/layouts/master.php
+LIGNE: 22
+
+ANCIEN CODE:
+<body onload="startTime()">
+
+NOUVEAU CODE:
+<body onload="if(typeof startTime === 'function') startTime()">
+
+EXPLICATION:
+Fix pour éviter l'erreur "startTime is not defined" sur les pages qui n'ont pas la fonction startTime() chargée.

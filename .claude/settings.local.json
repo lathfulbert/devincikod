@@ -21,7 +21,10 @@
       "Bash(net stop Apache2.4)",
       "Bash(net start:*)",
       "Bash(python:*)",
-      "Bash(powershell.exe -ExecutionPolicy Bypass -File test_api_complete.ps1)"
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File test_api_complete.ps1)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

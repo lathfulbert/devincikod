@@ -40,11 +40,16 @@ class WalletModule extends AbstractModule
     {
         return [
             [
-                'type' => 'link',
+                'type' => 'dropdown',
                 'title' => 'Wallet',
                 'icon' => 'dollar-sign',
-                'url' => '/admin/wallet',
-                'class' => 'link-nav'
+                'children' => [
+                    ['title' => 'Dashboard', 'url' => '/admin/wallet', 'icon' => 'home'],
+                    ['title' => 'Recharger mon Wallet', 'url' => '/admin/wallet/topup', 'icon' => 'plus-circle'],
+                    ['title' => 'Mes demandes de recharge', 'url' => '/admin/wallet/requests', 'icon' => 'list'],
+                    ['title' => '---', 'url' => '#'], // Separator
+                    ['title' => 'Gestion des demandes (Admin)', 'url' => '/admin/wallet/admin-requests', 'icon' => 'check-circle'],
+                ]
             ]
         ];
     }
