@@ -177,8 +177,10 @@ var options = {
         type: 'area',
         height: 350,
         toolbar: {
-            show: true
-        }
+            show: true,
+            offsetY: -20
+        },
+        offsetY: 10
     },
     dataLabels: {
         enabled: false
@@ -218,8 +220,9 @@ var options = {
         }
     },
     legend: {
-        position: 'top',
-        horizontalAlign: 'right'
+        position: 'bottom',
+        horizontalAlign: 'center',
+        offsetY: 5
     }
 };
 
