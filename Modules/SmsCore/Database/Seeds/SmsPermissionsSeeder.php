@@ -17,6 +17,13 @@ class SmsPermissionsSeeder
     {
         echo "Creating SMS permissions...\n";
 
+        // Module information
+        $moduleInfo = [
+            'module' => 'SMS',
+            'module_slug' => 'sms-core',
+            'module_id' => null  // Will be set when modules table is created
+        ];
+
         // Define SMS permissions with their roles
         $permissions = [
             // Dashboard
@@ -179,16 +186,43 @@ class SmsPermissionsSeeder
             )->fetch();
 
             if (!$existing) {
-                // Create permission
+                // Create permission with module information
+                // Generate slug from name
+                $slug = str_replace('.', '-', $perm['name']);
+
                 $this->db->query(
-                    "INSERT INTO permissions (name, description, created_at, updated_at) VALUES (?, ?, NOW(), NOW())",
-                    [$perm['name'], $perm['description']]
+                    "INSERT INTO permissions (name, slug, description, module, module_slug, module_id, created_at, updated_at)
+                     VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())",
+                    [
+                        $perm['name'],
+                        $slug,
+                        $perm['description'],
+                        $moduleInfo['module'],
+                        $moduleInfo['module_slug'],
+                        $moduleInfo['module_id']
+                    ]
                 );
                 $permissionId = $this->db->lastInsertId();
                 echo "  ✓ Created permission: {$perm['name']}\n";
             } else {
                 $permissionId = $existing['id'];
-                echo "  - Permission exists: {$perm['name']}\n";
+
+                // Update existing permission with module information if not set
+                $this->db->query(
+                    "UPDATE permissions
+                     SET module = COALESCE(module, ?),
+                         module_slug = COALESCE(module_slug, ?),
+                         module_id = COALESCE(module_id, ?),
+                         updated_at = NOW()
+                     WHERE id = ?",
+                    [
+                        $moduleInfo['module'],
+                        $moduleInfo['module_slug'],
+                        $moduleInfo['module_id'],
+                        $permissionId
+                    ]
+                );
+                echo "  - Permission exists: {$perm['name']} (module info updated)\n";
             }
 
             // Assign to roles
