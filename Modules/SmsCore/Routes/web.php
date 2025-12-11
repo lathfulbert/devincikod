@@ -82,6 +82,11 @@ $router->group([
         ->middleware('can:sms.bulk')
         ->name('sms.bulk');
 
+    // Parse file for column detection (used by import with variables)
+    $router->post('/parse-file', [SmsController::class, 'parseFile'])
+        ->middleware('can:sms.send')
+        ->name('sms.parse_file');
+
     // Campaign management
     $router->get('/campaigns', [SmsController::class, 'campaigns'])
         ->middleware('can:sms.campaigns.view')

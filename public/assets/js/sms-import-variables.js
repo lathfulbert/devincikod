@@ -40,13 +40,21 @@
             const formData = new FormData();
             formData.append('file', file);
 
-            const response = await fetch('/admin/sms/parse-file', {
+            const response = await fetch('/sms/parse-file', {
                 method: 'POST',
                 body: formData,
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
+
+            // Check if response is ok
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('Response status:', response.status);
+                console.error('Response text:', text);
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
             const result = await response.json();
 
