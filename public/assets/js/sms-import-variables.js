@@ -274,7 +274,7 @@
         const form = e.target;
         if (form.querySelector('#recipients_file')) {
             // Add hidden fields with file data
-            if (fileColumnsData.fullData && fileColumnsData.fullData.length > 0) {
+            if (fileColumnsData.full_data && fileColumnsData.full_data.length > 0) {
                 // Add hidden field for file_data
                 let fileDataInput = form.querySelector('input[name="file_data"]');
                 if (!fileDataInput) {
@@ -283,7 +283,7 @@
                     fileDataInput.name = 'file_data';
                     form.appendChild(fileDataInput);
                 }
-                fileDataInput.value = JSON.stringify(fileColumnsData.fullData);
+                fileDataInput.value = JSON.stringify(fileColumnsData.full_data);
 
                 // Add hidden field for phone_column
                 let phoneColInput = form.querySelector('input[name="phone_column"]');
