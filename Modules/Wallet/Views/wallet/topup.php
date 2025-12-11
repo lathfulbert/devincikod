@@ -58,15 +58,15 @@
                                 </optgroup>
                                 <?php if (!empty($gateways)): ?>
                                     <optgroup label="Paiement en ligne (crédit automatique)">
-                                        <?php foreach ($gateways as $gateway): ?>
-                                            <option value="gateway" data-gateway-id="<?= $gateway->id ?>">
-                                                <?= htmlspecialchars($gateway->name) ?> - Paiement instantané
+                                        <?php foreach ($gateways as $gatewayInfo): ?>
+                                            <option value="gateway" data-gateway-code="<?= htmlspecialchars($gatewayInfo['code']) ?>">
+                                                <?= htmlspecialchars($gatewayInfo['name']) ?> - Paiement instantané
                                             </option>
                                         <?php endforeach; ?>
                                     </optgroup>
                                 <?php endif; ?>
                             </select>
-                            <input type="hidden" name="gateway_id" id="gateway_id">
+                            <input type="hidden" name="gateway_code" id="gateway_code">
                             <small class="text-muted">
                                 <strong>Offline :</strong> Demande en attente de validation admin |
                                 <strong>Gateway :</strong> Crédit automatique après paiement
@@ -142,7 +142,7 @@
     const amountInput = document.querySelector('input[name="amount"]');
     const form = document.querySelector('form');
     const paymentMethodSelect = document.getElementById('payment_method');
-    const gatewayIdInput = document.getElementById('gateway_id');
+    const gatewayCodeInput = document.getElementById('gateway_code');
     const paymentInfoDiv = document.getElementById('payment-info');
     const paymentInfoText = document.getElementById('payment-info-text');
 
@@ -151,13 +151,13 @@
         paymentMethodSelect.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
             const paymentMethod = this.value;
-            const gatewayId = selectedOption.getAttribute('data-gateway-id');
+            const gatewayCode = selectedOption.getAttribute('data-gateway-code');
 
-            // Mettre à jour le gateway_id si c'est une gateway
-            if (gatewayId) {
-                gatewayIdInput.value = gatewayId;
+            // Mettre à jour le gateway_code si c'est une gateway
+            if (gatewayCode) {
+                gatewayCodeInput.value = gatewayCode;
             } else {
-                gatewayIdInput.value = '';
+                gatewayCodeInput.value = '';
             }
 
             // Mettre à jour le message d'information

@@ -5,18 +5,22 @@ namespace Modules\Wallet\Controllers;
 use App\Core\Application;
 use Modules\Wallet\Services\WalletService;
 use Modules\Wallet\Services\WalletNotificationService;
+use Modules\Wallet\Services\PaymentGatewayManager;
 use Modules\Wallet\Models\Wallet;
 use Modules\Wallet\Models\WalletTopupRequest;
+use Modules\Wallet\Models\SmsGateway;
 
 class WalletController
 {
     protected WalletService $walletService;
     protected WalletNotificationService $notificationService;
+    protected PaymentGatewayManager $gatewayManager;
 
     public function __construct()
     {
         $this->walletService = new WalletService();
         $this->notificationService = new WalletNotificationService();
+        $this->gatewayManager = new PaymentGatewayManager();
     }
 
     /**
@@ -53,9 +57,13 @@ class WalletController
 
         $wallet = $this->walletService->getWallet($userId);
 
+        // Get available payment gateways
+        $activeGateways = $this->gatewayManager->getActiveGateways();
+
         echo view('Wallet/wallet/topup', [
             'wallet' => $wallet,
             'userId' => $userId,
+            'gateways' => $activeGateways,
             'title' => 'Top-up Wallet'
         ]);
     }
@@ -69,7 +77,7 @@ class WalletController
         $userId = $_POST['user_id'] ?? $_SESSION['user']['id'] ?? $_SESSION['user_id'] ?? null;
         $amount = (float)($_POST['amount'] ?? 0);
         $paymentMethod = $_POST['payment_method'] ?? 'gateway';
-        $gatewayId = $_POST['gateway_id'] ?? null;
+        $gatewayCode = $_POST['gateway_code'] ?? null; // Code du gateway (cinetpay, wave, etc.)
         $notes = $_POST['notes'] ?? '';
 
         // Validations
@@ -117,7 +125,7 @@ class WalletController
                 'amount' => $amount,
                 'currency' => 'XOF',
                 'payment_method' => $paymentMethod,
-                'gateway_id' => $gatewayId,
+                'gateway_id' => null, // Will be set after gateway response
                 'status' => 'pending',
                 'notes' => $notes,
                 'ip_address' => $_SERVER['REMOTE_ADDR'] ?? null,
@@ -125,24 +133,81 @@ class WalletController
             ]);
 
             // Si paiement par gateway
-            if ($paymentMethod === 'gateway' && $gatewayId) {
-                // TODO: Rediriger vers la passerelle de paiement
-                // Pour l'instant, on simule un paiement réussi
-                $request->update([
-                    'gateway_status' => 'SUCCESS',
-                    'gateway_transaction_id' => 'SIMULATED_' . time(),
-                    'status' => 'completed'
-                ]);
+            if ($paymentMethod === 'gateway' && $gatewayCode) {
+                try {
+                    // Get user information
+                    $user = \Modules\Auth\Models\User::find($userId);
 
-                // Créditer directement le wallet
-                $this->walletService->addCredit($userId, $amount, 'Recharge via gateway #' . $request->id);
-                $request->markAsCompleted();
+                    // Generate unique reference
+                    $reference = 'TOPUP_' . $request->id . '_' . time();
 
-                // Envoyer notification d'approbation immédiate
-                $newBalance = $this->walletService->getBalance($userId);
-                $this->notificationService->sendRequestApprovedNotification($request, $newBalance);
+                    // Build return and webhook URLs
+                    $baseUrl = rtrim($_ENV['APP_URL'] ?? 'http://localhost', '/');
+                    $returnUrl = $baseUrl . '/admin/wallet/payment-return?request_id=' . $request->id;
+                    $cancelUrl = $baseUrl . '/admin/wallet/payment-cancel?request_id=' . $request->id;
+                    $webhookUrl = $baseUrl . '/api/webhook/payment/' . $gatewayCode;
 
-                $_SESSION['flash_success'] = "Recharge de " . number_format($amount, 0, ',', ' ') . " XOF effectuée avec succès";
+                    // Prepare payment data
+                    $paymentData = [
+                        'amount' => $amount,
+                        'currency' => 'XOF',
+                        'reference' => $reference,
+                        'description' => 'Recharge Wallet - ' . number_format($amount, 0, ',', ' ') . ' XOF',
+                        'return_url' => $returnUrl,
+                        'cancel_url' => $cancelUrl,
+                        'webhook_url' => $webhookUrl,
+                        'customer_name' => $user->name ?? 'Client',
+                        'customer_email' => $user->email ?? '',
+                        'customer_phone' => $user->phone ?? '',
+                        'metadata' => [
+                            'request_id' => $request->id,
+                            'user_id' => $userId,
+                            'wallet_id' => $wallet->id
+                        ]
+                    ];
+
+                    // Initiate payment through gateway
+                    $response = $this->gatewayManager->initiatePayment($gatewayCode, $paymentData);
+
+                    if ($response['success']) {
+                        // Update request with gateway details
+                        $request->update([
+                            'gateway_transaction_id' => $reference,
+                            'gateway_response' => json_encode($response),
+                            'status' => 'processing'
+                        ]);
+
+                        // Store payment URL in session for redirect
+                        $_SESSION['payment_url'] = $response['payment_url'];
+                        $_SESSION['flash_info'] = 'Redirection vers la passerelle de paiement...';
+
+                        // Redirect to payment gateway
+                        redirect($response['payment_url']);
+                        exit;
+                    } else {
+                        // Payment initiation failed
+                        $request->update([
+                            'gateway_response' => json_encode($response),
+                            'gateway_status' => 'FAILED',
+                            'status' => 'failed'
+                        ]);
+
+                        $_SESSION['flash_error'] = 'Échec de l\'initialisation du paiement: ' . ($response['error'] ?? 'Erreur inconnue');
+                        redirect('/admin/wallet/topup');
+                        exit;
+                    }
+
+                } catch (\Exception $e) {
+                    $request->update([
+                        'gateway_status' => 'ERROR',
+                        'status' => 'failed',
+                        'gateway_response' => json_encode(['error' => $e->getMessage()])
+                    ]);
+
+                    $_SESSION['flash_error'] = 'Erreur lors de l\'initialisation du paiement: ' . $e->getMessage();
+                    redirect('/admin/wallet/topup');
+                    exit;
+                }
             } else {
                 // Paiement offline - en attente de validation admin
 
@@ -153,10 +218,9 @@ class WalletController
                 $this->notificationService->sendAdminNotification($request);
 
                 $_SESSION['flash_info'] = "Votre demande de recharge de " . number_format($amount, 0, ',', ' ') . " XOF a été enregistrée et est en attente de validation par un administrateur.";
+                redirect('/admin/wallet/requests');
+                exit;
             }
-
-            redirect('/admin/wallet/requests');
-            exit;
 
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Échec de la demande : ' . $e->getMessage();
@@ -341,5 +405,182 @@ class WalletController
         $_SESSION['flash_success'] = 'Demande rejetée';
         redirect('/admin/wallet/admin-requests');
         exit;
+    }
+
+    /**
+     * Handle payment return from gateway (user redirected back)
+     */
+    public function paymentReturn()
+    {
+        $requestId = $_GET['request_id'] ?? null;
+
+        if (!$requestId) {
+            $_SESSION['flash_error'] = 'ID de demande manquant';
+            redirect('/admin/wallet/requests');
+            exit;
+        }
+
+        $request = WalletTopupRequest::find($requestId);
+
+        if (!$request) {
+            $_SESSION['flash_error'] = 'Demande de recharge introuvable';
+            redirect('/admin/wallet/requests');
+            exit;
+        }
+
+        // Check if payment is already completed
+        if ($request->status === 'completed') {
+            $_SESSION['flash_success'] = 'Paiement déjà confirmé. Votre wallet a été crédité.';
+            redirect('/admin/wallet/requests');
+            exit;
+        }
+
+        // Payment is processing - show waiting message
+        $_SESSION['flash_info'] = 'Votre paiement est en cours de traitement. Vous recevrez une confirmation par email une fois le paiement validé.';
+        redirect('/admin/wallet/requests');
+        exit;
+    }
+
+    /**
+     * Handle payment cancellation
+     */
+    public function paymentCancel()
+    {
+        $requestId = $_GET['request_id'] ?? null;
+
+        if (!$requestId) {
+            $_SESSION['flash_error'] = 'ID de demande manquant';
+            redirect('/admin/wallet/requests');
+            exit;
+        }
+
+        $request = WalletTopupRequest::find($requestId);
+
+        if (!$request) {
+            $_SESSION['flash_error'] = 'Demande de recharge introuvable';
+            redirect('/admin/wallet/requests');
+            exit;
+        }
+
+        // Mark as cancelled if still pending/processing
+        if (in_array($request->status, ['pending', 'processing'])) {
+            $request->update([
+                'status' => 'cancelled',
+                'gateway_status' => 'CANCELLED'
+            ]);
+        }
+
+        $_SESSION['flash_warning'] = 'Paiement annulé. Vous pouvez faire une nouvelle tentative si vous le souhaitez.';
+        redirect('/admin/wallet/topup');
+        exit;
+    }
+
+    /**
+     * Handle payment webhook/callback from gateway
+     * This is called by the payment gateway to notify payment status
+     */
+    public function handlePaymentCallback($gatewayCode)
+    {
+        // Get raw POST data
+        $rawData = file_get_contents('php://input');
+        $payload = json_decode($rawData, true);
+
+        // If JSON decode failed, try to use $_POST
+        if (!$payload) {
+            $payload = $_POST;
+        }
+
+        // Log the webhook for debugging
+        error_log("Payment webhook received from {$gatewayCode}: " . $rawData);
+
+        try {
+            // Process callback through gateway manager
+            $result = $this->gatewayManager->handleCallback($gatewayCode, $payload);
+
+            if (!$result['valid']) {
+                error_log("Invalid webhook signature from {$gatewayCode}: " . ($result['error'] ?? 'Unknown error'));
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Invalid signature']);
+                exit;
+            }
+
+            // Extract transaction details
+            $transactionId = $result['transaction_id'] ?? null;
+            $status = $result['status'] ?? 'unknown';
+            $gatewayReference = $result['gateway_reference'] ?? null;
+
+            if (!$transactionId) {
+                error_log("No transaction ID in webhook from {$gatewayCode}");
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Missing transaction ID']);
+                exit;
+            }
+
+            // Find the topup request
+            $request = WalletTopupRequest::where('gateway_transaction_id', $transactionId)->first();
+
+            if (!$request) {
+                error_log("Topup request not found for transaction {$transactionId}");
+                http_response_code(404);
+                echo json_encode(['status' => 'error', 'message' => 'Request not found']);
+                exit;
+            }
+
+            // Update request with gateway response
+            $request->update([
+                'gateway_response' => json_encode($result),
+                'gateway_status' => strtoupper($status)
+            ]);
+
+            // Handle based on status
+            if ($status === 'success' || $status === 'completed') {
+                // Payment successful - credit the wallet
+                if ($request->status !== 'completed') {
+                    $request->update(['status' => 'approved']);
+
+                    // Add credit to wallet
+                    $this->walletService->addCredit(
+                        $request->user_id,
+                        $request->amount,
+                        'Recharge via ' . $gatewayCode . ' (Ref: ' . ($gatewayReference ?? $transactionId) . ')'
+                    );
+
+                    // Mark as completed
+                    $request->markAsCompleted();
+
+                    // Send approval notification
+                    $newBalance = $this->walletService->getBalance($request->user_id);
+                    $this->notificationService->sendRequestApprovedNotification($request, $newBalance);
+
+                    error_log("Wallet credited successfully for request {$request->id}");
+                }
+
+                http_response_code(200);
+                echo json_encode(['status' => 'success', 'message' => 'Payment processed']);
+                exit;
+
+            } elseif ($status === 'failed' || $status === 'declined') {
+                // Payment failed
+                $request->update(['status' => 'failed']);
+
+                error_log("Payment failed for request {$request->id}");
+                http_response_code(200);
+                echo json_encode(['status' => 'success', 'message' => 'Payment failed recorded']);
+                exit;
+
+            } else {
+                // Unknown status - keep processing
+                error_log("Unknown payment status '{$status}' for request {$request->id}");
+                http_response_code(200);
+                echo json_encode(['status' => 'success', 'message' => 'Status recorded']);
+                exit;
+            }
+
+        } catch (\Exception $e) {
+            error_log("Error processing webhook from {$gatewayCode}: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+            exit;
+        }
     }
 }

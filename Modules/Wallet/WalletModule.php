@@ -28,6 +28,11 @@ class WalletModule extends AbstractModule
             ['GET', '/admin/wallet/admin-requests', [\Modules\Wallet\Controllers\WalletController::class, 'adminRequests'], [$authMiddleware]],
             ['POST', '/admin/wallet/approve/{id}', [\Modules\Wallet\Controllers\WalletController::class, 'approveRequest'], [$authMiddleware]],
             ['POST', '/admin/wallet/reject/{id}', [\Modules\Wallet\Controllers\WalletController::class, 'rejectRequest'], [$authMiddleware]],
+
+            // Payment Gateway Callbacks (no auth middleware - called by external gateways)
+            ['GET', '/admin/wallet/payment-return', [\Modules\Wallet\Controllers\WalletController::class, 'paymentReturn'], [$authMiddleware]],
+            ['GET', '/admin/wallet/payment-cancel', [\Modules\Wallet\Controllers\WalletController::class, 'paymentCancel'], [$authMiddleware]],
+            ['POST', '/api/webhook/payment/{gatewayCode}', [\Modules\Wallet\Controllers\WalletController::class, 'handlePaymentCallback'], []],
         ];
     }
 
