@@ -195,7 +195,7 @@ class SmsPricingController
         }
 
         $total = $query->count();
-        $logs = $query->limit($limit)->offset($offset)->get();
+        $logs = $query->with('user')->limit($limit)->offset($offset)->get();
         $totalPages = ceil($total / $limit);
 
         echo view('SmsCore/sms/billing/index', [
