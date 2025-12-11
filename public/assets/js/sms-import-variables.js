@@ -39,6 +39,7 @@
             // Upload and parse file
             const formData = new FormData();
             formData.append('file', file);
+            formData.append('_token', window.CSRF_TOKEN || '');
 
             const baseUrl = window.APP_BASE_URL || '';
             const response = await fetch(baseUrl + '/admin/sms/parse-file', {
