@@ -3,6 +3,7 @@
 namespace Modules\SmsCore\Controllers;
 
 use App\Core\Application;
+use Modules\SmsCore\Models\SmsMessage;
 
 class DashboardController
 {
