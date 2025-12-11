@@ -457,6 +457,10 @@ Exemple:
 
 @section('scripts')
 <!-- SMS Import with Variables -->
+<script>
+    // Set base URL for AJAX requests
+    window.APP_BASE_URL = '<?= url('') ?>';
+</script>
 <script src="<?= asset('assets/js/sms-import-variables.js') ?>"></script>
 
 <script>

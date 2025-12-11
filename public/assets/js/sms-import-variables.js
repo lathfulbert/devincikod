@@ -40,7 +40,8 @@
             const formData = new FormData();
             formData.append('file', file);
 
-            const response = await fetch('/admin/sms/parse-file', {
+            const baseUrl = window.APP_BASE_URL || '';
+            const response = await fetch(baseUrl + '/admin/sms/parse-file', {
                 method: 'POST',
                 body: formData,
                 headers: {
