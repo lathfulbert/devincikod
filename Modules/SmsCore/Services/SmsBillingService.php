@@ -45,7 +45,9 @@ class SmsBillingService
             'unit_cost' => $pricingData['unit_cost'],
             'total_cost' => $totalCost,
             'currency' => $pricingData['currency'],
-            'status' => 'pending'
+            'status' => 'pending',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
         ]);
 
         // 2. Debit Wallet
