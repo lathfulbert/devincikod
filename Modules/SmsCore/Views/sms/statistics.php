@@ -2,14 +2,18 @@
 
 @section('title', 'SMS Statistics')
 
+@section('css')
+<link rel="stylesheet" type="text/css" href="<?= asset('assets/css/vendors/animate.css') ?>">
+@endsection
+
 @section('content')
 <div class="container-fluid">
     <div class="page-title">
         <div class="row">
-            <div class="col-6">
+            <div class="col-sm-6">
                 <h3>Statistiques SMS</h3>
             </div>
-            <div class="col-6">
+            <div class="col-sm-6">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="<?= url('/admin/dashboard') ?>"><i data-feather="home"></i></a></li>
                     <li class="breadcrumb-item">SMS</li>
@@ -48,65 +52,99 @@
         </div>
     </div>
 
-    <!-- Statistics Chart -->
+    <!-- Summary Cards -->
     <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Évolution des Envois SMS</h5>
-                    <span>Du <?= date('d/m/Y', strtotime($from)) ?> au <?= date('d/m/Y', strtotime($to)) ?></span>
-                </div>
+        <div class="col-xxl-3 col-sm-6 box-col-6">
+            <div class="card o-hidden">
                 <div class="card-body">
-                    <canvas id="smsChart" height="100"></canvas>
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-light-primary rounded p-3">
+                                <i data-feather="send" class="text-primary" style="width: 32px; height: 32px;"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-1 text-muted">Total Envoyés</h6>
+                            <h3 class="mb-0 text-primary"><?= number_format($totalSent) ?></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xxl-3 col-sm-6 box-col-6">
+            <div class="card o-hidden">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-light-success rounded p-3">
+                                <i data-feather="check-circle" class="text-success" style="width: 32px; height: 32px;"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-1 text-muted">Livrés</h6>
+                            <h3 class="mb-0 text-success"><?= number_format($totalDelivered) ?></h3>
+                            <?php if ($totalSent > 0): ?>
+                                <small class="text-muted"><?= round(($totalDelivered / $totalSent) * 100, 1) ?>% taux de livraison</small>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xxl-3 col-sm-6 box-col-6">
+            <div class="card o-hidden">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-light-danger rounded p-3">
+                                <i data-feather="x-circle" class="text-danger" style="width: 32px; height: 32px;"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-1 text-muted">Échoués</h6>
+                            <h3 class="mb-0 text-danger"><?= number_format($totalFailed) ?></h3>
+                            <?php if ($totalSent > 0): ?>
+                                <small class="text-muted"><?= round(($totalFailed / $totalSent) * 100, 1) ?>% taux d'échec</small>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xxl-3 col-sm-6 box-col-6">
+            <div class="card o-hidden">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-light-warning rounded p-3">
+                                <i data-feather="clock" class="text-warning" style="width: 32px; height: 32px;"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-1 text-muted">En attente</h6>
+                            <h3 class="mb-0 text-warning"><?= number_format($totalPending) ?></h3>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Summary Statistics -->
-    <div class="row mt-4">
-        <div class="col-md-4">
+    <!-- Chart -->
+    <div class="row">
+        <div class="col-sm-12">
             <div class="card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <i data-feather="send" class="text-primary" style="width: 48px; height: 48px;"></i>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">Total Envoyés</h6>
-                            <h3 class="mb-0"><?= array_sum($chartData['sent']) ?></h3>
-                        </div>
+                <div class="card-header pb-0">
+                    <div class="header-top d-flex justify-content-between align-items-center">
+                        <h5>Évolution des Envois SMS</h5>
+                        <span class="text-muted">Du <?= date('d/m/Y', strtotime($from)) ?> au <?= date('d/m/Y', strtotime($to)) ?></span>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
                 <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <i data-feather="check-circle" class="text-success" style="width: 48px; height: 48px;"></i>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">Livrés</h6>
-                            <h3 class="mb-0"><?= array_sum($chartData['delivered']) ?></h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <i data-feather="x-circle" class="text-danger" style="width: 48px; height: 48px;"></i>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">Échecs</h6>
-                            <h3 class="mb-0"><?= array_sum($chartData['failed']) ?></h3>
-                        </div>
-                    </div>
+                    <div id="sms-chart"></div>
                 </div>
             </div>
         </div>
@@ -115,61 +153,77 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- ApexCharts -->
+<script src="<?= asset('assets/js/chart/apex-chart/apex-chart.js') ?>"></script>
+
 <script>
-    // Initialize Feather Icons
-    if (typeof feather !== 'undefined') {
-        feather.replace();
-    }
+if (typeof feather !== 'undefined') {
+    feather.replace();
+}
 
-    // Chart Data from PHP
-    const chartData = <?= json_encode($chartData) ?>;
-
-    // Create Chart
-    const ctx = document.getElementById('smsChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: chartData.labels,
-            datasets: [{
-                    label: 'Envoyés',
-                    data: chartData.sent,
-                    borderColor: 'rgb(75, 192, 192)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    tension: 0.4
-                },
-                {
-                    label: 'Livrés',
-                    data: chartData.delivered,
-                    borderColor: 'rgb(54, 162, 235)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    tension: 0.4
-                },
-                {
-                    label: 'Échecs',
-                    data: chartData.failed,
-                    borderColor: 'rgb(255, 99, 132)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    tension: 0.4
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                title: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
+// SMS Statistics Chart with ApexCharts
+var options = {
+    series: [{
+        name: 'Envoyés',
+        data: <?= $chartSent ?>
+    }, {
+        name: 'Livrés',
+        data: <?= $chartDelivered ?>
+    }, {
+        name: 'Échoués',
+        data: <?= $chartFailed ?>
+    }],
+    chart: {
+        type: 'area',
+        height: 350,
+        toolbar: {
+            show: true
+        }
+    },
+    dataLabels: {
+        enabled: false
+    },
+    stroke: {
+        curve: 'smooth',
+        width: 2
+    },
+    xaxis: {
+        categories: <?= $chartLabels ?>,
+        title: {
+            text: 'Date'
+        }
+    },
+    yaxis: {
+        title: {
+            text: 'Nombre de SMS'
+        }
+    },
+    colors: ['#7366ff', '#54ba4a', '#ff5370'],
+    fill: {
+        type: 'gradient',
+        gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.7,
+            opacityTo: 0.3,
+            stops: [0, 90, 100]
+        }
+    },
+    tooltip: {
+        shared: true,
+        intersect: false,
+        y: {
+            formatter: function (val) {
+                return val + " SMS"
             }
         }
-    });
+    },
+    legend: {
+        position: 'top',
+        horizontalAlign: 'right'
+    }
+};
+
+var chart = new ApexCharts(document.querySelector("#sms-chart"), options);
+chart.render();
 </script>
 @endsection

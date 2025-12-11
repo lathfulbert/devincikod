@@ -66,18 +66,89 @@ class DashboardController
         $from = $_GET['from'] ?? date('Y-m-d', strtotime('-30 days'));
         $to = $_GET['to'] ?? date('Y-m-d');
 
-        // Mock chart data
-        $chartData = [
-            'labels' => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-            'sent' => [120, 150, 180, 145, 200, 95, 110],
-            'delivered' => [115, 145, 175, 140, 195, 90, 105],
-            'failed' => [5, 5, 5, 5, 5, 5, 5]
-        ];
+        // Get current user
+        $currentUserId = $_SESSION['user']['id'] ?? null;
+        $isAdmin = in_array($_SESSION['user']['role_id'] ?? 0, [1, 2]); // 1=admin, 2=owner
+
+        // Build base query
+        $messagesQuery = SmsMessage::where('created_at', '>=', $from . ' 00:00:00')
+            ->where('created_at', '<=', $to . ' 23:59:59');
+
+        // Filter by user if not admin
+        if (!$isAdmin && $currentUserId) {
+            $messagesQuery->where('user_id', $currentUserId);
+        }
+
+        // Get all messages in period
+        $messages = $messagesQuery->orderBy('created_at', 'asc')->get();
+
+        // Calculate statistics
+        $totalSent = 0;
+        $totalDelivered = 0;
+        $totalFailed = 0;
+        $totalPending = 0;
+
+        foreach ($messages as $msg) {
+            $status = strtolower($msg->status ?? '');
+            if ($status === 'sent' || $status === 'delivered') {
+                $totalSent++;
+                if ($status === 'delivered') {
+                    $totalDelivered++;
+                }
+            } elseif ($status === 'failed') {
+                $totalFailed++;
+            } else {
+                $totalPending++;
+            }
+        }
+
+        // Group by date for chart
+        $dateData = [];
+        foreach ($messages as $msg) {
+            $date = date('Y-m-d', strtotime($msg->created_at));
+            if (!isset($dateData[$date])) {
+                $dateData[$date] = ['sent' => 0, 'delivered' => 0, 'failed' => 0];
+            }
+
+            $status = strtolower($msg->status ?? '');
+            if ($status === 'sent' || $status === 'delivered') {
+                $dateData[$date]['sent']++;
+                if ($status === 'delivered') {
+                    $dateData[$date]['delivered']++;
+                }
+            } elseif ($status === 'failed') {
+                $dateData[$date]['failed']++;
+            }
+        }
+
+        // Prepare chart data
+        $chartLabels = [];
+        $chartSent = [];
+        $chartDelivered = [];
+        $chartFailed = [];
+
+        $currentDate = strtotime($from);
+        $endDate = strtotime($to);
+        while ($currentDate <= $endDate) {
+            $dateKey = date('Y-m-d', $currentDate);
+            $chartLabels[] = date('d/m', $currentDate);
+            $chartSent[] = $dateData[$dateKey]['sent'] ?? 0;
+            $chartDelivered[] = $dateData[$dateKey]['delivered'] ?? 0;
+            $chartFailed[] = $dateData[$dateKey]['failed'] ?? 0;
+            $currentDate = strtotime('+1 day', $currentDate);
+        }
 
         echo view('SmsCore/sms/statistics', [
-            'chartData' => $chartData,
             'from' => $from,
             'to' => $to,
+            'totalSent' => $totalSent,
+            'totalDelivered' => $totalDelivered,
+            'totalFailed' => $totalFailed,
+            'totalPending' => $totalPending,
+            'chartLabels' => json_encode($chartLabels),
+            'chartSent' => json_encode($chartSent),
+            'chartDelivered' => json_encode($chartDelivered),
+            'chartFailed' => json_encode($chartFailed),
             'title' => 'SMS Statistics'
         ]);
     }
