@@ -456,6 +456,9 @@ Exemple:
 @endsection
 
 @section('scripts')
+<!-- SMS Import with Variables -->
+<script src="<?= asset('assets/js/sms-import-variables.js') ?>"></script>
+
 <script>
     // Character counter for all message fields
     document.querySelectorAll('.message-field').forEach(function(textarea) {

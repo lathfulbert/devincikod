@@ -244,6 +244,8 @@ public function send()
 
             // Parse recipients based on send type
             $recipients = [];
+            $fileData = null; // For storing full file data with columns
+            $phoneColumn = null;
 
             switch ($sendType) {
                 case 'manual':
@@ -251,10 +253,31 @@ public function send()
                     break;
 
                 case 'file':
-                    if (!isset($_FILES['recipients_file'])) {
-                        throw new \Exception('Aucun fichier fourni');
+                    // Check if file data is provided from advanced import
+                    if (isset($_POST['file_data']) && !empty($_POST['file_data'])) {
+                        // Advanced import with columns
+                        $fileDataJson = $_POST['file_data'];
+                        $fileData = json_decode($fileDataJson, true);
+                        $phoneColumn = $_POST['phone_column'] ?? null;
+
+                        if (!$fileData || !$phoneColumn) {
+                            throw new \Exception('Données de fichier invalides');
+                        }
+
+                        // Extract phone numbers from specified column
+                        $recipients = [];
+                        foreach ($fileData as $row) {
+                            if (isset($row[$phoneColumn]) && !empty($row[$phoneColumn])) {
+                                $recipients[] = $row[$phoneColumn];
+                            }
+                        }
+                    } else {
+                        // Simple import (old behavior)
+                        if (!isset($_FILES['recipients_file'])) {
+                            throw new \Exception('Aucun fichier fourni');
+                        }
+                        $recipients = FileImportService::import($_FILES['recipients_file']);
                     }
-                    $recipients = FileImportService::import($_FILES['recipients_file']);
                     break;
 
                 case 'contacts':
@@ -268,8 +291,10 @@ public function send()
             // Format all phone numbers
             $recipients = PhoneNumberService::formatMultiple($recipients);
 
-            // Remove duplicates
-            $recipients = PhoneNumberService::removeDuplicates($recipients);
+            // Remove duplicates (keep original if using file data for variables)
+            if ($fileData === null) {
+                $recipients = PhoneNumberService::removeDuplicates($recipients);
+            }
 
             if (empty($recipients)) {
                 $_SESSION['flash_error'] = 'Aucun destinataire valide trouvé.';
@@ -298,13 +323,13 @@ public function send()
             // Decide: Direct send or Queue
             if (!$useQueue && !$scheduledAtFormatted) {
                 // DIRECT SEND (< threshold, e.g. < 100)
-                $this->sendDirectBulk($recipients, $message, $sender, $campaign, $userId);
+                $this->sendDirectBulk($recipients, $message, $sender, $campaign, $userId, $fileData, $phoneColumn);
                 $successMessage = "Envoi en cours! {$campaign->sent_count}/{$recipientCount} SMS envoyés avec succès.";
                 $_SESSION['flash_success'] = $successMessage;
                 redirect('/admin/sms/campaigns');
             } else {
                 // USE QUEUE (>= threshold or scheduled)
-                $this->sendViaQueue($recipients, $message, $sender, $campaign, $scheduledAtFormatted);
+                $this->sendViaQueue($recipients, $message, $sender, $campaign, $scheduledAtFormatted, $fileData, $phoneColumn);
 
                 if ($scheduledAtFormatted) {
                     $successMessage = "Campagne programmée! {$recipientCount} SMS seront envoyés le " . date('d/m/Y à H:i', strtotime($scheduledAtFormatted));
@@ -400,12 +425,14 @@ public function send()
      * Send SMS directly (synchronous) - for small batches
      *
      * @param array $recipients Array of phone numbers
-     * @param string $message SMS message
+     * @param string $message SMS message template
      * @param string $sender Sender ID
      * @param object $campaign Campaign object
      * @param int|null $userId User ID
+     * @param array|null $fileData Full file data with columns (for variables)
+     * @param string|null $phoneColumn Phone column name
      */
-    private function sendDirectBulk(array $recipients, string $message, string $sender, $campaign, $userId)
+    private function sendDirectBulk(array $recipients, string $message, string $sender, $campaign, $userId, $fileData = null, $phoneColumn = null)
     {
         $gateway = SmsGateway::getDefault();
 
@@ -431,9 +458,26 @@ public function send()
         $sent = 0;
         $failed = 0;
 
+        // Build recipient data map for variable replacement
+        $recipientDataMap = [];
+        if ($fileData && $phoneColumn) {
+            foreach ($fileData as $row) {
+                if (isset($row[$phoneColumn])) {
+                    $phone = \Modules\SmsCore\Services\PhoneNumberService::format($row[$phoneColumn]);
+                    $recipientDataMap[$phone] = $row;
+                }
+            }
+        }
+
         foreach ($recipients as $recipient) {
             try {
-                $result = $senderService->send($recipient, $message, $sender, [
+                // Replace variables in message if file data is available
+                $personalizedMessage = $message;
+                if (isset($recipientDataMap[$recipient])) {
+                    $personalizedMessage = FileImportService::replaceVariables($message, $recipientDataMap[$recipient]);
+                }
+
+                $result = $senderService->send($recipient, $personalizedMessage, $sender, [
                     'user_id' => $userId,
                     'gateway_name' => $gateway->provider_code,
                     'campaign_id' => $campaign->id
@@ -462,17 +506,31 @@ public function send()
      * Send SMS via queue (asynchronous) - for large batches
      *
      * @param array $recipients Array of phone numbers
-     * @param string $message SMS message
+     * @param string $message SMS message template
      * @param string $sender Sender ID
      * @param object $campaign Campaign object
      * @param string|null $scheduledAt Scheduled time
+     * @param array|null $fileData Full file data with columns (for variables)
+     * @param string|null $phoneColumn Phone column name
      */
-    private function sendViaQueue(array $recipients, string $message, string $sender, $campaign, $scheduledAt = null)
+    private function sendViaQueue(array $recipients, string $message, string $sender, $campaign, $scheduledAt = null, $fileData = null, $phoneColumn = null)
     {
+        // Build recipient data map for variable replacement
+        $recipientDataMap = [];
+        if ($fileData && $phoneColumn) {
+            foreach ($fileData as $row) {
+                if (isset($row[$phoneColumn])) {
+                    $phone = \Modules\SmsCore\Services\PhoneNumberService::format($row[$phoneColumn]);
+                    $recipientDataMap[$phone] = $row;
+                }
+            }
+        }
+
         $added = SmsQueueService::addToQueue($recipients, $message, $sender, [
             'campaign_id' => $campaign->id,
             'user_id' => $_SESSION['user']['id'] ?? null,
-            'scheduled_at' => $scheduledAt
+            'scheduled_at' => $scheduledAt,
+            'file_data_map' => $recipientDataMap // Pass variable data to queue
         ]);
 
         // Mark campaign as queued
