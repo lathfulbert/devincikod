@@ -542,6 +542,88 @@ public function send()
     }
 
     /**
+     * Parse uploaded file and return column information
+     * Route: POST /admin/sms/parse-file
+     */
+    public function parseFile()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            if (!isset($_FILES['file'])) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Aucun fichier fourni'
+                ]);
+                exit;
+            }
+
+            // Import file with full column detection
+            $result = FileImportService::importWithColumns($_FILES['file']);
+
+            // Detect phone column
+            $phoneColumn = null;
+            $headers = $result['headers'];
+
+            foreach ($headers as $header) {
+                $headerLower = strtolower($header);
+                if (strpos($headerLower, 'phone') !== false ||
+                    strpos($headerLower, 'téléphone') !== false ||
+                    strpos($headerLower, 'telephone') !== false ||
+                    strpos($headerLower, 'tel') !== false ||
+                    strpos($headerLower, 'mobile') !== false ||
+                    strpos($headerLower, 'gsm') !== false) {
+                    $phoneColumn = $header;
+                    break;
+                }
+            }
+
+            // If no phone column detected, check values
+            if ($phoneColumn === null && !empty($result['data'])) {
+                foreach ($headers as $header) {
+                    $firstValue = $result['data'][0][$header] ?? '';
+                    if (preg_match('/^[\+]?[\d\s\-\(\)]{6,}$/', $firstValue)) {
+                        $phoneColumn = $header;
+                        break;
+                    }
+                }
+            }
+
+            // Default to first column
+            if ($phoneColumn === null && !empty($headers)) {
+                $phoneColumn = $headers[0];
+            }
+
+            // Get variable columns (all except phone column)
+            $variableColumns = array_filter($headers, function ($h) use ($phoneColumn) {
+                return $h !== $phoneColumn;
+            });
+
+            // Preview data (first 3 rows)
+            $previewData = array_slice($result['data'], 0, 3);
+
+            echo json_encode([
+                'success' => true,
+                'data' => [
+                    'headers' => $headers,
+                    'phone_column' => $phoneColumn,
+                    'variable_columns' => array_values($variableColumns),
+                    'total_rows' => count($result['data']),
+                    'preview_data' => $previewData,
+                    'full_data' => $result['data']
+                ]
+            ]);
+        } catch (\Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+
+        exit;
+    }
+
+    /**
      * Show Orange SMS Contracts/Balance
      * Route: /admin/sms/contracts
      */
