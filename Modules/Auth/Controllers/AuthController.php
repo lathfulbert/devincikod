@@ -33,6 +33,12 @@ class AuthController
      */
     public function showLogin()
     {
+        // Si l'utilisateur est déjà connecté, rediriger vers le dashboard admin
+        if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
+            redirect('/admin/dashboard');
+            return;
+        }
+
         echo view('auth/auth/login');
     }
 
@@ -128,6 +134,12 @@ class AuthController
      */
     public function showRegister()
     {
+        // Si l'utilisateur est déjà connecté, rediriger vers le dashboard admin
+        if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
+            redirect('/admin/dashboard');
+            return;
+        }
+
         echo view('auth/register');
     }
 
