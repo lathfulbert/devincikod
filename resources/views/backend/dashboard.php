@@ -74,101 +74,145 @@
                 </div>
             </div>
         </div>
+        <!-- Widgets Users -->
         <div class="col-xxl-auto col-xl-3 col-sm-6 box-col-3">
             <div class="row">
+                <?php
+                // Widget Total Users
+                $usersWidget = widget_data('users.total');
+                if ($usersWidget):
+                    $trendIcon = $usersWidget['trend']['direction'] === 'up' ? 'trending-up' : ($usersWidget['trend']['direction'] === 'down' ? 'trending-down' : 'minus');
+                    $trendClass = $usersWidget['trend']['direction'] === 'up' ? 'txt-success' : ($usersWidget['trend']['direction'] === 'down' ? 'txt-danger' : 'txt-muted');
+                    $trendSign = $usersWidget['trend']['direction'] === 'up' ? '+' : ($usersWidget['trend']['direction'] === 'down' ? '-' : '');
+                ?>
                 <div class="col-xl-12">
                     <div class="card widget-1">
                         <div class="card-body">
                             <div class="widget-content">
                                 <div class="widget-round secondary">
-                                    <div class="bg-round"><svg>
-                                            <use href="{{ asset('assets/svg/icon-sprite.svg#c-revenue') }}"> </use>
-                                        </svg><svg class="half-circle svg-fill">
+                                    <div class="bg-round">
+                                        <i data-feather="users" class="text-white"></i>
+                                        <svg class="half-circle svg-fill">
                                             <use href="{{ asset('assets/svg/icon-sprite.svg#halfcircle') }}"></use>
-                                        </svg></div>
+                                        </svg>
+                                    </div>
                                 </div>
                                 <div>
-                                    <h4>$<span class="counter" data-target="45195">0</span></h4><span
-                                        class="f-light">Revenue</span>
+                                    <h4><?= htmlspecialchars($usersWidget['value']) ?></h4>
+                                    <span class="f-light"><?= htmlspecialchars($usersWidget['title']) ?></span>
                                 </div>
                             </div>
-                            <div class="font-success f-w-500"><i class="bookmark-search me-1"
-                                    data-feather="trending-up"></i><span class="txt-success">+50%</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-12">
-                        <div class="card widget-1">
-                            <div class="card-body">
-                                <div class="widget-content">
-                                    <div class="widget-round success">
-                                        <div class="bg-round"><svg>
-                                                <use href="{{ asset('assets/svg/icon-sprite.svg#c-customer') }}">
-                                                </use>
-                                            </svg><svg class="half-circle svg-fill">
-                                                <use href="{{ asset('assets/svg/icon-sprite.svg#halfcircle') }}">
-                                                </use>
-                                            </svg></div>
-                                    </div>
-                                    <div>
-                                        <h4> <span class="counter" data-target="845">0</span>+</h4><span
-                                            class="f-light">Customers</span>
-                                    </div>
-                                </div>
-                                <div class="font-danger f-w-500"><i class="bookmark-search me-1"
-                                        data-feather="trending-down"></i><span class="txt-danger">-40%</span></div>
+                            <div class="font-<?= $usersWidget['trend']['direction'] === 'up' ? 'success' : ($usersWidget['trend']['direction'] === 'down' ? 'danger' : 'muted') ?> f-w-500">
+                                <i class="bookmark-search me-1" data-feather="<?= $trendIcon ?>"></i>
+                                <span class="<?= $trendClass ?>"><?= $trendSign ?><?= $usersWidget['trend']['percentage'] ?>%</span>
                             </div>
                         </div>
                     </div>
                 </div>
+                <?php endif; ?>
+
+                <?php
+                // Widget Active Users
+                $activeWidget = widget_data('users.active');
+                if ($activeWidget):
+                    $trendIcon = $activeWidget['trend']['direction'] === 'up' ? 'trending-up' : ($activeWidget['trend']['direction'] === 'down' ? 'trending-down' : 'minus');
+                    $trendClass = $activeWidget['trend']['direction'] === 'up' ? 'txt-success' : ($activeWidget['trend']['direction'] === 'down' ? 'txt-danger' : 'txt-muted');
+                    $trendSign = $activeWidget['trend']['direction'] === 'up' ? '+' : ($activeWidget['trend']['direction'] === 'down' ? '-' : '');
+                ?>
+                <div class="col-xl-12">
+                    <div class="card widget-1">
+                        <div class="card-body">
+                            <div class="widget-content">
+                                <div class="widget-round success">
+                                    <div class="bg-round">
+                                        <i data-feather="user-check" class="text-white"></i>
+                                        <svg class="half-circle svg-fill">
+                                            <use href="{{ asset('assets/svg/icon-sprite.svg#halfcircle') }}"></use>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4><?= htmlspecialchars($activeWidget['value']) ?></h4>
+                                    <span class="f-light"><?= htmlspecialchars($activeWidget['title']) ?></span>
+                                </div>
+                            </div>
+                            <div class="font-<?= $activeWidget['trend']['direction'] === 'up' ? 'success' : ($activeWidget['trend']['direction'] === 'down' ? 'danger' : 'muted') ?> f-w-500">
+                                <i class="bookmark-search me-1" data-feather="<?= $trendIcon ?>"></i>
+                                <span class="<?= $trendClass ?>"><?= $trendSign ?><?= $activeWidget['trend']['percentage'] ?>%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
+
+        <!-- Widgets SMS -->
         <div class="col-xxl-auto col-xl-3 col-sm-6 box-col-3">
             <div class="row">
+                <?php
+                // Widget Total SMS
+                $smsWidget = widget_data('sms.total');
+                if ($smsWidget):
+                    $trendIcon = $smsWidget['trend']['direction'] === 'up' ? 'trending-up' : ($smsWidget['trend']['direction'] === 'down' ? 'trending-down' : 'minus');
+                    $trendClass = $smsWidget['trend']['direction'] === 'up' ? 'txt-success' : ($smsWidget['trend']['direction'] === 'down' ? 'txt-danger' : 'txt-muted');
+                    $trendSign = $smsWidget['trend']['direction'] === 'up' ? '+' : ($smsWidget['trend']['direction'] === 'down' ? '-' : '');
+                ?>
                 <div class="col-xl-12">
                     <div class="card widget-1">
                         <div class="card-body">
                             <div class="widget-content">
                                 <div class="widget-round warning">
-                                    <div class="bg-round"><svg>
-                                            <use href="{{ asset('assets/svg/icon-sprite.svg#c-profit') }}"> </use>
-                                        </svg><svg class="half-circle svg-fill">
+                                    <div class="bg-round">
+                                        <i data-feather="send" class="text-white"></i>
+                                        <svg class="half-circle svg-fill">
                                             <use href="{{ asset('assets/svg/icon-sprite.svg#halfcircle') }}"></use>
-                                        </svg></div>
+                                        </svg>
+                                    </div>
                                 </div>
                                 <div>
-                                    <h4> <span class="counter" data-target="80">0</span>%</h4><span
-                                        class="f-light">Profit</span>
+                                    <h4><?= htmlspecialchars($smsWidget['value']) ?></h4>
+                                    <span class="f-light"><?= htmlspecialchars($smsWidget['title']) ?></span>
                                 </div>
                             </div>
-                            <div class="font-danger f-w-500"><i class="bookmark-search me-1"
-                                    data-feather="trending-down"></i><span class="txt-danger">-20%</span></div>
-                        </div>
-                    </div>
-                    <div class="col-xl-12">
-                        <div class="card widget-1">
-                            <div class="card-body">
-                                <div class="widget-content">
-                                    <div class="widget-round primary">
-                                        <div class="bg-round"><svg class="fill-primary">
-                                                <use href="{{ asset('assets/svg/icon-sprite.svg#c-invoice') }}">
-                                                </use>
-                                            </svg><svg class="half-circle svg-fill">
-                                                <use href="{{ asset('assets/svg/icon-sprite.svg#halfcircle') }}">
-                                                </use>
-                                            </svg></div>
-                                    </div>
-                                    <div>
-                                        <h4 class="counter" data-target="10905">0</h4><span
-                                            class="f-light">Invoices</span>
-                                    </div>
-                                </div>
-                                <div class="font-success f-w-500"><i class="bookmark-search me-1"
-                                        data-feather="trending-up"></i><span class="txt-success">+50%</span></div>
+                            <div class="font-<?= $smsWidget['trend']['direction'] === 'up' ? 'success' : ($smsWidget['trend']['direction'] === 'down' ? 'danger' : 'muted') ?> f-w-500">
+                                <i class="bookmark-search me-1" data-feather="<?= $trendIcon ?>"></i>
+                                <span class="<?= $trendClass ?>"><?= $trendSign ?><?= $smsWidget['trend']['percentage'] ?>%</span>
                             </div>
                         </div>
                     </div>
                 </div>
+                <?php endif; ?>
+
+                <?php
+                // Widget Sender Names
+                $senderWidget = widget_data('sms.sender_names');
+                if ($senderWidget):
+                ?>
+                <div class="col-xl-12">
+                    <div class="card widget-1">
+                        <div class="card-body">
+                            <div class="widget-content">
+                                <div class="widget-round primary">
+                                    <div class="bg-round">
+                                        <i data-feather="tag" class="text-white"></i>
+                                        <svg class="half-circle svg-fill">
+                                            <use href="{{ asset('assets/svg/icon-sprite.svg#halfcircle') }}"></use>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4><?= htmlspecialchars($senderWidget['value']) ?></h4>
+                                    <span class="f-light"><?= htmlspecialchars($senderWidget['title']) ?></span>
+                                </div>
+                            </div>
+                            <div class="font-muted f-w-500">
+                                <small><?= htmlspecialchars($senderWidget['description']) ?></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
         <div class="col-xxl-auto col-xl-4 col-sm-6 box-col-4 ord-xl-5 box-ord-5">
