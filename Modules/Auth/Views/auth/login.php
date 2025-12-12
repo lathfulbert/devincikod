@@ -1,6 +1,6 @@
 @extends('backend.layouts.auth.master')
 
-@section('title', 'Login with Sweetalert')
+@section('title', 'Login DavinciA')
 
 @section('css')
 @endsection
@@ -12,13 +12,13 @@
             <div class="login-card login-dark">
                 <div>
                     <div><a class="logo text-start" href="{{ route('admin.dashboard') }}"><img class="img-fluid for-light"
-                                src="{{ asset('assets/images/logo/logo.png') }}" alt="looginpage"><img
+                                src="{{ asset('assets/images/logo/davinci.png') }}" alt="looginpage" height="50"><img
                                 class="img-fluid for-dark" src="{{ asset('assets/images/logo/logo_dark.png') }}"
                                 alt="looginpage"></a></div>
                     <div class="login-main">
                         <form class="theme-form" method="POST" action="<?= url('/auth/login') ?>">
                             @csrf
-                            <h4>Sign in to account</h4>
+                            <h4>Sign in to account </h4>
                             <p>Enter your email & password to login</p>
                             <div class="form-group">
                                 <label class="col-form-label">Email Address</label>

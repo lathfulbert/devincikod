@@ -4,26 +4,29 @@
 
 @section('css')
 <style>
+/* Cards des modules */
 .module-card {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    margin-bottom: 15px;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
 }
 
 .module-card:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    transform: translateY(-3px);
 }
 
+/* Header des modules avec gradient */
 .module-header {
-    padding: 15px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    border-radius: 8px 8px 0 0;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 15px 20px;
+    border-radius: 12px 12px 0 0;
 }
 
 .module-header:hover {
@@ -36,29 +39,66 @@
     align-items: center;
     gap: 10px;
     color: white;
+    font-size: 1rem;
+    font-weight: 600;
 }
 
 .module-header .badge {
     background: rgba(255,255,255,0.3);
     color: white;
+    font-size: 0.8rem;
 }
 
+/* Body des modules */
 .module-body {
+    background: #fafbfc;
+    max-height: 450px;
+    overflow-y: auto;
     padding: 15px;
-    background: #f8f9fa;
 }
 
+.module-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.module-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.module-body::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+}
+
+.module-body::-webkit-scrollbar-thumb:hover {
+    background: #5568d3;
+}
+
+/* Items de permissions */
 .permission-item {
-    padding: 10px 15px;
+    padding: 10px 12px;
     background: white;
-    margin-bottom: 8px;
     border-radius: 6px;
     border: 1px solid #e0e0e0;
+    margin-bottom: 8px;
     transition: all 0.2s ease;
 }
 
 .permission-item:hover {
     background: #f0f7ff;
+    border-color: #667eea;
+    transform: translateX(3px);
+}
+
+.permission-item .form-check-input {
+    margin-top: 2px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.permission-item .form-check-input:checked {
+    background-color: #667eea;
     border-color: #667eea;
 }
 
@@ -66,49 +106,60 @@
     display: flex;
     flex-direction: column;
     cursor: pointer;
-    width: 100%;
+    margin-left: 8px;
 }
 
 .permission-name {
     font-weight: 600;
-    color: #333;
-    font-size: 0.95rem;
+    color: #2c3e50;
+    font-size: 0.9rem;
 }
 
 .permission-description {
-    color: #666;
-    font-size: 0.85rem;
-    margin-top: 4px;
-}
-
-.select-all-btn {
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.select-all-btn:hover {
-    background: rgba(255,255,255,0.3);
-}
-
-#searchPermissions {
-    max-width: 400px;
-}
-
-.highlight {
-    background-color: yellow;
-    font-weight: bold;
+    color: #6c757d;
+    font-size: 0.8rem;
+    margin-top: 2px;
 }
 
 .module-stats {
     display: flex;
     gap: 10px;
     align-items: center;
+}
+
+/* Zone de recherche et filtres */
+.search-filter-bar {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+#searchPermissions, #filterModule {
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 10px 15px;
+    transition: all 0.2s;
+}
+
+#searchPermissions:focus, #filterModule:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Badge de compteur */
+#selectedCount {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+/* Highlight pour la recherche */
+.highlight {
+    background: linear-gradient(120deg, #ffeaa7 0%, #fdcb6e 100%);
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: 700;
 }
 </style>
 @endsection
@@ -181,69 +232,74 @@
                     </div>
 
                     <!-- Search and Filter -->
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" id="searchPermissions" placeholder="🔍 Rechercher une permission...">
-                        </div>
-                        <div class="col-md-6">
-                            <select class="form-select" id="filterModule">
-                                <option value="">📦 Tous les modules</option>
-                                <?php foreach ($permissionsByModule as $module): ?>
-                                    <option value="<?= htmlspecialchars($module['name']) ?>">
-                                        <?= htmlspecialchars($module['name']) ?> (<?= count($module['permissions']) ?>)
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                    <div class="search-filter-bar">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" id="searchPermissions" placeholder="🔍 Rechercher une permission...">
+                            </div>
+                            <div class="col-md-6">
+                                <select class="form-select" id="filterModule">
+                                    <option value="">📦 Tous les modules</option>
+                                    <?php foreach ($permissionsByModule as $module): ?>
+                                        <option value="<?= htmlspecialchars($module['name']) ?>">
+                                            <?= htmlspecialchars($module['name']) ?> (<?= count($module['permissions']) ?>)
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Permissions by Module -->
                     <div id="permissionsContainer">
-                        <?php if (!empty($permissionsByModule)): ?>
-                            <?php foreach ($permissionsByModule as $moduleName => $module): ?>
-                                <div class="module-card" data-module="<?= htmlspecialchars($moduleName) ?>">
-                                    <div class="module-header" onclick="toggleModule(this)">
-                                        <h5>
-                                            <i data-feather="<?= htmlspecialchars($module['icon']) ?>"></i>
-                                            <?= htmlspecialchars($module['name']) ?>
-                                            <span class="badge"><?= count($module['permissions']) ?> permission(s)</span>
-                                        </h5>
-                                        <div class="module-stats">
-                                            <button type="button" class="select-all-btn" onclick="event.stopPropagation(); toggleModulePermissions(this, '<?= htmlspecialchars($moduleName) ?>')">
-                                                <i data-feather="check-circle" style="width: 14px; height: 14px;"></i> Tout
-                                            </button>
-                                            <i data-feather="chevron-down" class="toggle-icon"></i>
-                                        </div>
-                                    </div>
-                                    <div class="module-body" style="display: block;">
-                                        <?php foreach ($module['permissions'] as $permission): ?>
-                                            <div class="permission-item" data-permission-name="<?= strtolower($permission->name) ?>" data-permission-desc="<?= strtolower($permission->description ?? '') ?>">
-                                                <div class="form-check">
-                                                    <input class="form-check-input permission-checkbox"
-                                                        type="checkbox"
-                                                        name="permissions[]"
-                                                        value="<?= $permission->id ?>"
-                                                        id="perm_<?= $permission->id ?>"
-                                                        data-module="<?= htmlspecialchars($moduleName) ?>"
-                                                        <?= in_array($permission->id, $rolePermissionIds ?? []) ? 'checked' : '' ?>
-                                                        onchange="updateCount()">
-                                                    <label class="form-check-label" for="perm_<?= $permission->id ?>">
-                                                        <span class="permission-name"><?= htmlspecialchars($permission->name) ?></span>
-                                                        <?php if (!empty($permission->description)): ?>
-                                                            <span class="permission-description"><?= htmlspecialchars($permission->description) ?></span>
-                                                        <?php endif; ?>
-                                                    </label>
+                        <div class="row g-3">
+                            <?php if (!empty($permissionsByModule)): ?>
+                                <?php foreach ($permissionsByModule as $moduleName => $module): ?>
+                                    <div class="col-12 col-md-6 col-lg-4" data-module="<?= htmlspecialchars($moduleName) ?>">
+                                        <div class="card module-card h-100">
+                                            <div class="card-header module-header" onclick="toggleModule(this)">
+                                                <h5>
+                                                    <i data-feather="<?= htmlspecialchars($module['icon']) ?>"></i>
+                                                    <?= htmlspecialchars($module['name']) ?>
+                                                    <span class="badge"><?= count($module['permissions']) ?></span>
+                                                </h5>
+                                                <div class="module-stats">
+                                                    <button type="button" class="btn btn-success btn-sm select-all-btn" onclick="event.stopPropagation(); toggleModulePermissions(this, '<?= htmlspecialchars($moduleName) ?>')">
+                                                        <i data-feather="check-circle" style="width: 14px; height: 14px;"></i> Tout
+                                                    </button>
+                                                    <i data-feather="chevron-down" class="toggle-icon"></i>
                                                 </div>
                                             </div>
-                                        <?php endforeach; ?>
+                                            <div class="card-body module-body" style="display: block;">
+                                                <?php foreach ($module['permissions'] as $permission): ?>
+                                                    <div class="permission-item" data-permission-name="<?= strtolower($permission->name) ?>" data-permission-desc="<?= strtolower($permission->description ?? '') ?>">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input permission-checkbox"
+                                                                type="checkbox"
+                                                                name="permissions[]"
+                                                                value="<?= $permission->id ?>"
+                                                                id="perm_<?= $permission->id ?>"
+                                                                data-module="<?= htmlspecialchars($moduleName) ?>"
+                                                                <?= in_array($permission->id, $rolePermissionIds ?? []) ? 'checked' : '' ?>
+                                                                onchange="updateCount()">
+                                                            <label class="form-check-label" for="perm_<?= $permission->id ?>">
+                                                                <span class="permission-name"><?= htmlspecialchars($permission->name) ?></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="col-12">
+                                    <div class="alert alert-warning">
+                                        <i data-feather="alert-circle"></i> Aucune permission disponible
                                     </div>
                                 </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <div class="alert alert-warning">
-                                <i data-feather="alert-circle"></i> Aucune permission disponible
-                            </div>
-                        <?php endif; ?>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
 
