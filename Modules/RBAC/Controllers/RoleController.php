@@ -19,8 +19,38 @@ class RoleController
     public function create()
     {
         $app = Application::getInstance();
-        $permissions = Permission::all();
-        echo view('rbac/admin/roles/create', ['title' => 'Create Role', 'permissions' => $permissions]);
+        $db = Database::getInstance();
+
+        // Get all permissions with their modules
+        $sql = "SELECT p.*, m.name as module_name, m.icon as module_icon
+                FROM permissions p
+                LEFT JOIN modules m ON p.module_id = m.id
+                ORDER BY m.name, p.name";
+        $stmt = $db->query($sql);
+        $permissions = $stmt->fetchAll(\PDO::FETCH_OBJ);
+
+        // Group permissions by module
+        $permissionsByModule = [];
+        foreach ($permissions as $permission) {
+            $moduleName = $permission->module_name ?? $permission->module ?? 'Sans module';
+            if (!isset($permissionsByModule[$moduleName])) {
+                $permissionsByModule[$moduleName] = [
+                    'name' => $moduleName,
+                    'icon' => $permission->module_icon ?? 'box',
+                    'permissions' => []
+                ];
+            }
+            $permissionsByModule[$moduleName]['permissions'][] = $permission;
+        }
+
+        // Sort modules alphabetically
+        ksort($permissionsByModule);
+
+        echo view('rbac/admin/roles/create', [
+            'title' => 'Créer un rôle',
+            'permissions' => $permissions,
+            'permissionsByModule' => $permissionsByModule
+        ]);
     }
 
     public function store()
@@ -56,15 +86,42 @@ class RoleController
         }
 
         $app = Application::getInstance();
+        $db = Database::getInstance();
         $role = Role::find($id);
-        $permissions = Permission::all();
+
+        // Get all permissions with their modules
+        $sql = "SELECT p.*, m.name as module_name, m.icon as module_icon
+                FROM permissions p
+                LEFT JOIN modules m ON p.module_id = m.id
+                ORDER BY m.name, p.name";
+        $stmt = $db->query($sql);
+        $permissions = $stmt->fetchAll(\PDO::FETCH_OBJ);
+
+        // Group permissions by module
+        $permissionsByModule = [];
+        foreach ($permissions as $permission) {
+            $moduleName = $permission->module_name ?? $permission->module ?? 'Sans module';
+            if (!isset($permissionsByModule[$moduleName])) {
+                $permissionsByModule[$moduleName] = [
+                    'name' => $moduleName,
+                    'icon' => $permission->module_icon ?? 'box',
+                    'permissions' => []
+                ];
+            }
+            $permissionsByModule[$moduleName]['permissions'][] = $permission;
+        }
+
+        // Sort modules alphabetically
+        ksort($permissionsByModule);
+
         $rolePermissions = $role->permissions()->getResults();
         $rolePermissionIds = array_map(fn($p) => $p->id, $rolePermissions);
 
         echo view('rbac/admin/roles/edit', [
-            'title' => 'Edit Role',
+            'title' => 'Éditer le rôle',
             'role' => $role,
             'permissions' => $permissions,
+            'permissionsByModule' => $permissionsByModule,
             'rolePermissionIds' => $rolePermissionIds
         ]);
     }

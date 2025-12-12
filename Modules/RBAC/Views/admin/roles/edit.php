@@ -2,6 +2,117 @@
 
 @section('title', $title ?? 'Admin')
 
+@section('css')
+<style>
+.module-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.module-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.module-header {
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.module-header:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #6a4094 100%);
+}
+
+.module-header h5 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+}
+
+.module-header .badge {
+    background: rgba(255,255,255,0.3);
+    color: white;
+}
+
+.module-body {
+    padding: 15px;
+    background: #f8f9fa;
+}
+
+.permission-item {
+    padding: 10px 15px;
+    background: white;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.2s ease;
+}
+
+.permission-item:hover {
+    background: #f0f7ff;
+    border-color: #667eea;
+}
+
+.permission-item .form-check-label {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    width: 100%;
+}
+
+.permission-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.permission-description {
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+
+.select-all-btn {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.select-all-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+#searchPermissions {
+    max-width: 400px;
+}
+
+.highlight {
+    background-color: yellow;
+    font-weight: bold;
+}
+
+.module-stats {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+</style>
+@endsection
+
 @section('content')
 
 <div class="container-fluid">
@@ -10,7 +121,7 @@
     $breadcrumb = [
         ['label' => 'Dashboard', 'url' => '/admin/dashboard'],
         ['label' => 'Rôles', 'url' => '/admin/roles'],
-        ['label' => 'Éditer']
+        ['label' => 'Créer']
     ];
     component('breadcrumb');
     ?>
@@ -23,71 +134,138 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-lg-8 offset-lg-2">
+        <div class="col-12">
             <?php
             component('card-start', ['card_title' => "Éditer le rôle : " . htmlspecialchars($role->name)]);
             ?>
 
-            <form action="<?= url('/admin/roles/' . $role->id . '/update') ?>" method="POST">
+            <form action="<?= url('/admin/roles/' . $role->id . '/update') ?>" method="POST" id="roleForm">
                 <?= csrf_field() ?>
 
-                <div class="mb-3">
-                    <label for="name" class="form-label">Nom du rôle <span class="text-danger">*</span></label>
-                    <input type="text" name="name" id="name" class="form-control" value="<?= htmlspecialchars($role->name) ?>" required autofocus>
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <label for="name" class="form-label">Nom du rôle <span class="text-danger">*</span></label>
+                        <input type="text" name="name" id="name" class="form-control" value="<?= htmlspecialchars($role->name) ?>" required autofocus>
+                        <small class="form-text text-muted">Exemple: Administrateur, Éditeur, etc.</small>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="slug" class="form-label">Slug <span class="text-danger">*</span></label>
+                        <input type="text" name="slug" id="slug" class="form-control" value="<?= htmlspecialchars($role->slug) ?>" required>
+                        <small class="form-text text-muted">Exemple: admin, editor, etc.</small>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea name="description" id="description" class="form-control" rows="1"><?= htmlspecialchars($role->description ?? '') ?></textarea>
+                        <small class="form-text text-muted">Description optionnelle du rôle</small>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="slug" class="form-label">Slug <span class="text-danger">*</span></label>
-                    <input type="text" name="slug" id="slug" class="form-control" value="<?= htmlspecialchars($role->slug) ?>" required>
-                    <small class="form-text text-muted">Exemple: admin, editor, etc. (en minuscules, sans espaces)</small>
-                </div>
+                <hr class="my-4">
 
                 <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea name="description" id="description" class="form-control" rows="3"><?= htmlspecialchars($role->description ?? '') ?></textarea>
-                    <small class="form-text text-muted">Description optionnelle du rôle</small>
-                </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">
+                            <i data-feather="shield"></i> Permissions
+                            <span class="badge bg-primary ms-2" id="selectedCount">0 sélectionnée(s)</span>
+                        </h5>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-success" id="selectAllBtn">
+                                <i data-feather="check-square"></i> Tout sélectionner
+                            </button>
+                            <button type="button" class="btn btn-sm btn-warning" id="deselectAllBtn">
+                                <i data-feather="square"></i> Tout désélectionner
+                            </button>
+                        </div>
+                    </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Permissions</label>
-                    <div class="border rounded p-3" style="background-color: #f8f9fa;">
-                        <?php if (!empty($permissions)): ?>
-                            <?php foreach ($permissions as $permission): ?>
-                                <div class="form-check">
-                                    <input class="form-check-input"
-                                        type="checkbox"
-                                        name="permissions[]"
-                                        value="<?= $permission->id ?>"
-                                        id="perm_<?= $permission->id ?>"
-                                        <?= in_array($permission->id, $rolePermissionIds ?? []) ? 'checked' : '' ?>>
-                                    <label class="form-check-label" for="perm_<?= $permission->id ?>">
-                                        <strong><?= htmlspecialchars($permission->name) ?></strong>
-                                        <?php if (!empty($permission->description)): ?>
-                                            <br><small class="text-muted"><?= htmlspecialchars($permission->description) ?></small>
-                                        <?php endif; ?>
-                                    </label>
+                    <!-- Search and Filter -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="searchPermissions" placeholder="🔍 Rechercher une permission...">
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select" id="filterModule">
+                                <option value="">📦 Tous les modules</option>
+                                <?php foreach ($permissionsByModule as $module): ?>
+                                    <option value="<?= htmlspecialchars($module['name']) ?>">
+                                        <?= htmlspecialchars($module['name']) ?> (<?= count($module['permissions']) ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Permissions by Module -->
+                    <div id="permissionsContainer">
+                        <?php if (!empty($permissionsByModule)): ?>
+                            <?php foreach ($permissionsByModule as $moduleName => $module): ?>
+                                <div class="module-card" data-module="<?= htmlspecialchars($moduleName) ?>">
+                                    <div class="module-header" onclick="toggleModule(this)">
+                                        <h5>
+                                            <i data-feather="<?= htmlspecialchars($module['icon']) ?>"></i>
+                                            <?= htmlspecialchars($module['name']) ?>
+                                            <span class="badge"><?= count($module['permissions']) ?> permission(s)</span>
+                                        </h5>
+                                        <div class="module-stats">
+                                            <button type="button" class="select-all-btn" onclick="event.stopPropagation(); toggleModulePermissions(this, '<?= htmlspecialchars($moduleName) ?>')">
+                                                <i data-feather="check-circle" style="width: 14px; height: 14px;"></i> Tout
+                                            </button>
+                                            <i data-feather="chevron-down" class="toggle-icon"></i>
+                                        </div>
+                                    </div>
+                                    <div class="module-body" style="display: block;">
+                                        <?php foreach ($module['permissions'] as $permission): ?>
+                                            <div class="permission-item" data-permission-name="<?= strtolower($permission->name) ?>" data-permission-desc="<?= strtolower($permission->description ?? '') ?>">
+                                                <div class="form-check">
+                                                    <input class="form-check-input permission-checkbox"
+                                                        type="checkbox"
+                                                        name="permissions[]"
+                                                        value="<?= $permission->id ?>"
+                                                        id="perm_<?= $permission->id ?>"
+                                                        data-module="<?= htmlspecialchars($moduleName) ?>"
+                                                        <?= in_array($permission->id, $rolePermissionIds ?? []) ? 'checked' : '' ?>
+                                                        onchange="updateCount()">
+                                                    <label class="form-check-label" for="perm_<?= $permission->id ?>">
+                                                        <span class="permission-name"><?= htmlspecialchars($permission->name) ?></span>
+                                                        <?php if (!empty($permission->description)): ?>
+                                                            <span class="permission-description"><?= htmlspecialchars($permission->description) ?></span>
+                                                        <?php endif; ?>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
                                 </div>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <p class="text-muted mb-0"><i data-feather="alert-circle"></i> Aucune permission disponible</p>
+                            <div class="alert alert-warning">
+                                <i data-feather="alert-circle"></i> Aucune permission disponible
+                            </div>
                         <?php endif; ?>
                     </div>
-                    <small class="form-text text-muted">Sélectionnez les permissions pour ce rôle</small>
                 </div>
 
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-primary">
-                        <i data-feather="save"></i> Mettre à jour
-                    </button>
-                    <a href="<?= url('/admin/roles') ?>" class="btn btn-secondary">
-                        <i data-feather="x"></i> Annuler
-                    </a>
-                    <form action="<?= url('/admin/roles/' . $role->id . '/delete') ?>" method="POST" style="display:inline;" class="float-end" onsubmit="return confirm('Supprimer définitivement ce rôle ?');">
-                        <?= csrf_field() ?>
-                        <button type="submit" class="btn btn-danger">
-                            <i data-feather="trash-2"></i> Supprimer
+                <hr class="my-4">
+
+                <div class="mt-4 d-flex justify-content-between">
+                    <div>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i data-feather="save"></i> Mettre à jour
                         </button>
-                    </form>
+                        <a href="<?= url('/admin/roles') ?>" class="btn btn-secondary btn-lg">
+                            <i data-feather="x"></i> Annuler
+                        </a>
+                    </div>
+                    <div>
+                        <form action="<?= url('/admin/roles/' . $role->id . '/delete') ?>" method="POST" style="display:inline;" onsubmit="return confirm('Supprimer définitivement ce rôle ?');">
+                            <?= csrf_field() ?>
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i data-feather="trash-2"></i> Supprimer
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </form>
 
@@ -100,6 +278,97 @@
 
 @section('scripts')
 <script>
+// Toggle module visibility
+function toggleModule(header) {
+    const body = header.nextElementSibling;
+    const icon = header.querySelector('.toggle-icon');
+
+    if (body.style.display === 'none') {
+        body.style.display = 'block';
+        icon.setAttribute('data-feather', 'chevron-down');
+    } else {
+        body.style.display = 'none';
+        icon.setAttribute('data-feather', 'chevron-right');
+    }
     feather.replace();
+}
+
+// Toggle all permissions in a module
+function toggleModulePermissions(btn, moduleName) {
+    const checkboxes = document.querySelectorAll(`input[data-module="${moduleName}"]`);
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+
+    checkboxes.forEach(cb => {
+        cb.checked = !allChecked;
+    });
+
+    updateCount();
+}
+
+// Select all permissions
+document.getElementById('selectAllBtn').addEventListener('click', function() {
+    document.querySelectorAll('.permission-checkbox').forEach(cb => cb.checked = true);
+    updateCount();
+});
+
+// Deselect all permissions
+document.getElementById('deselectAllBtn').addEventListener('click', function() {
+    document.querySelectorAll('.permission-checkbox').forEach(cb => cb.checked = false);
+    updateCount();
+});
+
+// Update selected count
+function updateCount() {
+    const count = document.querySelectorAll('.permission-checkbox:checked').length;
+    document.getElementById('selectedCount').textContent = count + ' sélectionnée(s)';
+}
+
+// Search functionality
+document.getElementById('searchPermissions').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const permissionItems = document.querySelectorAll('.permission-item');
+
+    permissionItems.forEach(item => {
+        const name = item.getAttribute('data-permission-name');
+        const desc = item.getAttribute('data-permission-desc');
+        const text = name + ' ' + desc;
+
+        if (text.includes(searchTerm)) {
+            item.style.display = '';
+            // Highlight search term
+            if (searchTerm) {
+                const label = item.querySelector('.permission-name');
+                const originalText = label.textContent;
+                const regex = new RegExp(`(${searchTerm})`, 'gi');
+                label.innerHTML = originalText.replace(regex, '<span class="highlight">$1</span>');
+            }
+        } else {
+            item.style.display = 'none';
+        }
+    });
+
+    // Hide empty modules
+    document.querySelectorAll('.module-card').forEach(card => {
+        const visibleItems = card.querySelectorAll('.permission-item[style=""]').length;
+        card.style.display = visibleItems > 0 ? '' : 'none';
+    });
+});
+
+// Filter by module
+document.getElementById('filterModule').addEventListener('change', function() {
+    const selectedModule = this.value;
+
+    document.querySelectorAll('.module-card').forEach(card => {
+        if (!selectedModule || card.getAttribute('data-module') === selectedModule) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+});
+
+// Initialize
+feather.replace();
+updateCount();
 </script>
 @endsection
