@@ -33,14 +33,24 @@ class SmsStatusWidget extends AbstractWidget
     {
         $db = Database::getInstance();
 
+        // Vérifier si super admin
+        $isSuperAdmin = $this->isSuperAdmin();
+        $userId = $this->getCurrentUserId();
+
+        // Construire la requête selon le type d'utilisateur
+        $whereClause = $isSuperAdmin ? '' : ' WHERE created_by = ?';
+        $params = $isSuperAdmin ? [] : [$userId];
+
         // Compter par statut
-        $result = $db->query("
+        $query = "
             SELECT
                 status,
                 COUNT(*) as count
             FROM sms_messages
+            " . $whereClause . "
             GROUP BY status
-        ")->fetchAll();
+        ";
+        $result = $db->query($query, $params)->fetchAll();
 
         $statusCounts = [
             'sent' => 0,

@@ -33,12 +33,23 @@ class SenderNamesWidget extends AbstractWidget
     {
         $db = Database::getInstance();
 
+        // Vérifier si super admin
+        $isSuperAdmin = $this->isSuperAdmin();
+        $userId = $this->getCurrentUserId();
+
+        // Construire la condition WHERE selon le type d'utilisateur
+        $whereClause = $isSuperAdmin ? '' : ' WHERE created_by = ?';
+        $whereActive = $isSuperAdmin ? 'WHERE is_active = 1' : 'WHERE is_active = 1 AND created_by = ?';
+        $params = $isSuperAdmin ? [] : [$userId];
+
         // Total sender names
-        $result = $db->query("SELECT COUNT(*) as total FROM sms_sender_names")->fetch();
+        $query = "SELECT COUNT(*) as total FROM sms_sender_names" . $whereClause;
+        $result = $db->query($query, $params)->fetch();
         $totalSenders = $result['total'] ?? 0;
 
         // Sender names actifs
-        $result = $db->query("SELECT COUNT(*) as total FROM sms_sender_names WHERE is_active = 1")->fetch();
+        $query = "SELECT COUNT(*) as total FROM sms_sender_names " . $whereActive;
+        $result = $db->query($query, $params)->fetch();
         $activeSenders = $result['total'] ?? 0;
 
         return [
