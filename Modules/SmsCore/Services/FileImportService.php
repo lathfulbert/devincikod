@@ -267,7 +267,7 @@ class FileImportService
                 // Check if first row is header
                 if (!empty($row[0]) && !self::looksLikePhoneNumber($row[0])) {
                     // First row is header
-                    $headers = array_map('trim', $row);
+                    $headers = array_map(function($val) { return trim((string)$val); }, $row);
                     continue;
                 } else {
                     // First row is data, generate generic headers
@@ -282,7 +282,7 @@ class FileImportService
                 $rowData = [];
                 foreach ($row as $index => $value) {
                     $header = $headers[$index] ?? 'Colonne' . ($index + 1);
-                    $rowData[$header] = trim($value);
+                    $rowData[$header] = trim((string)($value ?? ''));
                 }
                 $data[] = $rowData;
             }
@@ -325,7 +325,8 @@ class FileImportService
 
                 $rowData = [];
                 foreach ($cellIterator as $cell) {
-                    $rowData[] = trim($cell->getValue());
+                    $value = $cell->getValue();
+                    $rowData[] = trim((string)($value ?? ''));
                 }
 
                 // Skip empty rows

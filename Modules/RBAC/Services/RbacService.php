@@ -98,9 +98,21 @@ class RbacService implements RbacProviderInterface
         $role = Role::where('slug', $roleName)->first();
         if (!$role) return false;
 
-        // Eager load permissions if possible, or query directly
-        // For now, query directly via pivot
+        // Essayer d'abord avec le slug tel quel
         $permission = Permission::where('slug', $permissionSlug)->first();
+
+        // Si non trouvé, essayer avec normalisation (remplacer . et _ par -)
+        if (!$permission) {
+            $normalizedSlug = str_replace(['.', '_'], '-', $permissionSlug);
+            $permission = Permission::where('slug', $normalizedSlug)->first();
+        }
+
+        // Si toujours non trouvé, essayer l'inverse (remplacer - par .)
+        if (!$permission) {
+            $normalizedSlug = str_replace('-', '.', $permissionSlug);
+            $permission = Permission::where('slug', $normalizedSlug)->first();
+        }
+
         if (!$permission) return false;
 
         return RolePermission::where('role_id', $role->id)
@@ -119,7 +131,21 @@ class RbacService implements RbacProviderInterface
         $roleIds = array_map(fn($ur) => $ur->role_id, $userRoles);
 
         // 2. Check if any of these roles have the permission
+        // Essayer d'abord avec le slug tel quel
         $permission = Permission::where('slug', $permissionSlug)->first();
+
+        // Si non trouvé, essayer avec normalisation (remplacer . et _ par -)
+        if (!$permission) {
+            $normalizedSlug = str_replace(['.', '_'], '-', $permissionSlug);
+            $permission = Permission::where('slug', $normalizedSlug)->first();
+        }
+
+        // Si toujours non trouvé, essayer l'inverse (remplacer - par .)
+        if (!$permission) {
+            $normalizedSlug = str_replace('-', '.', $permissionSlug);
+            $permission = Permission::where('slug', $normalizedSlug)->first();
+        }
+
         if (!$permission) return false;
 
         return RolePermission::whereIn('role_id', $roleIds)

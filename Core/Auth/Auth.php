@@ -30,8 +30,24 @@ class Auth
         return $this->session->has('user');
     }
 
-    public function user(): ?array
+    public function user()
     {
-        return $this->session->get('user');
+        $userData = $this->session->get('user');
+
+        if (!$userData) {
+            return null;
+        }
+
+        // Si c'est déjà un objet User, le retourner directement
+        if ($userData instanceof \Modules\Users\Models\User) {
+            return $userData;
+        }
+
+        // Si c'est un tableau, charger le modèle User complet
+        if (is_array($userData) && isset($userData['id'])) {
+            return \Modules\Users\Models\User::find($userData['id']);
+        }
+
+        return null;
     }
 }

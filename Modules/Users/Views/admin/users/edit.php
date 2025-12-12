@@ -37,6 +37,12 @@
                 </div>
 
                 <div class="mb-3">
+                    <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" name="email" id="email" class="form-control" value="<?= htmlspecialchars($user->email ?? '') ?>" required>
+                    <small class="form-text text-muted">Adresse email valide et unique</small>
+                </div>
+
+                <div class="mb-3">
                     <label for="password" class="form-label">Mot de passe</label>
                     <input type="password" name="password" id="password" class="form-control" autocomplete="new-password">
                     <small class="form-text text-muted">Laisser vide pour conserver le mot de passe actuel</small>

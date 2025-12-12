@@ -32,7 +32,7 @@ class User extends Model
         return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
     }
 
-    // Helper to check permissions directly from User model if needed, 
+    // Helper to check permissions directly from User model if needed,
     // though RbacService is preferred for complex logic.
     public function hasRole(string $roleSlug): bool
     {
@@ -42,6 +42,18 @@ class User extends Model
             }
         }
         return false;
+    }
+
+    /**
+     * Check if user has a specific permission
+     *
+     * @param string $permission Permission slug
+     * @return bool
+     */
+    public function can(string $permission): bool
+    {
+        $rbacService = \App\Core\Container\Container::getInstance()->make(\Modules\RBAC\Services\RbacService::class);
+        return $rbacService->userHasPermission($this, $permission);
     }
 
     /**

@@ -39,6 +39,12 @@
                 </div>
 
                 <div class="mb-3">
+                    <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" name="email" id="email" class="form-control" required>
+                    <small class="form-text text-muted">Adresse email valide et unique</small>
+                </div>
+
+                <div class="mb-3">
                     <label for="password" class="form-label">Mot de passe <span class="text-danger">*</span></label>
                     <input type="password" name="password" id="password" class="form-control" required autocomplete="new-password">
                     <small class="form-text text-muted">Minimum 8 caractères recommandé</small>
