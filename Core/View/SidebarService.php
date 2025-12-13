@@ -3,6 +3,7 @@
 namespace App\Core\View;
 
 use App\Core\Application;
+use App\Core\Module\Middleware\ModuleAccessMiddleware;
 
 class SidebarService
 {
@@ -14,9 +15,19 @@ class SidebarService
         $app = Application::getInstance();
         $modules = $app->moduleManager->getModules(); // Only loaded (enabled) modules
 
+        // Obtenir les modules accessibles pour l'utilisateur actuel
+        $accessMiddleware = new ModuleAccessMiddleware();
+        $accessibleModules = $accessMiddleware->getAccessibleModules();
+
         $menuItems = [];
 
         foreach ($modules as $module) {
+            // Vérifier si le module est accessible
+            $moduleKey = self::getModuleKey($module->getName());
+            if (!in_array($moduleKey, $accessibleModules)) {
+                continue; // Sauter ce module si pas accessible
+            }
+
             $items = $module->getMenuItems();
             if (!empty($items)) {
                 $menuItems = array_merge($menuItems, $items);
@@ -36,6 +47,36 @@ class SidebarService
         foreach ($items as $item) {
             self::renderItem($item);
         }
+    }
+
+    /**
+     * Convertit un nom de module en clé de permission
+     *
+     * @param string $moduleName
+     * @return string
+     */
+    protected static function getModuleKey(string $moduleName): string
+    {
+        // Gérer les acronymes courants (AI, RBAC, API, etc.)
+        $acronyms = ['AI', 'RBAC', 'API', 'SMS', 'MFA', 'OTP', 'CRM', 'ERP'];
+        $normalized = $moduleName;
+        
+        foreach ($acronyms as $acronym) {
+            if (strpos($normalized, $acronym) !== false) {
+                // Remplacer l'acronyme par sa version minuscule
+                $normalized = str_replace($acronym, strtolower($acronym), $normalized);
+            }
+        }
+        
+        // Convert PascalCase to snake_case (mais préserver les acronymes déjà en minuscule)
+        $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $normalized));
+        // Replace spaces and hyphens with underscores
+        $key = str_replace([' ', '-'], '_', $key);
+        // Nettoyer les underscores multiples
+        $key = preg_replace('/_+/', '_', $key);
+        $key = trim($key, '_');
+        
+        return $key;
     }
 
     protected static function renderItem(array $item): void

@@ -9,7 +9,7 @@ use Modules\SmsCore\Controllers\SmsApiController;
 // Sender Names Management (Admin only)
 $router->group([
     'prefix' => '/sms/sender-names',
-    'middleware' => ['auth']
+    'middleware' => ['auth', 'module_access:sms_core']
 ], function ($router) {
     // List sender names
     $router->get('', [SenderNameController::class, 'index'])
@@ -56,13 +56,13 @@ $router->group([
 
 // API endpoint for getting user's sender names
 $router->get('/api/sms/sender-names/user', [SenderNameController::class, 'apiGetUserSenderNames'])
-    ->middleware('auth')
+    ->middleware(['auth', 'module_access:sms_core'])
     ->name('api.sms.sender_names.user');
 
 // SMS Sending routes (if not already defined)
 $router->group([
     'prefix' => '/sms',
-    'middleware' => ['auth']
+    'middleware' => ['auth', 'module_access:sms_core']
 ], function ($router) {
     // Single SMS
     $router->get('/send', [SmsController::class, 'sendForm'])

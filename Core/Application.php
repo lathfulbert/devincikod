@@ -155,6 +155,9 @@ class Application extends Container
 
         $this->router->registerMiddleware('secure_upload', \App\Core\Files\Middleware\SecureUploadMiddleware::class);
 
+        // Module Access Middleware
+        $this->router->registerMiddleware('module_access', \App\Core\Module\Middleware\ModuleAccessMiddleware::class);
+
         // Load Global Web Routes
         $routesPath = $this->basePath . '/routes/web.php';
         if (file_exists($routesPath)) {
