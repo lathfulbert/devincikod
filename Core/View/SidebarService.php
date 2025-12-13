@@ -97,6 +97,36 @@ class SidebarService
         return $rbacService->userHasPermission($user, $permission);
     }
 
+    /**
+     * Convertit un nom de module en clé de permission
+     *
+     * @param string $moduleName
+     * @return string
+     */
+    protected static function getModuleKey(string $moduleName): string
+    {
+        // Gérer les acronymes courants (AI, RBAC, API, etc.)
+        $acronyms = ['AI', 'RBAC', 'API', 'SMS', 'MFA', 'OTP', 'CRM', 'ERP'];
+        $normalized = $moduleName;
+        
+        foreach ($acronyms as $acronym) {
+            if (strpos($normalized, $acronym) !== false) {
+                // Remplacer l'acronyme par sa version minuscule
+                $normalized = str_replace($acronym, strtolower($acronym), $normalized);
+            }
+        }
+        
+        // Convert PascalCase to snake_case (mais préserver les acronymes déjà en minuscule)
+        $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $normalized));
+        // Replace spaces and hyphens with underscores
+        $key = str_replace([' ', '-'], '_', $key);
+        // Nettoyer les underscores multiples
+        $key = preg_replace('/_+/', '_', $key);
+        $key = trim($key, '_');
+        
+        return $key;
+    }
+
     protected static function renderItem(array $item): void
     {
         $type = $item['type'] ?? 'link';
