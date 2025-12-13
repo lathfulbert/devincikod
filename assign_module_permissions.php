@@ -25,30 +25,44 @@ $modules = $moduleManager->getModules();
 // Obtenir tous les rôles existants
 $existingRoles = $db->query('SELECT name FROM roles')->fetchAll(PDO::FETCH_COLUMN);
 
-// Donner les permissions d'accès aux modules à tous les rôles
-foreach ($existingRoles as $roleName) {
+// Définir quels rôles ont accès à quels modules
+$rolePermissions = [
+    'Administrateur' => ['admin', 'api_keys', 'auth', 'contacts', 'i18n', 'r_b_a_c', 'settings', 'sms_core', 'users', 'wallet'],
+    'Manager' => ['admin', 'api_keys', 'auth', 'contacts', 'i18n', 'settings', 'sms_core', 'users', 'wallet'],
+    'Éditeur' => ['auth', 'contacts', 'i18n', 'users'],
+    'Rédacteur' => ['auth', 'contacts', 'users'],
+    'Utilisateur' => ['auth', 'users'] // Pas d'accès aux modules avancés
+];
+
+// Donner les permissions selon les rôles
+foreach ($rolePermissions as $roleName => $allowedModules) {
     echo "Assignation des permissions au rôle '{$roleName}' :\n";
     
     foreach ($modules as $module) {
         $moduleName = $module->getName();
-        // Convertir le nom du module en clé de permission
         $moduleKey = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $moduleName));
         $moduleKey = str_replace([' ', '-'], '_', $moduleKey);
         $moduleKey = preg_replace('/_+/', '_', $moduleKey);
         $moduleKey = trim($moduleKey, '_');
         
-        $permissionSlug = 'access.' . $moduleKey;
-        
-        try {
-            $rbacService->givePermissionToRole($roleName, $permissionSlug);
-            echo "  ✓ {$permissionSlug}\n";
-        } catch (Exception $e) {
-            // Permission déjà existante, ignorer
-            echo "  - {$permissionSlug} (déjà existante)\n";
+        if (in_array($moduleKey, $allowedModules)) {
+            $permissionSlug = 'access.' . $moduleKey;
+            
+            try {
+                $rbacService->givePermissionToRole($roleName, $permissionSlug);
+                echo "  ✓ {$permissionSlug}\n";
+            } catch (Exception $e) {
+                echo "  - {$permissionSlug} (déjà existante)\n";
+            }
         }
     }
     echo "\n";
 }
 
 echo "\nAssignation terminée!\n";
-echo "Tous les rôles existants ont maintenant les permissions d'accès à tous les modules.\n";
+echo "Permissions assignées selon la hiérarchie :\n";
+echo "- Administrateur : accès à tous les modules\n";
+echo "- Manager : accès aux modules principaux sauf RBAC\n";
+echo "- Éditeur : accès limité (auth, contacts, i18n, users)\n";
+echo "- Rédacteur : accès basique (auth, users)\n";
+echo "- Utilisateur : accès minimal (auth, users)\n";
