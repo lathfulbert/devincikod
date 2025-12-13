@@ -87,11 +87,13 @@ class SidebarService
 
         // Admin a toutes les permissions
         if (is_object($user) && method_exists($user, 'hasRole')) {
-            if ($user->hasRole('admin')) {
+            if ($user->hasRole('Administrateur') || $user->hasRole('admin')) {
                 return true;
             }
-        } elseif (is_array($user) && isset($user['role']) && $user['role'] === 'admin') {
-            return true;
+        } elseif (is_array($user) && isset($user['role'])) {
+            if ($user['role'] === 'Administrateur' || $user['role'] === 'admin') {
+                return true;
+            }
         }
 
         return $rbacService->userHasPermission($user, $permission);

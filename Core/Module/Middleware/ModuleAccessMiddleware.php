@@ -61,9 +61,9 @@ class ModuleAccessMiddleware
         // Vérifier si l'utilisateur est admin (a tous les droits)
         $isAdmin = false;
         if (is_object($user) && method_exists($user, 'hasRole')) {
-            $isAdmin = $user->hasRole('admin');
-        } elseif (is_array($user) && isset($user['role']) && $user['role'] === 'admin') {
-            $isAdmin = true;
+            $isAdmin = $user->hasRole('Administrateur') || $user->hasRole('admin');
+        } elseif (is_array($user) && isset($user['role'])) {
+            $isAdmin = $user['role'] === 'Administrateur' || $user['role'] === 'admin';
         }
         
         if ($isAdmin) {

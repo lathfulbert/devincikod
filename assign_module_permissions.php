@@ -25,6 +25,11 @@ $modules = $moduleManager->getModules();
 // Obtenir tous les rôles existants
 $existingRoles = $db->query('SELECT name FROM roles')->fetchAll(PDO::FETCH_COLUMN);
 
+// Nettoyer les permissions 'access.*' existantes pour tous les rôles
+echo "Nettoyage des permissions 'access.*' existantes...\n";
+$db->query("DELETE FROM role_permissions WHERE permission_id IN (SELECT id FROM permissions WHERE slug LIKE 'access.%')");
+echo "Permissions 'access.*' supprimées de tous les rôles.\n\n";
+
 // Définir quels rôles ont accès à quels modules
 $rolePermissions = [
     'Administrateur' => ['admin', 'api_keys', 'auth', 'contacts', 'i18n', 'r_b_a_c', 'settings', 'sms_core', 'users', 'wallet'],
