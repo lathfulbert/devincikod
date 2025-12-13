@@ -56,7 +56,8 @@ $router->group([
 
 // API endpoint for getting user's sender names
 $router->get('/api/sms/sender-names/user', [SenderNameController::class, 'apiGetUserSenderNames'])
-    ->middleware(['auth', 'module_access:sms_core'])
+    ->middleware('auth')
+    ->middleware('module_access:sms_core')
     ->name('api.sms.sender_names.user');
 
 // SMS Sending routes (if not already defined)
