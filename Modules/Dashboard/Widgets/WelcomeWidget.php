@@ -32,14 +32,30 @@ class WelcomeWidget extends AbstractWidget
         $user = $this->getCurrentUser();
         $userName = $user ? ($user->first_name ?? $user->username ?? 'Utilisateur') : 'Visiteur';
 
+        // Compter les modules actifs
+        $app = \App\Core\Application::getInstance();
+        $activeModules = count($app->moduleManager->getModules());
+
+        // Compter les utilisateurs actifs (simulation)
+        $activeUsers = $this->getActiveUsersCount();
+
         return [
             'title' => 'Bienvenue ' . $userName,
             'value' => 'Dashboard des modules actifs',
-            'description' => 'Voici un aperçu des statistiques de vos modules actifs.',
+            'description' => "Vous avez accès à {$activeModules} modules actifs. {$activeUsers} utilisateurs actifs aujourd'hui.",
             'icon' => 'home',
             'meta' => [
-                'welcome_message' => 'Tous vos widgets sont affichés ci-dessous.'
+                'welcome_message' => 'Tous vos widgets sont affichés ci-dessous.',
+                'modules_count' => $activeModules,
+                'active_users' => $activeUsers
             ]
         ];
+    }
+
+    private function getActiveUsersCount(): int
+    {
+        // TODO: Remplacer par une vraie requête DB
+        // Exemple: return DB::table('users')->where('last_login', '>', now()->subDay())->count();
+        return rand(10, 100); // Simulation
     }
 }

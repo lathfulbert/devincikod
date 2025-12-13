@@ -10,6 +10,13 @@ class DashboardModule extends AbstractModule
     {
         return __DIR__;
     }
+    public function boot(): void
+    {
+        // Enregistrer les widgets du module
+        if (function_exists('register_widget')) {
+            register_widget('dashboard', \Modules\Dashboard\Widgets\WelcomeWidget::class);
+        }
+    }
 
     public function getRoutes(): array
     {
@@ -26,7 +33,8 @@ class DashboardModule extends AbstractModule
                 'title' => 'Dashboard',
                 'icon' => 'home',
                 'url' => '/admin/dashboard',
-                'class' => 'link-nav'
+                'class' => 'link-nav',
+                'permission' => 'access.dashboard' // Permission requise pour voir le menu
             ]
         ];
     }

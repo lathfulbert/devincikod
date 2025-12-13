@@ -20,29 +20,11 @@ class SmsCoreModule extends AbstractModule
         ];
     }
 
-    public function getMenuItems(): array
+    public function boot(): void
     {
-        return [
-            [
-                'type' => 'dropdown',
-                'title' => 'SMS',
-                'icon' => 'message-circle',
-                'children' => [
-                    ['title' => 'Dashboard', 'url' => '/admin/sms'],
-                    ['title' => 'Send SMS', 'url' => '/admin/sms/send'],
-                    ['title' => 'Bulk SMS', 'url' => '/admin/sms/bulk'],
-                    ['title' => 'Campaigns', 'url' => '/admin/sms/campaigns'],
-                    ['title' => 'History', 'url' => '/admin/sms/history'],
-                    ['title' => 'Statistics', 'url' => '/admin/sms/statistics'],
-                    ['title' => 'Sender Names', 'url' => '/sms/sender-names'],
-                    ['title' => 'Tarification', 'url' => '/admin/sms/pricing'],
-                    ['title' => 'Facturation', 'url' => '/admin/sms/billing'],
-                    ['title' => 'Fournisseurs (Stats)', 'url' => '/admin/sms/providers', 'icon' => 'server'],
-                    ['title' => '---', 'url' => '#'], // Separator
-                    ['title' => 'Documentation API', 'url' => '/admin/sms/api/docs', 'icon' => 'book'],
-                    ['title' => 'Mes clés API', 'url' => '/admin/api-keys', 'icon' => 'key'],
-                ]
-            ]
-        ];
+        // Enregistrer les widgets du module
+        if (function_exists('register_widget')) {
+            register_widget('sms_core', \Modules\SmsCore\Widgets\SmsStatisticsWidget::class);
+        }
     }
 }

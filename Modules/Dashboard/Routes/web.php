@@ -8,4 +8,5 @@ $authMiddleware = [new \App\Core\Middleware\AuthMiddleware(), 'handle'];
 
 // Dashboard route
 $router->get('/admin/dashboard', [DashboardController::class, 'index'])
-    ->middleware('auth');
+    ->middleware('auth')
+    ->middleware('module_access:dashboard');

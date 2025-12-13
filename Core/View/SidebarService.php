@@ -30,7 +30,18 @@ class SidebarService
 
             $items = $module->getMenuItems();
             if (!empty($items)) {
-                $menuItems = array_merge($menuItems, $items);
+                // Filtrer les items selon les permissions individuelles
+                $filteredItems = [];
+                foreach ($items as $item) {
+                    if (isset($item['permission'])) {
+                        // Vérifier la permission spécifique à l'item
+                        if (!$this->hasPermission($item['permission'])) {
+                            continue; // Sauter cet item si permission manquante
+                        }
+                    }
+                    $filteredItems[] = $item;
+                }
+                $menuItems = array_merge($menuItems, $filteredItems);
             }
         }
 
@@ -50,33 +61,40 @@ class SidebarService
     }
 
     /**
-     * Convertit un nom de module en clé de permission
+     * Vérifie si l'utilisateur a une permission spécifique
      *
-     * @param string $moduleName
-     * @return string
+     * @param string $permission
+     * @return bool
      */
-    protected static function getModuleKey(string $moduleName): string
+    protected static function hasPermission(string $permission): bool
     {
-        // Gérer les acronymes courants (AI, RBAC, API, etc.)
-        $acronyms = ['AI', 'RBAC', 'API', 'SMS', 'MFA', 'OTP', 'CRM', 'ERP'];
-        $normalized = $moduleName;
-        
-        foreach ($acronyms as $acronym) {
-            if (strpos($normalized, $acronym) !== false) {
-                // Remplacer l'acronyme par sa version minuscule
-                $normalized = str_replace($acronym, strtolower($acronym), $normalized);
+        $app = Application::getInstance();
+        $rbacService = $app->make(\Modules\RBAC\Services\RbacService::class);
+
+        // Obtenir l'utilisateur actuel
+        $user = null;
+        if (function_exists('auth')) {
+            $user = auth()->user();
+        } else {
+            if (isset($_SESSION['user_id'])) {
+                $user = \Modules\Users\Models\User::find($_SESSION['user_id']);
             }
         }
-        
-        // Convert PascalCase to snake_case (mais préserver les acronymes déjà en minuscule)
-        $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $normalized));
-        // Replace spaces and hyphens with underscores
-        $key = str_replace([' ', '-'], '_', $key);
-        // Nettoyer les underscores multiples
-        $key = preg_replace('/_+/', '_', $key);
-        $key = trim($key, '_');
-        
-        return $key;
+
+        if (!$user) {
+            return false;
+        }
+
+        // Admin a toutes les permissions
+        if (is_object($user) && method_exists($user, 'hasRole')) {
+            if ($user->hasRole('admin')) {
+                return true;
+            }
+        } elseif (is_array($user) && isset($user['role']) && $user['role'] === 'admin') {
+            return true;
+        }
+
+        return $rbacService->userHasPermission($user, $permission);
     }
 
     protected static function renderItem(array $item): void
