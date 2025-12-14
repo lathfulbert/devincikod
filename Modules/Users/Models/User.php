@@ -36,8 +36,22 @@ class User extends Model
     // though RbacService is preferred for complex logic.
     public function hasRole(string $roleSlug): bool
     {
+        // Charger les rôles si pas encore chargés
+        if (!isset($this->relations['roles'])) {
+            try {
+                $results = $this->roles()->getResults();
+                $this->roles = is_array($results) ? $results : [];
+            } catch (\Exception $e) {
+                $this->roles = [];
+            }
+        }
+        
+        if (!is_array($this->roles)) {
+            $this->roles = [];
+        }
+        
         foreach ($this->roles as $role) {
-            if ($role->slug === $roleSlug) {
+            if ($role && isset($role->slug) && $role->slug === $roleSlug) {
                 return true;
             }
         }

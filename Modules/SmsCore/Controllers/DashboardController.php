@@ -11,25 +11,30 @@ class DashboardController
     {
         $app = Application::getInstance();
 
-        // Get real statistics from database
-        $totalMessages = \Modules\SmsCore\Models\SmsMessage::count();
+        $user = auth()->user();
+        $userId = $user->id ?? ($_SESSION['user']['id'] ?? $_SESSION['user_id'] ?? null);
+        $canSeeAll = $user->can('sms.see_all');
 
-        $messagesToday = \Modules\SmsCore\Models\SmsMessage::where('created_at', '>=', date('Y-m-d 00:00:00'))
-            ->count();
+        // Base query
+        $baseQuery = \Modules\SmsCore\Models\SmsMessage::query();
+        if (!$canSeeAll && $userId) {
+            $baseQuery->where('user_id', $userId);
+        }
 
-        $sentMessages = \Modules\SmsCore\Models\SmsMessage::where('status', 'sent')->count();
+        // Statistiques filtrées
+        $totalMessages = (clone $baseQuery)->count();
+        $messagesToday = (clone $baseQuery)->where('created_at', '>=', date('Y-m-d 00:00:00'))->count();
+        $sentMessages = (clone $baseQuery)->where('status', 'sent')->count();
         $successRate = $totalMessages > 0 ? round(($sentMessages / $totalMessages) * 100, 1) : 0;
 
-        // Get recent messages
-        $recentMessages = \Modules\SmsCore\Models\SmsMessage::orderBy('created_at', 'DESC')
-            ->limit(10)
-            ->get();
+        // Messages récents filtrés
+        $recentMessages = (clone $baseQuery)->orderBy('created_at', 'DESC')->limit(10)->get();
 
-        // Calculate total cost manually (QueryBuilder doesn't have sum())
-        $allMessages = \Modules\SmsCore\Models\SmsMessage::all();
+        // Coût total filtré
+        $allMessages = (clone $baseQuery)->get();
         $totalCost = 0;
         foreach ($allMessages as $msg) {
-            $totalCost += $msg->cost ?? 0.03; // Default 0.03 if cost not set
+            $totalCost += $msg->cost ?? 0.03;
         }
 
         // Get real wallet balance for current user

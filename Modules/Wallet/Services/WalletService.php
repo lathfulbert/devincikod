@@ -186,7 +186,49 @@ class WalletService
         return WalletTransaction::where('wallet_id', $wallet->id)
             ->orderBy('created_at', 'desc')
             ->limit($limit)
-            ->get()
-            ->toArray();
+            ->get();
+    }
+
+    /**
+     * Get total balance across all wallets
+     */
+    public function getTotalBalance(): float
+    {
+        $result = Wallet::selectRaw('SUM(balance) as total_balance')->first();
+        return $result->total_balance ?? 0.0;
+    }
+
+    /**
+     * Get total number of users with wallets
+     */
+    public function getTotalUsersWithWallets(): int
+    {
+        return Wallet::count();
+    }
+
+    /**
+     * Get count of pending topup requests
+     */
+    public function getPendingRequestsCount(): int
+    {
+        return \Modules\Wallet\Models\WalletTopupRequest::where('status', 'pending')->count();
+    }
+
+    /**
+     * Get recent transactions across all wallets
+     */
+    public function getRecentTransactions(int $limit = 10): array
+    {
+        return WalletTransaction::orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
+     * Get user wallet (alias for getWallet for consistency)
+     */
+    public function getUserWallet(int $userId): ?Wallet
+    {
+        return $this->getWallet($userId);
     }
 }

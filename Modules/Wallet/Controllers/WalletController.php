@@ -24,16 +24,60 @@ class WalletController
     }
 
     /**
+     * Wallet Dashboard with statistics widgets
+     */
+    public function dashboard()
+    {
+        $app = Application::getInstance();
+        $user = auth()->user();
+
+        // Statistiques pour le dashboard
+        $stats = [
+            'total_balance' => $this->walletService->getTotalBalance(),
+            'total_users' => $this->walletService->getTotalUsersWithWallets(),
+            'pending_requests' => $this->walletService->getPendingRequestsCount(),
+            'recent_transactions' => $this->walletService->getRecentTransactions(5)
+        ];
+
+        // Wallet de l'utilisateur actuel
+        $userWallet = $this->walletService->getUserWallet($user->id);
+
+        echo view('Wallet/wallet/dashboard', [
+            'stats' => $stats,
+            'userWallet' => $userWallet,
+            'title' => 'Wallet Dashboard'
+        ]);
+    }
+
+    /**
      * List all user wallets (Admin)
      */
-    public function index()
+    public function manage()
     {
         $app = Application::getInstance();
         $wallets = $this->walletService->getAllWallets();
 
-        echo view('Wallet/wallet/index', [
+        echo view('Wallet/wallet/manage', [
             'wallets' => $wallets,
-            'title' => 'Wallet Management'
+            'title' => 'Gestion des Wallets'
+        ]);
+    }
+
+    /**
+     * Show user's own wallet requests
+     */
+    public function myRequests()
+    {
+        $app = Application::getInstance();
+        $user = auth()->user();
+
+        $requests = WalletTopupRequest::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        echo view('Wallet/wallet/my_requests', [
+            'requests' => $requests,
+            'title' => 'Mes demandes de recharge'
         ]);
     }
 
@@ -271,32 +315,7 @@ class WalletController
         ]);
     }
 
-    /**
-     * View top-up requests for current user
-     */
-    public function requests()
-    {
-        $app = Application::getInstance();
-        $userId = $_SESSION['user']['id'] ?? $_SESSION['user_id'] ?? null;
 
-        if (!$userId) {
-            $_SESSION['flash_error'] = 'Utilisateur non authentifié';
-            redirect('/login');
-            exit;
-        }
-
-        $requests = WalletTopupRequest::where('user_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        $wallet = $this->walletService->getWallet($userId);
-
-        echo view('Wallet/wallet/requests', [
-            'requests' => $requests,
-            'wallet' => $wallet,
-            'title' => 'Mes demandes de recharge'
-        ]);
-    }
 
     /**
      * View all top-up requests (Admin)
@@ -304,6 +323,13 @@ class WalletController
     public function adminRequests()
     {
         $app = Application::getInstance();
+        $user = auth()->user();
+        // Contrôle de permission explicite
+        if (!$user->can('wallet.requests.manage')) {
+            $_SESSION['flash_error'] = "Vous n'avez pas la permission d'accéder à cette page.";
+            redirect('/admin/dashboard');
+            exit;
+        }
 
         // Filter by status
         $status = $_GET['status'] ?? null;
@@ -472,6 +498,68 @@ class WalletController
 
         $_SESSION['flash_warning'] = 'Paiement annulé. Vous pouvez faire une nouvelle tentative si vous le souhaitez.';
         redirect('/admin/wallet/topup');
+        exit;
+    }
+
+    /**
+     * Cancel a user's topup request
+     */
+    public function cancelRequest()
+    {
+        $app = Application::getInstance();
+        $user = auth()->user();
+
+        if (!$user) {
+            $_SESSION['flash_error'] = 'Vous devez être connecté';
+            redirect('/admin/login');
+            exit;
+        }
+
+        $requestId = $_POST['request_id'] ?? null;
+
+        if (!$requestId) {
+            $_SESSION['flash_error'] = 'ID de demande manquant';
+            redirect('/admin/wallet/requests');
+            exit;
+        }
+
+        try {
+            $request = WalletTopupRequest::find($requestId);
+
+            if (!$request) {
+                $_SESSION['flash_error'] = 'Demande introuvable';
+                redirect('/admin/wallet/requests');
+                exit;
+            }
+
+            // Vérifier que la demande appartient à l'utilisateur
+            if ($request->user_id != $user->id) {
+                $_SESSION['flash_error'] = 'Accès non autorisé';
+                redirect('/admin/wallet/requests');
+                exit;
+            }
+
+            // Vérifier que la demande est en attente
+            if ($request->status !== 'pending') {
+                $_SESSION['flash_error'] = 'Seules les demandes en attente peuvent être annulées';
+                redirect('/admin/wallet/requests');
+                exit;
+            }
+
+            // Annuler la demande
+            $request->update([
+                'status' => 'cancelled',
+                'admin_notes' => 'Annulé par l\'utilisateur'
+            ]);
+
+            $_SESSION['flash_success'] = 'Demande annulée avec succès';
+
+        } catch (\Exception $e) {
+            error_log("Error cancelling request: " . $e->getMessage());
+            $_SESSION['flash_error'] = 'Erreur lors de l\'annulation de la demande';
+        }
+
+        redirect('/admin/wallet/requests');
         exit;
     }
 

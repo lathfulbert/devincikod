@@ -13,6 +13,12 @@ class SmsPricingController
      */
     public function index()
     {
+        $user = auth()->user();
+        if (!$user->can('sms.pricing.manage')) {
+            $_SESSION['flash_error'] = "Vous n'avez pas la permission d'accéder à cette page.";
+            redirect('/admin/dashboard');
+            exit;
+        }
         $app = Application::getInstance();
         $pricingGrid = Setting::get('sms_pricing_grid', []);
 
@@ -178,6 +184,12 @@ class SmsPricingController
      */
     public function logs()
     {
+        $user = auth()->user();
+        if (!$user->can('sms.billing.manage')) {
+            $_SESSION['flash_error'] = "Vous n'avez pas la permission d'accéder à cette page.";
+            redirect('/admin/dashboard');
+            exit;
+        }
         $app = Application::getInstance();
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
         $limit = 20;

@@ -630,6 +630,12 @@ public function send()
     public function contracts()
     {
         $app = Application::getInstance();
+        $user = auth()->user();
+        if (!$user->can('sms.contracts.manage')) {
+            $_SESSION['flash_error'] = "Vous n'avez pas la permission d'accéder à cette page.";
+            redirect('/admin/dashboard');
+            exit;
+        }
 
         // Find Orange Gateway config
         $gatewayConfig = SmsGateway::where('provider_code', 'orange_ci')->first();

@@ -14,6 +14,12 @@ class ProviderDashboardController
      */
     public function index()
     {
+        $user = auth()->user();
+        if (!$user->can('sms.providers.manage')) {
+            $_SESSION['flash_error'] = "Vous n'avez pas la permission d'accéder à cette page.";
+            redirect('/admin/dashboard');
+            exit;
+        }
         $gateways = SmsGateway::where('is_active', true)->get();
 
         echo view('SmsCore/providers/index', [

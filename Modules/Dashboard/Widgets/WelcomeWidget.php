@@ -29,7 +29,7 @@ class WelcomeWidget extends AbstractWidget
 
     protected function calculateData(): array
     {
-        $user = $this->getCurrentUser();
+        $user = function_exists('auth') ? auth()->user() : null;
         $userName = $user ? ($user->first_name ?? $user->username ?? 'Utilisateur') : 'Visiteur';
 
         // Compter les modules actifs

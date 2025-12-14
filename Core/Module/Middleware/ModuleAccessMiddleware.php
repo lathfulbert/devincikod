@@ -30,9 +30,10 @@ class ModuleAccessMiddleware
      * Vérifie l'accès à un module
      *
      * @param string $moduleKey Clé du module (ex: 'crm', 'sms_marketing', 'wallet')
+     * @param object|null $testUser Utilisateur pour les tests (optionnel)
      * @return bool
      */
-    public function canAccessModule(string $moduleKey): bool
+    public function canAccessModule(string $moduleKey, ?object $testUser = null): bool
     {
         // Modules exemptés du contrôle d'accès (essentiels pour l'authentification)
         $exemptModules = ['auth'];
@@ -42,11 +43,11 @@ class ModuleAccessMiddleware
         }
 
         // Utiliser la fonction helper auth() ou charger depuis la session
-        $user = null;
+        $user = $testUser;
         
-        if (function_exists('auth')) {
+        if (!$user && function_exists('auth')) {
             $user = auth()->user();
-        } else {
+        } elseif (!$user) {
             // Fallback: charger depuis la session
             if (isset($_SESSION['user_id'])) {
                 $user = \Modules\Users\Models\User::find($_SESSION['user_id']);
@@ -146,18 +147,53 @@ class ModuleAccessMiddleware
             // Fallback: charger depuis la session
             if (isset($_SESSION['user_id'])) {
                 $user = \Modules\Users\Models\User::find($_SESSION['user_id']);
+                // Charger les rôles
+                if ($user) {
+                    $user->load('roles');
+                }
             }
         }
 
         if (!$user) {
             return [];
         }
-        
+
         $app = Application::getInstance();
 
         // Récupérer tous les modules enregistrés
         $moduleManager = $app->moduleManager;
         $allModules = $moduleManager->getRegistry()->getAll();
+
+        // Vérifier si l'utilisateur est admin (a tous les droits)
+        $isAdmin = false;
+        if (is_object($user) && method_exists($user, 'hasRole')) {
+            try {
+                $isAdmin = $user->hasRole('Administrateur') || $user->hasRole('admin');
+            } catch (Exception $e) {
+                // Fallback: check role name
+                $roles = \Modules\RBAC\Models\UserRole::where('user_id', $user->id)->get();
+                foreach ($roles as $ur) {
+                    $role = \Modules\RBAC\Models\Role::find($ur->role_id);
+                    if ($role && ($role->name === 'Administrateur' || $role->slug === 'admin')) {
+                        $isAdmin = true;
+                        break;
+                    }
+                }
+            }
+        } elseif (is_array($user) && isset($user['role'])) {
+            $isAdmin = $user['role'] === 'Administrateur' || $user['role'] === 'admin';
+        }
+        
+        if ($isAdmin) {
+            // Admin a accès à tous les modules
+            $allModuleKeys = [];
+            foreach ($allModules as $moduleData) {
+                $moduleName = $moduleData['name'];
+                $moduleKey = $this->getModuleKey($moduleName);
+                $allModuleKeys[] = $moduleKey;
+            }
+            return $allModuleKeys;
+        }
 
         $accessibleModules = [];
 

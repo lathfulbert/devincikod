@@ -35,7 +35,7 @@ class SidebarService
                 foreach ($items as $item) {
                     if (isset($item['permission'])) {
                         // Vérifier la permission spécifique à l'item
-                        if (!$this->hasPermission($item['permission'])) {
+                        if (!self::hasPermission($item['permission'])) {
                             continue; // Sauter cet item si permission manquante
                         }
                     }
@@ -155,22 +155,36 @@ class SidebarService
         }
 
         if ($type === 'dropdown') {
-            echo '<li class="sidebar-list">
-                    <a class="sidebar-link sidebar-title" href="javascript:void(0)">
-                        <i data-feather="' . ($item['icon'] ?? 'circle') . '"></i>
-                        <span>' . htmlspecialchars($item['title']) . '</span>
-                    </a>
-                    <ul class="sidebar-submenu">';
-
+            // Filtrer les enfants selon les permissions
+            $filteredChildren = [];
             if (isset($item['children']) && is_array($item['children'])) {
                 foreach ($item['children'] as $child) {
-                    $childUrl = isset($child['url']) ? url($child['url']) : '#';
-                    echo '<li><a href="' . $childUrl . '">' . htmlspecialchars($child['title']) . '</a></li>';
+                    if (isset($child['permission'])) {
+                        if (!self::hasPermission($child['permission'])) {
+                            continue; // Sauter cet enfant si permission manquante
+                        }
+                    }
+                    $filteredChildren[] = $child;
                 }
             }
 
-            echo '  </ul>
-                  </li>';
+            // N'afficher le dropdown que s'il y a des enfants visibles
+            if (!empty($filteredChildren)) {
+                echo '<li class="sidebar-list">
+                        <a class="sidebar-link sidebar-title" href="javascript:void(0)">
+                            <i data-feather="' . ($item['icon'] ?? 'circle') . '"></i>
+                            <span>' . htmlspecialchars($item['title']) . '</span>
+                        </a>
+                        <ul class="sidebar-submenu">';
+
+                foreach ($filteredChildren as $child) {
+                    $childUrl = isset($child['url']) ? url($child['url']) : '#';
+                    echo '<li><a href="' . $childUrl . '">' . htmlspecialchars($child['title']) . '</a></li>';
+                }
+
+                echo '  </ul>
+                      </li>';
+            }
         }
     }
 }
