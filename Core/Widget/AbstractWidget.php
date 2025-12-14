@@ -21,6 +21,15 @@ abstract class AbstractWidget implements WidgetInterface
     protected bool $cacheable = true;
     protected int $cacheDuration = 300; // 5 minutes par défaut
     protected array $config = [];
+    protected bool $enabled = true; // Permet d'activer/désactiver le widget
+
+    /**
+     * Permet de savoir si le widget est activé
+     */
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
 
     /**
      * Méthode abstraite que chaque widget doit implémenter

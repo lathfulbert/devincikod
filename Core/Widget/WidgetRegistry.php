@@ -117,8 +117,22 @@ class WidgetRegistry
     public function getAllWidgets(): array
     {
         $allWidgets = [];
+        $statusConfig = [];
+        $configPath = __DIR__ . '/../../../config/widgets_status.php';
+        if (file_exists($configPath)) {
+            $statusConfig = include $configPath;
+        }
         foreach (array_keys($this->widgets) as $widgetName) {
-            $allWidgets[$widgetName] = $this->get($widgetName);
+            $widget = $this->get($widgetName);
+            if ($widget && method_exists($widget, 'isEnabled')) {
+                // Si le statut est défini dans la config, il prime
+                $enabled = array_key_exists($widgetName, $statusConfig)
+                    ? (bool)$statusConfig[$widgetName]
+                    : $widget->isEnabled();
+                if ($enabled) {
+                    $allWidgets[$widgetName] = $widget;
+                }
+            }
         }
         return $allWidgets;
     }
@@ -216,7 +230,7 @@ class WidgetRegistry
         $accessible = [];
 
         foreach ($widgets as $name => $widget) {
-            if ($widget->canView($user)) {
+            if ($widget && method_exists($widget, 'isEnabled') && $widget->isEnabled() && $widget->canView($user)) {
                 $accessible[$name] = $widget;
             }
         }

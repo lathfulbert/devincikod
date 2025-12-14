@@ -1,0 +1,9 @@
+{
+  "name": "Dashboard",
+  "version": "1.0.0",
+  "description": "Tableau de bord principal du back-office.",
+  "author": "VotreNom",
+  "permissions": {
+    "access.dashboard": "Accès au tableau de bord"
+  }
+}

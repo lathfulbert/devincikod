@@ -180,7 +180,7 @@ class WalletController
             if ($paymentMethod === 'gateway' && $gatewayCode) {
                 try {
                     // Get user information
-                    $user = \Modules\Auth\Models\User::find($userId);
+                    $user = \Modules\Users\Models\User::find($userId);
 
                     // Generate unique reference
                     $reference = 'TOPUP_' . $request->id . '_' . time();

@@ -12,12 +12,7 @@ use Modules\Admin\Controllers\CronController;
 
 $authMiddleware = [new \App\Core\Middleware\AuthMiddleware(), 'handle'];
 
-// Dashboard and base routes
-// Accessible à tous les utilisateurs connectés
-$router->get('/admin', [AdminController::class, 'index'])
-    ->middleware('auth'); // Root route
-$router->get('/admin/dashboard', [AdminController::class, 'dashboard'])
-    ->middleware('auth');
+// (Routes dashboard supprimées ici pour laisser la priorité au module Dashboard)
 
 // Monitoring routes
 $router->get('/admin/monitoring', [MonitoringController::class, 'index'])

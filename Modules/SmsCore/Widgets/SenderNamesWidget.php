@@ -34,11 +34,11 @@ class SenderNamesWidget extends AbstractWidget
         $db = Database::getInstance();
 
         // Total sender names
-        $result = $db->query("SELECT COUNT(*) as total FROM sms_sender_names")->fetch();
+        $result = $db->query("SELECT COUNT(*) as total FROM sender_names")->fetch();
         $totalSenders = $result['total'] ?? 0;
 
         // Sender names actifs
-        $result = $db->query("SELECT COUNT(*) as total FROM sms_sender_names WHERE is_active = 1")->fetch();
+        $result = $db->query("SELECT COUNT(*) as total FROM sender_names WHERE is_active = 1")->fetch();
         $activeSenders = $result['total'] ?? 0;
 
         return [

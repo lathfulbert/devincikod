@@ -21,7 +21,22 @@ use Modules\Auth\Controllers\AuthController;
 /** @var \App\Core\Routing\Router $router */
 
 // Auth routes
-$router->get('/', [AuthController::class, 'showLogin']);
+$router->get('/', function() {
+    if (auth()->check()) {
+        header('Location: /admin/dashboard');
+        exit;
+    }
+    return (new Modules\Auth\Controllers\AuthController())->showLogin();
+});
+
+// Redirection /admin vers dashboard si connecté
+$router->get('/admin', function() {
+    if (auth()->check()) {
+        header('Location: /admin/dashboard');
+        exit;
+    }
+    return (new Modules\Auth\Controllers\AuthController())->showLogin();
+});
 
 // File Manager API Routes
 $router->group(['prefix' => '/api/files', 'middleware' => ['secure_upload', 'api_auth']], function ($router) {

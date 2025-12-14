@@ -147,10 +147,7 @@ class ModuleAccessMiddleware
             // Fallback: charger depuis la session
             if (isset($_SESSION['user_id'])) {
                 $user = \Modules\Users\Models\User::find($_SESSION['user_id']);
-                // Charger les rôles
-                if ($user) {
-                    $user->load('roles');
-                }
+                // Les rôles seront chargés automatiquement via hasRole()
             }
         }
 
@@ -169,7 +166,7 @@ class ModuleAccessMiddleware
         if (is_object($user) && method_exists($user, 'hasRole')) {
             try {
                 $isAdmin = $user->hasRole('Administrateur') || $user->hasRole('admin');
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 // Fallback: check role name
                 $roles = \Modules\RBAC\Models\UserRole::where('user_id', $user->id)->get();
                 foreach ($roles as $ur) {
