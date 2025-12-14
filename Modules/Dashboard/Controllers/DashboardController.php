@@ -47,6 +47,6 @@ class DashboardController
             'is_admin' => $isAdmin
         ];
 
-        echo view('backend.dashboard', $data);
+        echo view('Dashboard/dashboard', $data);
     }
 }
