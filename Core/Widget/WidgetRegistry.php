@@ -128,7 +128,7 @@ class WidgetRegistry
                 // Si le statut est défini dans la config, il prime
                 $enabled = array_key_exists($widgetName, $statusConfig)
                     ? (bool)$statusConfig[$widgetName]
-                    : $widget->isEnabled();
+                    : (method_exists($widget, 'isEnabled') ? $widget->isEnabled() : true);
                 if ($enabled) {
                     $allWidgets[$widgetName] = $widget;
                 }
@@ -226,15 +226,48 @@ class WidgetRegistry
      */
     public function getWidgetsForUser($user, ?string $module = null): array
     {
-        $widgets = $module ? $this->getModuleWidgets($module) : $this->getAllWidgets();
+        $widgets = $module ? $this->getModuleWidgets($module) : $this->getAllRegisteredWidgets();
         $accessible = [];
 
-        foreach ($widgets as $name => $widget) {
-            if ($widget && method_exists($widget, 'isEnabled') && $widget->isEnabled() && $widget->canView($user)) {
-                $accessible[$name] = $widget;
+        // Charger le statut depuis la config
+        $configPath = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'widgets_status.php';
+        $fileExists = file_exists($configPath);
+        $statusConfig = $fileExists ? include $configPath : [];
+
+            foreach ($widgets as $name => $widget) {
+                // Utiliser le nom du widget retourné par getName() pour la correspondance
+                $widgetKey = method_exists($widget, 'getName') ? $widget->getName() : $name;
+                // Si la clé existe et est false, on exclut systématiquement
+                if (array_key_exists($widgetKey, $statusConfig) && !$statusConfig[$widgetKey]) {
+                    continue;
+                }
+                $enabled = (method_exists($widget, 'isEnabled') ? $widget->isEnabled() : true);
+                if ($widget && $enabled) {
+                    if (method_exists($widget, 'canView')) {
+                        if ($widget->canView($user)) {
+                            $accessible[$name] = $widget;
+                        }
+                    } else {
+                        $accessible[$name] = $widget;
+                    }
+                }
             }
-        }
 
         return $accessible;
+    }
+
+    /**
+     * Retourne tous les widgets enregistrés (activés ou non)
+     * @return array<string, WidgetInterface>
+     */
+    public function getAllRegisteredWidgets(): array
+    {
+        $all = [];
+        foreach ($this->widgets as $widgetName => $meta) {
+            $class = $meta['class'];
+            $instance = $meta['instance'] ?? new $class();
+            $all[$widgetName] = $instance;
+        }
+        return $all;
     }
 }

@@ -14,7 +14,7 @@
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="<?= url('/') ?>"><i data-feather="home"></i></a></li>
                     <li class="breadcrumb-item"><a href="<?= url('/admin/sms') ?>">SMS</a></li>
-                    <li class="breadcrumb-item"><a href="<?= url('/sms/sender-names') ?>">Sender Names</a></li>
+                    <li class="breadcrumb-item"><a href="<?= url('/admin/sms/sender-names') ?>">Sender Names</a></li>
                     <li class="breadcrumb-item active">Edit</li>
                 </ol>
             </div>
@@ -38,7 +38,7 @@
                     <h5><i data-feather="edit"></i> Edit Sender Name</h5>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="<?= url('/sms/sender-names/update') ?>">
+                    <form method="POST" action="<?= url('/admin/sms/sender-names/update') ?>">
                         <?= csrf_field() ?>
                         <input type="hidden" name="id" value="<?= $senderName->id ?>">
 
@@ -147,7 +147,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i data-feather="save"></i> Update Sender Name
                             </button>
-                            <a href="<?= url('/sms/sender-names') ?>" class="btn btn-secondary">
+                            <a href="<?= url('/admin/sms/sender-names') ?>" class="btn btn-secondary">
                                 <i data-feather="x"></i> Cancel
                             </a>
                         </div>

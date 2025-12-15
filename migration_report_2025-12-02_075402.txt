@@ -1,3 +1,0 @@
-✅ Admin Routes: 14 routes mises à jour
-✅ Auth Routes: 5 routes mises à jour
-⚠️  Routes API: Révision manuelle requise

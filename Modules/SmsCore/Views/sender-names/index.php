@@ -80,11 +80,11 @@
                                             </td>
                                             <td>
                                                 <div class="btn-group btn-group-sm">
-                                                    <a href="/sms/sender-names/assign-users?id=<?= $senderName->id ?>"
+                                                    <a href="admin/sms/sender-names/assign-users?id=<?= $senderName->id ?>"
                                                        class="btn btn-info" title="Assign Users">
                                                         <i class="fas fa-users"></i>
                                                     </a>
-                                                    <a href="/sms/sender-names/edit?id=<?= $senderName->id ?>"
+                                                    <a href="admin/sms/sender-names/edit?id=<?= $senderName->id ?>"
                                                        class="btn btn-primary" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
@@ -108,7 +108,7 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<form id="deleteForm" method="POST" action="/sms/sender-names/delete">
+<form id="deleteForm" method="POST" action="admin/sms/sender-names/delete">
     <input type="hidden" name="id" id="deleteId">
 </form>
 

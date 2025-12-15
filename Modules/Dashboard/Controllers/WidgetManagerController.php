@@ -10,16 +10,28 @@ class WidgetManagerController
         // Découvrir tous les widgets
         $registry = WidgetRegistry::getInstance();
         $registry->discoverAllWidgets();
-        $widgets = $registry->getAllWidgets();
 
-        // Récupérer le statut de chaque widget (en dur ou via config plus tard)
+        // Charger le statut depuis la config
+        $configPath = __DIR__ . '/../../../config/widgets_status.php';
+        $statusConfig = file_exists($configPath) ? include $configPath : [];
+
+        // Récupérer TOUS les widgets (activés ou non)
+        $all = (new \ReflectionObject($registry))->getProperty('widgets');
+        $all->setAccessible(true);
+        $widgets = $all->getValue($registry);
+
         $widgetList = [];
-        foreach ($widgets as $widget) {
+        foreach ($widgets as $widgetName => $meta) {
+            $class = $meta['class'];
+            $instance = $meta['instance'] ?? new $class();
+            $enabled = array_key_exists($widgetName, $statusConfig)
+                ? (bool)$statusConfig[$widgetName]
+                : $instance->isEnabled();
             $widgetList[] = [
-                'name' => $widget->getName(),
-                'module' => (new \ReflectionClass($widget))->getNamespaceName(),
-                'enabled' => $widget->isEnabled(),
-                'class' => get_class($widget)
+                'name' => $widgetName,
+                'module' => (new \ReflectionClass($instance))->getNamespaceName(),
+                'enabled' => $enabled,
+                'class' => $class
             ];
         }
 
@@ -44,7 +56,8 @@ class WidgetManagerController
         // Sauvegarder le fichier
         $export = "<?php\nreturn " . var_export($statusConfig, true) . ";\n";
         file_put_contents($configPath, $export);
-        header('Location: /admin/dashboard/widgets');
+       // header('Location: /admin/dashboard/widgets');
+        redirect('/admin/dashboard/widgets');
         exit;
     }
 }

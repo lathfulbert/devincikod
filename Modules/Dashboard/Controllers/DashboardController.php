@@ -41,8 +41,11 @@ class DashboardController
         $registry->discoverAllWidgets();
         $widgets = [];
         $debugWidgetNames = [];
+        $widgetNames = [];
+        $widgetClassNames = [];
         foreach ($registry->getWidgetsForUser($user) as $widget) {
-            $debugWidgetNames[] = get_class($widget);
+            $widgetNames[] = method_exists($widget, 'getName') ? $widget->getName() : 'NO_NAME_METHOD';
+            $widgetClassNames[] = get_class($widget);
             $data = $widget->getData();
             ob_start();
             ?>
@@ -73,9 +76,26 @@ class DashboardController
             <?php
             $widgets[] = ob_get_clean();
         }
-        $debugAlert = null;
+
+        // Afficher aussi la liste des clés de widgets_status.php
+        $configPath = __DIR__ . '/../../../config/widgets_status.php';
+        $statusConfig = file_exists($configPath) ? include $configPath : [];
+        $statusKeys = array_keys($statusConfig);
+
+        $debugAlert = '<div class="alert alert-info">DEBUG :<br>'
+            . '<b>widgets_status.php keys :</b> <pre>' . print_r($statusKeys, true) . '</pre>'
+            . '<b>widgetNames (getName):</b> <pre>' . print_r($widgetNames, true) . '</pre>'
+            . '<b>widgetClassNames :</b> <pre>' . print_r($widgetClassNames, true) . '</pre>'
+            . '<b>widgets (HTML, count=' . count($widgets) . '):</b> <pre>' . print_r($widgets, true) . '</pre>'
+            . '</div>';
         if (empty($widgets)) {
-            $debugAlert = '<div class="alert alert-warning">Aucun widget trouvé. Widgets détectés (debug) : <pre>' . print_r($debugWidgetNames, true) . '</pre></div>';
+            $debugAlert .= '<div class="alert alert-warning">Aucun widget trouvé.</div>';
+        }
+        $debugAlert = null;
+        // Debug temporaire : afficher le contenu de $widgets et $debugWidgetNames
+        $debugAlert = '<div class="alert alert-info">DEBUG :<br><b>$widgets :</b> <pre>' . print_r($widgets, true) . '</pre><b>$debugWidgetNames :</b> <pre>' . print_r($debugWidgetNames, true) . '</pre></div>';
+        if (empty($widgets)) {
+            $debugAlert .= '<div class="alert alert-warning">Aucun widget trouvé. Widgets détectés (debug) : <pre>' . print_r($debugWidgetNames, true) . '</pre></div>';
         }
 
         // Préparer les données pour la vue
@@ -84,11 +104,16 @@ class DashboardController
             'widgets' => $widgets,
             'user' => $user,
             'is_admin' => $isAdmin,
-            'debugAlert' => $debugAlert
+            'debugAlert' => $debugAlert,
+            'widgetNames' => $widgetNames,
+            'widgetClassNames' => $widgetClassNames,
+            'widgetsStatusKeys' => $statusKeys,
+            'widgetsCount' => count($widgets)
         ];
 
        
 
+        // Debug ultime : afficher le contenu réel transmis à la vue
         // Forcer la vue du module Dashboard (notation relative comme dans les autres modules)
         echo view('dashboard/index', $data);
     }

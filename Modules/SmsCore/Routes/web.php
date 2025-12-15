@@ -7,8 +7,9 @@ use Modules\SmsCore\Controllers\SmsApiController;
 /** @var \App\Core\Routing\Router $router */
 
 // Sender Names Management (Admin only)
+// Changement du préfixe pour accès via /admin/sms/sender-names
 $router->group([
-    'prefix' => '/sms/sender-names',
+    'prefix' => '/admin/sms/sender-names',
     'middleware' => ['auth', 'module_access:sms_core']
 ], function ($router) {
     // List sender names
@@ -62,7 +63,7 @@ $router->get('/api/sms/sender-names/user', [SenderNameController::class, 'apiGet
 
 // SMS Sending routes (if not already defined)
 $router->group([
-    'prefix' => '/sms',
+    'prefix' => '/admin/sms',
     'middleware' => ['auth', 'module_access:sms_core']
 ], function ($router) {
     // Single SMS

@@ -1,3 +1,7 @@
+<?php if (!is_object($senderName)) : ?>
+    <div class="alert alert-danger m-4">Sender name introuvable ou corrompu.</div>
+    <?php return; ?>
+<?php endif; ?>
 @extends('backend.layouts.master')
 
 @section('title', 'Assign Users')
@@ -14,7 +18,7 @@
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="<?= url('/') ?>"><i data-feather="home"></i></a></li>
                     <li class="breadcrumb-item"><a href="<?= url('/admin/sms') ?>">SMS</a></li>
-                    <li class="breadcrumb-item"><a href="<?= url('/sms/sender-names') ?>">Sender Names</a></li>
+                    <li class="breadcrumb-item"><a href="<?= url('/admin/sms/sender-names') ?>">Sender Names</a></li>
                     <li class="breadcrumb-item active">Assign Users</li>
                 </ol>
             </div>
@@ -24,7 +28,6 @@
 
 <div class="container-fluid">
     <?php if (isset($_SESSION['flash_success'])): ?>
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
             <?= $_SESSION['flash_success'] ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
@@ -51,7 +54,7 @@
                             </h5>
                         </div>
                         <div class="col-md-6 text-end">
-                            <a href="<?= url('/sms/sender-names') ?>" class="btn btn-sm btn-secondary">
+                            <a href="<?= url('/admin/sms/sender-names') ?>" class="btn btn-sm btn-secondary">
                                 <i data-feather="arrow-left"></i> Back to List
                             </a>
                         </div>
@@ -72,7 +75,7 @@
                         </div>
                     <?php endif; ?>
 
-                    <form method="POST" action="<?= url('/sms/sender-names/save-assignments') ?>">
+                    <form method="POST" action="<?= url('/admin/sms/sender-names/save-assignments') ?>">
                         <?= csrf_field() ?>
                         <input type="hidden" name="sender_name_id" value="<?= $senderName->id ?>">
 
@@ -155,7 +158,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i data-feather="save"></i> Save Assignments
                             </button>
-                            <a href="<?= url('/sms/sender-names') ?>" class="btn btn-secondary">
+                            <a href="<?= url('/admin/sms/sender-names') ?>" class="btn btn-secondary">
                                 <i data-feather="x"></i> Cancel
                             </a>
                         </div>

@@ -1,7 +1,0 @@
-MonModule.zip
-└── MonModule/              (ou directement à la racine)
-    ├── module.json         (obligatoire)
-    ├── MonModuleModule.php
-    ├── Controllers/
-    ├── Views/
-    └── Database/

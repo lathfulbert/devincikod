@@ -58,6 +58,11 @@ class SmsCoreModule extends AbstractModule
                         'permission' => 'access.sms_core'
                     ],
                     [
+                        'title' => 'Sender Names',
+                        'url' => '/admin/sms/sender-names',
+                        'permission' => 'sms.sender_names.view'
+                    ],
+                    [
                         'title' => 'Historique',
                         'url' => '/admin/sms/history',
                         'permission' => 'access.sms_core'

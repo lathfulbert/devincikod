@@ -17,6 +17,9 @@ return [
     \Modules\Backup\BackupModule::class,
     \Modules\Settings\SettingsModule::class,
 
+    // Dashboard
+    \Modules\Dashboard\DashboardModule::class,
+
     // SMS Platform Modules (new)
     \Modules\SmsCore\SmsCoreModule::class,
     \Modules\Wallet\WalletModule::class,

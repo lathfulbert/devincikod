@@ -15,6 +15,29 @@ use Modules\RBAC\Services\RbacService;
  */
 abstract class AbstractWidget implements WidgetInterface
 {
+    /**
+     * Vérifie si le widget est activé dans la config widgets_status.php
+     */
+    protected function isGloballyEnabled(): bool
+    {
+        $configPath = __DIR__ . '/../../../config/widgets_status.php';
+        if (file_exists($configPath)) {
+            $statusConfig = include $configPath;
+            $name = $this->getName();
+            if (array_key_exists($name, $statusConfig)) {
+                return (bool)$statusConfig[$name];
+            }
+        }
+        return $this->isEnabled();
+    }
+
+    /**
+     * Par défaut, un widget ne doit pas être visible s'il est désactivé globalement
+     */
+    public function canView($user): bool
+    {
+        return $this->isGloballyEnabled();
+    }
     protected string $name;
     protected string $type;
     protected ?string $permission = null;
@@ -117,27 +140,6 @@ abstract class AbstractWidget implements WidgetInterface
     /**
      * {@inheritDoc}
      */
-    public function canView($user): bool
-    {
-        // Si pas de permission requise, tout le monde peut voir
-        if ($this->permission === null) {
-            return true;
-        }
-
-        // Si pas d'utilisateur, refuser
-        if (!$user) {
-            return false;
-        }
-
-        // Vérifier via le service RBAC
-        try {
-            $rbacService = Container::getInstance()->make(RbacService::class);
-            return $rbacService->userHasPermission($user, $this->permission);
-        } catch (\Exception $e) {
-            error_log("Widget permission check failed: " . $e->getMessage());
-            return false;
-        }
-    }
 
     /**
      * {@inheritDoc}

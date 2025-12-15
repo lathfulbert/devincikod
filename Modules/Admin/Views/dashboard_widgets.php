@@ -71,15 +71,25 @@
         </div>
 
         <!-- Widgets Utilisateurs -->
+
         <?php
         // Afficher les widgets du module Users
         echo widget('users.total', [
             'stat_card_class' => 'card widget-1'
         ]);
-        ?>
-
-        <?php
         echo widget('users.active', [
+            'stat_card_class' => 'card widget-1'
+        ]);
+        // Nouveau widget : utilisateurs créés par moi ou tous (admin)
+        echo widget('users.created_by', [
+            'stat_card_class' => 'card widget-1'
+        ]);
+        // Nouveau widget : wallets créés par moi ou tous (admin)
+        echo widget('wallets.created_by', [
+            'stat_card_class' => 'card widget-1'
+        ]);
+        // Widget : crédit total des wallets (tous ou par owner)
+        echo widget('wallets.credit', [
             'stat_card_class' => 'card widget-1'
         ]);
         ?>

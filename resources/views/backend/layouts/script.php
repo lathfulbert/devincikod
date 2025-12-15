@@ -1,3 +1,8 @@
+<script>
+    // Supprime le slash final si présent pour éviter les // dans les assets
+    window.BASE_URL = "{{ rtrim(url('/'), '/') }}";
+</script>
+ 
  <!-- latest jquery-->
  <script src="<?= url() ?>/assets/js/jquery-3.5.1.min.js"></script>
  <!-- Bootstrap js-->

@@ -51,13 +51,13 @@ class SenderNameController
         // Validation
         if (empty($name)) {
             $_SESSION['error'] = 'Sender name is required';
-            redirect('/sms/sender-names/create');
+            redirect('/admin/sms/sender-names/create');
             exit;
         }
 
         if (strlen($name) > 11) {
             $_SESSION['error'] = 'Sender name must be 11 characters or less';
-            redirect('/sms/sender-names/create');
+            redirect('/admin/sms/sender-names/create');
             exit;
         }
 
@@ -65,7 +65,7 @@ class SenderNameController
         $existing = SenderName::where('name', $name)->first();
         if ($existing) {
             $_SESSION['error'] = 'This sender name already exists';
-            redirect('/sms/sender-names/create');
+            redirect('/admin/sms/sender-names/create');
             exit;
         }
 
@@ -84,7 +84,7 @@ class SenderNameController
         $senderName->save();
 
         $_SESSION['success'] = 'Sender name created successfully';
-        redirect('/sms/sender-names');
+        redirect('/admin/sms/sender-names');
         exit;
     }
 
@@ -97,9 +97,9 @@ class SenderNameController
         $senderName = SenderName::find($id);
 
         if (!$senderName) {
-            $_SESSION['error'] = 'Sender name not found';
-            header('Location: /sms/sender-names');
-            exit;
+              $_SESSION['error'] = 'Sender name not found';
+              redirect('/admin/sms/sender-names');
+              exit;
         }
 
         echo view('SmsCore/sms/sender-names/edit', [
@@ -118,23 +118,27 @@ class SenderNameController
 
         if (!$senderName) {
             $_SESSION['error'] = 'Sender name not found';
-            redirect('/sms/sender-names');
+            redirect('/admin/sms/sender-names');
             exit;
         }
 
+        $senderName->name = strtoupper(trim($_POST['name'] ?? $senderName->name));
         $senderName->operator = trim($_POST['operator'] ?? '');
         $senderName->status = $_POST['status'] ?? 'pending';
         $senderName->is_active = isset($_POST['is_active']) ? 1 : 0;
         $senderName->notes = trim($_POST['notes'] ?? '');
 
-        if ($senderName->status === 'approved' && !$senderName->validation_date) {
+        // Si une date de validation est soumise, on la prend, sinon on applique la logique existante
+        if (!empty($_POST['validation_date'])) {
+            $senderName->validation_date = $_POST['validation_date'];
+        } elseif ($senderName->status === 'approved' && !$senderName->validation_date) {
             $senderName->validation_date = date('Y-m-d');
         }
 
         $senderName->save();
 
         $_SESSION['success'] = 'Sender name updated successfully';
-        redirect('/sms/sender-names');
+        redirect('/admin/sms/sender-names');
         exit;
     }
 
@@ -148,14 +152,14 @@ class SenderNameController
 
         if (!$senderName) {
             $_SESSION['error'] = 'Sender name not found';
-            redirect('/sms/sender-names');
+            redirect('/admin/sms/sender-names');
             exit;
         }
 
         $senderName->delete();
 
         $_SESSION['success'] = 'Sender name deleted successfully';
-        redirect('/sms/sender-names');
+        redirect('/admin/sms/sender-names');
         exit;
     }
 
@@ -167,9 +171,9 @@ class SenderNameController
         $id = (int)($_GET['id'] ?? 0);
         $senderName = SenderName::find($id);
 
-        if (!$senderName) {
-            $_SESSION['error'] = 'Sender name not found';
-            header('Location: /sms/sender-names');
+        if (!is_object($senderName)) {
+            $_SESSION['error'] = 'Sender name introuvable ou corrompu.';
+            redirect('/admin/sms/sender-names');
             exit;
         }
 
@@ -200,9 +204,9 @@ class SenderNameController
         $senderName = SenderName::find($id);
 
         if (!$senderName) {
-            $_SESSION['error'] = 'Sender name not found';
-            header('Location: /sms/sender-names');
-            exit;
+              $_SESSION['error'] = 'Sender name not found';
+              redirect('/admin/sms/sender-names');
+              exit;
         }
 
         // Remove all existing assignments and add new ones
@@ -228,7 +232,7 @@ class SenderNameController
             $_SESSION['error'] = 'Failed to save assignments: ' . $e->getMessage();
         }
 
-        header('Location: /sms/sender-names');
+        redirect('/admin/sms/sender-names');
         exit;
     }
 
@@ -243,7 +247,7 @@ class SenderNameController
 
         if (!$userId) {
             $_SESSION['error'] = 'User ID is required';
-            header('Location: /sms/sender-names');
+                redirect('/admin/sms/sender-names');
             exit;
         }
 
@@ -255,7 +259,7 @@ class SenderNameController
             $_SESSION['error'] = 'Failed to assign sender names';
         }
 
-        header('Location: /sms/sender-names');
+            redirect('/admin/sms/sender-names');
         exit;
     }
 

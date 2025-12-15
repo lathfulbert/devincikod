@@ -47,7 +47,7 @@
                             <h5><i data-feather="message-square"></i> Sender Names</h5>
                         </div>
                         <div class="col-md-6 text-end">
-                            <a href="<?= url('/sms/sender-names/create') ?>" class="btn btn-sm btn-primary">
+                            <a href="<?= url('/admin/sms/sender-names/create') ?>" class="btn btn-sm btn-primary">
                                 <i data-feather="plus"></i> Add Sender Name
                             </a>
                         </div>
@@ -73,7 +73,7 @@
                                     <tr>
                                         <td colspan="8" class="text-center text-muted py-4">
                                             <i data-feather="inbox" style="width: 48px; height: 48px;"></i>
-                                            <p class="mt-2">No sender names yet. <a href="<?= url('/sms/sender-names/create') ?>">Create one</a></p>
+                                            <p class="mt-2">No sender names yet. <a href="<?= url('/admin/sms/sender-names/create') ?>">Create one</a></p>
                                         </td>
                                     </tr>
                                 <?php else: ?>
@@ -114,12 +114,12 @@
                                             <td><?= date('M d, Y', strtotime($senderName->created_at)) ?></td>
                                             <td>
                                                 <div class="btn-group" role="group">
-                                                    <a href="<?= url('/sms/sender-names/assign-users?id=' . $senderName->id) ?>"
+                                                    <a href="<?= url('/admin/sms/sender-names/assign-users?id=' . $senderName->id) ?>"
                                                        class="btn btn-sm btn-outline-info"
                                                        title="Assign to users">
                                                         <i data-feather="users"></i>
                                                     </a>
-                                                    <a href="<?= url('/sms/sender-names/edit?id=' . $senderName->id) ?>"
+                                                    <a href="<?= url('/admin/sms/sender-names/edit?id=' . $senderName->id) ?>"
                                                        class="btn btn-sm btn-outline-primary"
                                                        title="Edit">
                                                         <i data-feather="edit"></i>
@@ -180,7 +180,7 @@
     function confirmDelete(id, name) {
         if (confirm(`Are you sure you want to delete the sender name "${name}"?\n\nThis will also remove all user assignments for this sender name.`)) {
             const form = document.getElementById('deleteForm');
-            form.action = '<?= url('/sms/sender-names/delete') ?>';
+            form.action = '<?= url('/admin/sms/sender-names/delete') ?>';
 
             // Add hidden input for ID
             const input = document.createElement('input');
