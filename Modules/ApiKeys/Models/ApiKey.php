@@ -9,6 +9,18 @@ use Modules\Users\Models\User;
 
 class ApiKey extends Model
 {
+    // Propriétés publiques pour accès direct dans les vues
+    public $key;
+    public $name;
+    public $user_id;
+    public $permissions;
+    public $is_active;
+    public $expires_at;
+    public $created_at;
+    public $updated_at;
+    public $created_by;
+    public $updated_by;
+    public $deleted_by;
     use HasAuthor;
     use SoftDeletes;
 

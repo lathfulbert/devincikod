@@ -52,7 +52,7 @@ class ApiAnalyticsController
             $recentLogs = ApiRequestLog::getLogsForApiKey($selectedKeyId, 50);
         }
 
-        echo view('apikeys/apikeys/analytics', [
+        echo view('ApiKeys/apikeys/analytics', [
             'title' => 'API Analytics',
             'apiKeys' => $apiKeys,
             'selectedKeyId' => $selectedKeyId,

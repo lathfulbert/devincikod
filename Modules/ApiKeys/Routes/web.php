@@ -8,9 +8,9 @@ use Modules\ApiKeys\Controllers\UserApiKeyController;
 /** @var \App\Core\Routing\Router $router */
 
 // User Personal API Key (accessible to all authenticated users)
-$router->get('/admin/api-keys', [UserApiKeyController::class, 'index']);
-$router->post('/admin/api-keys/generate', [UserApiKeyController::class, 'generate']);
-$router->post('/admin/api-keys/revoke', [UserApiKeyController::class, 'revoke']);
+$router->get('/admin/apikeys', [UserApiKeyController::class, 'index']);
+$router->post('/admin/apikeys/generate', [UserApiKeyController::class, 'generate']);
+$router->post('/admin/apikeys/revoke', [UserApiKeyController::class, 'revoke']);
 
 // System API Keys Management (Admin - full history and management)
 $router->group(['prefix' => '/admin/system-api-keys', 'middleware' => ['auth']], function ($router) {

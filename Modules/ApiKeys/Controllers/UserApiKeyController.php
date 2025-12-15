@@ -13,7 +13,7 @@ class UserApiKeyController
     public function index()
     {
         if (!isset($_SESSION['user_id'])) {
-            redirect('/auth/login');
+            redirect('/admin/auth/login');
             return;
         }
 
@@ -33,7 +33,9 @@ class UserApiKeyController
             error_log("ApiKey attributes: " . json_encode(get_object_vars($apiKey)));
         }
 
-        echo view('apikeys/apikeys/user', [
+        // Debug avancé : log de la tentative de rendu de la vue
+        $viewName = 'ApiKeys/apikeys/user';
+        echo view($viewName, [
             'title' => 'Ma Clé API',
             'user' => $user,
             'apiKey' => $apiKey

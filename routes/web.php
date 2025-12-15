@@ -1,4 +1,3 @@
-
 <?php
 
 use App\Core\Files\Controllers\FileController;

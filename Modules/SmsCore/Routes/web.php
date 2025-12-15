@@ -67,7 +67,7 @@ $router->group([
     'middleware' => ['auth', 'module_access:sms_core']
 ], function ($router) {
     // Single SMS
-    $router->get('/send', [SmsController::class, 'sendForm'])
+    $router->get('/send', [SmsController::class, 'send'])
         ->middleware('can:sms.send')
         ->name('sms.send.form');
 

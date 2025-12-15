@@ -29,7 +29,9 @@ class View
         static $depth = 0;
         $depth++;
 
-        file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', str_repeat("  ", $depth - 1) . "[$depth] Rendering: $view (reset=$reset)\n", FILE_APPEND);
+        if (function_exists('isDevelopment') && isDevelopment()) {
+            file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', str_repeat("  ", $depth - 1) . "[$depth] Rendering: $view (reset=$reset)\n", FILE_APPEND);
+        }
 
         if ($depth > 20) {
             file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "INFINITE LOOP DETECTED!\n", FILE_APPEND);
@@ -52,10 +54,13 @@ class View
             $this->engine->setExtends('');
         }
 
+
         // Resolve file path
         $file = $this->resolveViewPath($view);
 
         if (!$file) {
+            $msg = date('Y-m-d H:i:s') . " [ERROR] View not found in render: $view\n";
+            file_put_contents(__DIR__ . '/../../storage/logs/view_error.log', $msg, FILE_APPEND);
             return "View {$view} not found.";
         }
 
@@ -101,26 +106,39 @@ class View
             return self::$resolvedPathsCache[$view];
         }
 
+        // Debug : stocke tous les chemins testés
+        $debugPaths = [];
+
         // Handle dot notation: layouts.app -> layouts/app
         $viewPath = str_replace('.', '/', $view);
         $basePath = dirname(dirname(__DIR__));
 
-        file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "Resolving '$view' -> viewPath='$viewPath'\n", FILE_APPEND);
+        if (function_exists('isDevelopment') && isDevelopment()) {
+            file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "Resolving '$view' -> viewPath='$viewPath'\n", FILE_APPEND);
+        }
 
         // 1. Check in resources/views/backend for all backend views (PRIORITY)
         if (strpos($viewPath, 'backend/') === 0) {
-            $path = $this->checkPath($basePath . '/resources/views/' . $viewPath);
+            $candidate = $basePath . '/resources/views/' . $viewPath;
+            $debugPaths[] = $candidate;
+            $path = $this->checkPath($candidate);
             if ($path) {
-                file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to RESOURCES: $path\n", FILE_APPEND);
+                if (function_exists('isDevelopment') && isDevelopment()) {
+                    file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to RESOURCES: $path\n", FILE_APPEND);
+                }
                 return self::$resolvedPathsCache[$view] = $path;
             }
         }
 
         // 2. Check in resources/views/errors for error pages
         if (strpos($viewPath, 'errors/') === 0) {
-            $path = $this->checkPath($basePath . '/resources/views/' . $viewPath);
+            $candidate = $basePath . '/resources/views/' . $viewPath;
+            $debugPaths[] = $candidate;
+            $path = $this->checkPath($candidate);
             if ($path) {
-                file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to RESOURCES: $path\n", FILE_APPEND);
+                if (function_exists('isDevelopment') && isDevelopment()) {
+                    file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to RESOURCES: $path\n", FILE_APPEND);
+                }
                 return self::$resolvedPathsCache[$view] = $path;
             }
         }
@@ -132,18 +150,41 @@ class View
             $moduleViewPath = implode('/', array_slice($parts, 1)); // Rest is the view path
 
             $moduleBasePath = $basePath . '/Modules/' . $moduleName . '/Views/' . $moduleViewPath;
+            $debugPaths[] = $moduleBasePath;
 
-            file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  Checking module: $moduleName, path: $moduleViewPath\n", FILE_APPEND);
+            if (function_exists('isDevelopment') && isDevelopment()) {
+                file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  Checking module: $moduleName, path: $moduleViewPath\n", FILE_APPEND);
+            }
 
             $path = $this->checkPath($moduleBasePath);
             if ($path) {
-                file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to MODULE: $path\n", FILE_APPEND);
+                if (function_exists('isDevelopment') && isDevelopment()) {
+                    file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Resolved to MODULE: $path\n", FILE_APPEND);
+                }
                 return self::$resolvedPathsCache[$view] = $path;
             }
         }
 
-        // Not found
-        file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Failed to resolve: $view\n", FILE_APPEND);
+        // Not found : log détaillé
+        $log = date('Y-m-d H:i:s') . " [ERROR] View not found: $view\n";
+        foreach ($debugPaths as $p) {
+            $log .= "  - Testé : $p.tpl : ";
+            if (file_exists($p . '.tpl')) {
+                $log .= "existe, perms=" . substr(sprintf('%o', fileperms($p . '.tpl')), -4) . "\n";
+            } else {
+                $log .= "absent\n";
+            }
+            $log .= "  - Testé : $p.php : ";
+            if (file_exists($p . '.php')) {
+                $log .= "existe, perms=" . substr(sprintf('%o', fileperms($p . '.php')), -4) . "\n";
+            } else {
+                $log .= "absent\n";
+            }
+        }
+        file_put_contents(__DIR__ . '/../../storage/logs/view_error.log', $log, FILE_APPEND);
+        if (function_exists('isDevelopment') && isDevelopment()) {
+            file_put_contents(__DIR__ . '/../../storage/logs/debug_view_render.log', "  => Failed to resolve: $view\n", FILE_APPEND);
+        }
         return null;
     }
 
