@@ -68,7 +68,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <form method="POST" action="<?= url('/admin/api-keys/generate') ?>"
+                            <form method="POST" action="<?= url('/admin/apikeys/generate') ?>"
                                 onsubmit="return confirm('Régénérer une nouvelle clé révoquera l\'ancienne. Continuer ?')">
                                 <?= csrf_field() ?>
                                 <button type="submit" class="btn btn-warning">
@@ -76,7 +76,7 @@
                                 </button>
                             </form>
 
-                            <form method="POST" action="<?= url('/admin/api-keys/revoke') ?>"
+                            <form method="POST" action="<?= url('/admin/apikeys/revoke') ?>"
                                 onsubmit="return confirm('Êtes-vous sûr de vouloir révoquer votre clé API ?')">
                                 <?= csrf_field() ?>
                                 <button type="submit" class="btn btn-danger">
@@ -90,7 +90,7 @@
                             <h5>Vous n'avez pas encore de clé API</h5>
                             <p class="text-muted">Générez une clé API pour accéder aux services programmatiquement</p>
 
-                            <form method="POST" action="<?= url('/admin/api-keys/generate') ?>" class="mt-3">
+                            <form method="POST" action="<?= url('/admin/apikeys/generate') ?>" class="mt-3">
                                 <?= csrf_field() ?>
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fa fa-plus"></i> Générer une clé API

@@ -73,7 +73,7 @@ php cli.php migrate:run SmsCore
 #### 1. Générer une clé API
 
 ```
-1. Accédez à /admin/api-keys
+1. Accédez à /admin/apikeys
 2. Cliquez sur "Générer une clé API"
 3. Copiez votre clé
 ```
@@ -134,7 +134,7 @@ Lisez `Documentation/ADMIN_GUIDE.md` pour le guide complet.
 ### Accès rapide
 
 - **Documentation interactive** : `/admin/sms/api/docs`
-- **Gestion clés API** : `/admin/api-keys`
+- **Gestion clés API** : `/admin/apikeys`
 - **Dashboard** : `/admin/sms`
 
 ---
@@ -420,7 +420,7 @@ php cli.php sms:stats --period=month
 ## 🤝 Support
 
 - **Documentation web** : `/admin/sms/api/docs`
-- **Gestion clés API** : `/admin/api-keys`
+- **Gestion clés API** : `/admin/apikeys`
 - **Email** : support@votre-domaine.com
 - **Guide admin** : `Documentation/ADMIN_GUIDE.md`
 

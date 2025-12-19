@@ -84,7 +84,7 @@ class UserApiKeyController
         $_SESSION['new_api_key'] = $key; // Show once (plain text)
         $_SESSION['flash_success'] = 'Nouvelle clé API générée avec succès';
 
-        redirect('/admin/api-keys');
+        redirect('/admin/apikeys');
     }
 
     /**
@@ -113,6 +113,6 @@ class UserApiKeyController
             $_SESSION['flash_success'] = 'Clé API révoquée avec succès';
         }
 
-        redirect('/admin/api-keys');
+        redirect('/admin/apikeys');
     }
 }

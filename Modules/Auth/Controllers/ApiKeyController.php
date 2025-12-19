@@ -45,7 +45,7 @@ class ApiKeyController
 
         if (!$user) {
             $_SESSION['flash']['danger'][] = 'Utilisateur non trouvé';
-            redirect('/admin/api-keys');
+            redirect('/admin/apikeys');
             exit;
         }
 
@@ -65,7 +65,7 @@ class ApiKeyController
             $_SESSION['flash']['danger'][] = 'Erreur lors de la génération de la clé API : ' . $e->getMessage();
         }
 
-        redirect('/admin/api-keys');
+        redirect('/admin/apikeys');
         exit;
     }
 
@@ -85,7 +85,7 @@ class ApiKeyController
 
         if (!$user) {
             $_SESSION['flash']['danger'][] = 'Utilisateur non trouvé';
-            redirect('/admin/api-keys');
+            redirect('/admin/apikeys');
             exit;
         }
 
@@ -99,7 +99,7 @@ class ApiKeyController
         ]);
 
         $_SESSION['flash']['success'][] = 'Clé API régénérée avec succès. Veuillez mettre à jour vos applications avec la nouvelle clé.';
-        redirect('/admin/api-keys');
+        redirect('/admin/apikeys');
         exit;
     }
 
@@ -120,7 +120,7 @@ class ApiKeyController
 
         if (!$user) {
             $_SESSION['flash']['danger'][] = 'Utilisateur non trouvé';
-            redirect('/admin/api-keys');
+            redirect('/admin/apikeys');
             exit;
         }
 
@@ -137,7 +137,7 @@ class ApiKeyController
             $_SESSION['flash']['danger'][] = 'Erreur lors de la révocation de la clé API : ' . $e->getMessage();
         }
 
-        redirect('/admin/api-keys');
+        redirect('/admin/apikeys');
         exit;
     }
 

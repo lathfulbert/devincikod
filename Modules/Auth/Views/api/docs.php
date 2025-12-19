@@ -9,7 +9,7 @@
     // Breadcrumb
     $breadcrumb = [
         ['label' => 'Dashboard', 'url' => '/admin/dashboard'],
-        ['label' => 'API Keys', 'url' => '/admin/api-keys'],
+        ['label' => 'API Keys', 'url' => '/admin/apikeys'],
         ['label' => 'Documentation']
     ];
     component('breadcrumb');

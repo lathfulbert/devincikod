@@ -100,7 +100,7 @@ Bienvenue dans la documentation complète du module SMS.
 | Tarification | `/admin/sms/pricing` | Grille tarifaire |
 | Facturation | `/admin/sms/billing` | Logs facturation |
 | **Documentation API** | **`/admin/sms/api/docs`** | **Docs interactive** |
-| **Mes clés API** | **`/admin/api-keys`** | **Gestion clés** |
+| **Mes clés API** | **`/admin/apikeys`** | **Gestion clés** |
 
 ---
 
@@ -158,7 +158,7 @@ Permissions principales à configurer :
 ## 📞 Support
 
 - **Interface de documentation :** `/admin/sms/api/docs`
-- **Gestion des clés :** `/admin/api-keys`
+- **Gestion des clés :** `/admin/apikeys`
 - **Email :** support@votre-domaine.com
 
 ---

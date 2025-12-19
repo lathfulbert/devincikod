@@ -63,7 +63,7 @@
           <ul class="profile-dropdown onhover-show-div">
             <li><a href="<?= url('/admin/profile') ?>"><i data-feather="user"></i><span>My Profile</span></a></li>
             <li><a href="<?= url('/admin/profile/change-password') ?>"><i data-feather="lock"></i><span>Change Password</span></a></li>
-            <li><a href="<?= url('/admin/api-keys') ?>"><i data-feather="key"></i><span>API Keys</span></a></li>
+            <li><a href="<?= url('/admin/apikeys') ?>"><i data-feather="key"></i><span>API Keys</span></a></li>
             <li><a href="<?= url('/logout') ?>"><i data-feather="log-out"></i><span>Logout</span></a></li>
           </ul>
         </li>

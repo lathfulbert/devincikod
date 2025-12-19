@@ -42,6 +42,6 @@ class ApiDocsController
     public function keys()
     {
         // Rediriger vers le module ApiKeys qui gère déjà les clés API
-        redirect('/admin/api-keys');
+        redirect('/admin/apikeys');
     }
 }

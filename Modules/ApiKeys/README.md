@@ -50,7 +50,7 @@ sk_ff13d4639f6491120e3c94dd584a6e282c9fa82994d4424edd7971ff3b97377c
 
 ### Générer une clé API
 
-1. Accédez à `/admin/api-keys`
+1. Accédez à `/admin/apikeys`
 2. Cliquez sur "Générer une clé API"
 3. **Copiez immédiatement la clé affichée** (elle ne sera plus jamais affichée)
 4. Stockez-la en sécurité (gestionnaire de mots de passe, variables d'environnement)
@@ -90,12 +90,12 @@ curl -X POST https://votre-domaine.com/api/v1/sms/send \
 ## 🔄 Révoquer et Régénérer
 
 ### Révoquer une clé
-1. Accédez à `/admin/api-keys`
+1. Accédez à `/admin/apikeys`
 2. Cliquez sur "Révoquer la clé"
 3. La clé est **définitivement supprimée** (ne peut plus être utilisée)
 
 ### Régénérer une clé
-1. Accédez à `/admin/api-keys`
+1. Accédez à `/admin/apikeys`
 2. Cliquez sur "Régénérer la clé"
 3. **L'ancienne clé est révoquée** automatiquement
 4. **Copiez la nouvelle clé immédiatement**

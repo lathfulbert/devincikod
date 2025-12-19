@@ -56,7 +56,7 @@
                     Toutes les applications utilisant cette clé cesseront de fonctionner.
                 </div>
 
-                <form action="<?= url('/admin/api-keys/revoke') ?>" method="POST"
+                <form action="<?= url('/admin/apikeys/revoke') ?>" method="POST"
                       onsubmit="return confirm('Êtes-vous sûr de vouloir révoquer cette clé API ?');">
                     <?= csrf_field() ?>
                     <button type="submit" class="btn btn-danger">
@@ -70,7 +70,7 @@
                     <h4 class="mt-3">Aucune Clé API</h4>
                     <p class="text-muted">Vous n'avez pas encore de clé API. Générez-en une pour commencer.</p>
 
-                    <form action="<?= url('/admin/api-keys/generate') ?>" method="POST" class="mt-4">
+                    <form action="<?= url('/admin/apikeys/generate') ?>" method="POST" class="mt-4">
                         <?= csrf_field() ?>
                         <button type="submit" class="btn btn-primary">
                             <i data-feather="plus-circle"></i> Générer une Clé API
@@ -85,7 +85,7 @@
                 <div class="col-md-6">
                     <h5>Documentation</h5>
                     <p>Consultez la documentation pour apprendre à utiliser l'API :</p>
-                    <a href="<?= url('/admin/api-keys/docs') ?>" class="btn btn-outline-primary">
+                    <a href="<?= url('/admin/apikeys/docs') ?>" class="btn btn-outline-primary">
                         <i data-feather="book"></i> Voir la Documentation
                     </a>
                 </div>

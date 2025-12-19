@@ -5,7 +5,7 @@
 ### 1. Générer votre clé API
 
 1. Connectez-vous à votre compte
-2. Accédez à **Mes clés API** (`/admin/api-keys`)
+2. Accédez à **Mes clés API** (`/admin/apikeys`)
 3. Cliquez sur "Générer une clé API"
 4. Copiez votre clé et conservez-la en sécurité
 
@@ -66,5 +66,5 @@ Pour utiliser l'API, votre compte doit disposer des permissions suivantes :
 ## 📞 Support
 
 - Documentation complète : `/admin/sms/api/docs`
-- Gestion des clés : `/admin/api-keys`
+- Gestion des clés : `/admin/apikeys`
 - Dashboard SMS : `/admin/sms`

@@ -21,7 +21,7 @@ Module SmsCore (Modules/SmsCore/)
 ### 1. Génération de clé API
 
 **Utilisateur :**
-1. Accède à `/admin/api-keys` (module ApiKeys)
+1. Accède à `/admin/apikeys` (module ApiKeys)
 2. Clique sur "Générer une clé API"
 3. Copie la clé générée (format : `sk_xxxxxxxxxxxxxxxx`)
 
@@ -53,15 +53,15 @@ curl -X POST https://votre-domaine.com/api/v1/sms/send \
 | Route | Action |
 |-------|--------|
 | `GET /admin/sms/api/docs` | Afficher la documentation API |
-| `GET /admin/sms/api/keys` | Redirection vers `/admin/api-keys` |
+| `GET /admin/sms/api/keys` | Redirection vers `/admin/apikeys` |
 
 ### Module ApiKeys (utilisé)
 
 | Route | Action |
 |-------|--------|
-| `GET /admin/api-keys` | Interface de gestion des clés |
-| `POST /admin/api-keys/generate` | Générer une nouvelle clé |
-| `POST /admin/api-keys/revoke` | Révoquer une clé |
+| `GET /admin/apikeys` | Interface de gestion des clés |
+| `POST /admin/apikeys/generate` | Générer une nouvelle clé |
+| `POST /admin/apikeys/revoke` | Révoquer une clé |
 
 ## Middleware d'authentification
 
@@ -134,7 +134,7 @@ Le module SmsCore peut tracker spécifiquement :
 ### 1. Configuration utilisateur
 
 ```php
-// L'utilisateur génère sa clé via /admin/api-keys
+// L'utilisateur génère sa clé via /admin/apikeys
 $apiKey = ApiKey::create([
     'user_id' => auth()->id(),
     'key' => 'sk_' . bin2hex(random_bytes(32)),
@@ -242,7 +242,7 @@ Chaque clé peut avoir :
 ## Documentation utilisateur
 
 **Liens importants :**
-- Gestion clés : `/admin/api-keys`
+- Gestion clés : `/admin/apikeys`
 - Documentation SMS : `/admin/sms/api/docs`
 - Dashboard SMS : `/admin/sms`
 

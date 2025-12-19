@@ -13,7 +13,7 @@ class RoleController
     {
         $app = Application::getInstance();
         $roles = Role::all();
-        echo view('rbac/admin/roles/index', ['title' => 'Roles', 'roles' => $roles]);
+        echo view('RBAC/admin/roles/index', ['title' => 'Roles', 'roles' => $roles]);
     }
 
     public function create()
@@ -46,7 +46,7 @@ class RoleController
         // Sort modules alphabetically
         ksort($permissionsByModule);
 
-        echo view('rbac/admin/roles/create', [
+        echo view('RBAC/admin/roles/create', [
             'title' => 'Créer un rôle',
             'permissions' => $permissions,
             'permissionsByModule' => $permissionsByModule
@@ -117,7 +117,7 @@ class RoleController
         $rolePermissions = $role->permissions()->getResults();
         $rolePermissionIds = array_map(fn($p) => $p->id, $rolePermissions);
 
-        echo view('rbac/admin/roles/edit', [
+        echo view('RBAC/admin/roles/edit', [
             'title' => 'Éditer le rôle',
             'role' => $role,
             'permissions' => $permissions,

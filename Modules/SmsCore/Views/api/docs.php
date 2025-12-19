@@ -108,14 +108,14 @@
             <?php
             component('card-start', [
                 'card_title' => "Documentation API SMS",
-                'card_actions' => '<a href="' . url('/admin/api-keys') . '" class="btn btn-primary btn-sm"><i data-feather="key"></i> Gérer mes clés API</a>'
+                'card_actions' => '<a href="' . url('/admin/apikeys') . '" class="btn btn-primary btn-sm"><i data-feather="key"></i> Gérer mes clés API</a>'
             ]);
             ?>
 
             <div class="alert alert-info alert-api">
                 <i data-feather="info"></i>
                 <strong>Important:</strong> Vous devez générer une clé API depuis la page
-                <a href="<?= url('/admin/api-keys') ?>">Gérer mes clés API</a> pour utiliser l'API SMS.
+                <a href="<?= url('/admin/apikeys') ?>">Gérer mes clés API</a> pour utiliser l'API SMS.
             </div>
 
             <div class="api-docs">

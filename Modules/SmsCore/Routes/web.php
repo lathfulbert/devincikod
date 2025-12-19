@@ -89,12 +89,4 @@ $router->group([
         ->middleware('can:sms.send')
         ->name('sms.parse_file');
 
-    // Campaign management
-    $router->get('/campaigns', [SmsController::class, 'campaigns'])
-        ->middleware('can:sms.campaigns.view')
-        ->name('sms.campaigns');
-
-    $router->post('/campaigns/create', [SmsController::class, 'createCampaign'])
-        ->middleware('can:sms.campaigns.create')
-        ->name('sms.campaigns.create');
 });
