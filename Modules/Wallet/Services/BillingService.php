@@ -1,15 +1,32 @@
+<?php
+namespace Modules\Wallet\Services;
+
+/**
+ * Service de facturation du wallet (API, SMS, etc.)
+ */
+class BillingService
+{
+    protected WalletService $walletService;
+    protected TransactionService $transactionService;
+    protected PricingService $pricingService;
+
+    public function __construct(
+        WalletService $walletService,
+        TransactionService $transactionService,
+        PricingService $pricingService
+    ) {
+        $this->walletService = $walletService;
+        $this->transactionService = $transactionService;
+        $this->pricingService = $pricingService;
+    }
+
     /**
      * Débite le wallet pour un appel API (facturation automatique par clé API)
-     * @param int $userId
-     * @param int $apiKeyId
-     * @param string $endpoint
-     * @param array $criteria (ex: volume, type d'appel, etc.)
-     * @return array
      */
     public function chargeApiUsage(int $userId, int $apiKeyId, string $endpoint, array $criteria = []): array
     {
-        // Exemple : tarif forfaitaire par appel, surcharge possible selon endpoint ou volume
-        $baseCost = $this->pricingService->getApiCost($endpoint, $criteria);
+        // Calcul du coût d'un SMS selon les critères (gateway, pays, etc.)
+        $baseCost = $this->pricingService->calculateCost($criteria);
 
         if (!$this->walletService->hasBalance($userId, $baseCost)) {
             throw new \RuntimeException('Solde insuffisant pour appel API');
@@ -32,25 +49,6 @@
             'transaction_id' => $transaction['id'],
             'remaining_balance' => $this->walletService->getBalance($userId)
         ];
-    }
-<?php
-
-namespace Modules\Wallet\Services;
-
-class BillingService
-{
-    protected WalletService $walletService;
-    protected TransactionService $transactionService;
-    protected PricingService $pricingService;
-
-    public function __construct(
-        WalletService $walletService,
-        TransactionService $transactionService,
-        PricingService $pricingService
-    ) {
-        $this->walletService = $walletService;
-        $this->transactionService = $transactionService;
-        $this->pricingService = $pricingService;
     }
 
     public function chargeSms(int $userId, int $count = 1, array $criteria = []): array

@@ -37,7 +37,7 @@ try {
     echo "[ERROR] " . $e->getMessage() . "\n";
 
     // Enregistrer l'erreur dans le monitoring
-    HeartbeatHelper::recordError('cron_job', $e->getMessage());
+    \App\Core\Services\HealthCheckService::recordError('cron_job', $e->getMessage());
 
     exit(1);
 }
