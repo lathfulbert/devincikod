@@ -31,11 +31,14 @@ class SystemHealthWidget extends AbstractWidget
 
     protected function calculateData(): array
     {
+
         $checks = [
             'database' => $this->checkDatabase(),
             'cache' => $this->checkCache(),
             'storage' => $this->checkStorage(),
-            'memory' => $this->checkMemory()
+            'memory' => $this->checkMemory(),
+            'cron' => $this->checkCron(),
+            'queue' => $this->checkQueue()
         ];
 
         $healthScore = 0;
@@ -64,7 +67,43 @@ class SystemHealthWidget extends AbstractWidget
             ]
         ];
     }
+    private function checkCron(): array
+    {
+        try {
+            $health = \App\Core\Services\HealthCheckService::checkServiceHealth('cron_job');
+            return [
+                'name' => 'Cron',
+                'status' => $health['status'],
+                'message' => $health['message'] . ($health['last_run'] ? ' (Dernier: ' . $health['last_run'] . ')' : '')
+            ];
+        } catch (\Exception $e) {
+            return [
+                'name' => 'Cron',
+                'status' => 'error',
+                'message' => 'Erreur lors du contrôle cron'
+            ];
+        }
+    }
 
+    private function checkQueue(): array
+    {
+        try {
+            $health = \App\Core\Services\HealthCheckService::checkServiceHealth('queue_worker');
+            return [
+                'name' => 'Queue',
+                'status' => $health['status'],
+                'message' => $health['message'] . ($health['last_run'] ? ' (Dernier: ' . $health['last_run'] . ')' : '')
+            ];
+        } catch (\Exception $e) {
+            return [
+                'name' => 'Queue',
+                'status' => 'error',
+                'message' => 'Erreur lors du contrôle queue'
+            ];
+        }
+    }
+
+    // ...
     private function checkDatabase(): array
     {
         try {

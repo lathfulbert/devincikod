@@ -11,7 +11,9 @@ class HealthCheckService
      */
     private static function getDb(): \PDO
     {
-        return Database::getInstance()->getPdo();
+        $pdo = Database::getInstance()->getPdo();
+        // ...debug supprimé...
+        return $pdo;
     }
 
     /**

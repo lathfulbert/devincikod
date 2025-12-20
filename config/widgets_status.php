@@ -3,7 +3,7 @@ return array (
   'dashboard.welcome' => false,
   'dashboard.sms_stats' => false,
   'sms.statistics' => false,
-  'admin.system_health' => false,
+  'admin.system_health' => true,
   'sms.sender_names' => false,
   'dashboard.wallet_credit' => false,
   'sms.status' => false,
@@ -13,5 +13,5 @@ return array (
   'users.total' => false,
   'wallets.created_by' => false,
   'wallets.credit' => true,
-  'admin.recent_activity' => false,
+  'admin.recent_activity' => true,
 );

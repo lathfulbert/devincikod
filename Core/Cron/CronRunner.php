@@ -44,6 +44,9 @@ class CronRunner
         foreach ($dueTasks as $task) {
             $this->executeTask($task);
         }
+
+        // Enregistrer le heartbeat après exécution des tâches cron
+        \App\Core\Services\HeartbeatHelper::ping('cron_job');
     }
 
     /**

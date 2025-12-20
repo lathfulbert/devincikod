@@ -48,6 +48,10 @@ class QueueWorker
         echo "🚀 Worker started. Listening on queue: $queue\n";
         echo "   Press Ctrl+C to stop gracefully.\n\n";
 
+
+        $lastHeartbeat = time();
+        $heartbeatInterval = 60; // secondes
+
         while (!$this->shouldQuit) {
             // Check memory usage
             if ($this->memoryExceeded()) {
@@ -61,6 +65,16 @@ class QueueWorker
             if ($job === null) {
                 // No jobs available, sleep
                 echo "💤 No jobs. Sleeping for {$this->sleepSeconds}s...\n";
+                // Heartbeat même en idle toutes les 60s
+                if ((time() - $lastHeartbeat) >= $heartbeatInterval) {
+                    try {
+                        echo "[DEBUG] Heartbeat queue_worker (idle)\n";
+                        \App\Core\Services\HeartbeatHelper::ping('queue_worker');
+                    } catch (\Throwable $e) {
+                        echo "[ERROR] Heartbeat failed (idle): " . $e->getMessage() . "\n";
+                    }
+                    $lastHeartbeat = time();
+                }
                 sleep($this->sleepSeconds);
                 continue;
             }
@@ -68,6 +82,14 @@ class QueueWorker
             // Process the job
             $this->processJob($job, $queue);
             $jobsProcessed++;
+            // Heartbeat après chaque job traité
+            try {
+                echo "[DEBUG] Heartbeat queue_worker (job)\n";
+                \App\Core\Services\HeartbeatHelper::ping('queue_worker');
+            } catch (\Throwable $e) {
+                echo "[ERROR] Heartbeat failed (job): " . $e->getMessage() . "\n";
+            }
+            $lastHeartbeat = time();
 
             // Check if we've hit max jobs limit
             if ($maxJobs !== null && $jobsProcessed >= $maxJobs) {
