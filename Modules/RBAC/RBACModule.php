@@ -36,12 +36,12 @@ class RBACModule extends AbstractModule
                 'children' => [
                     [
                         'title' => __('rbac.roles.list'),
-                        'url' => '/admin/roles',
+                        'route' => 'admin.roles.index',
                         'permission' => 'admin.roles.view'
                     ],
                     [
                         'title' => __('rbac.permissions.list'),
-                        'url' => '/admin/permissions',
+                        'route' => 'admin.permissions.index',
                         'permission' => 'admin.permissions.view'
                     ]
                 ]

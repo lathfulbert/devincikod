@@ -85,11 +85,11 @@ class EmailMarketingModule extends AbstractModule
                 'title' => 'Email Marketing',
                 'icon' => 'mail',
                 'children' => [
-                    ['title' => 'Dashboard', 'url' => '/admin/email-marketing'],
-                    ['title' => 'Campaigns', 'url' => '/admin/email-marketing/campaigns'],
-                    ['title' => 'Templates', 'url' => '/admin/email-marketing/templates'],
-                    ['title' => 'Workflows', 'url' => '/admin/email-marketing/workflows'],
-                    ['title' => 'Analytics', 'url' => '/admin/email-marketing/analytics'],
+                    ['title' => 'Dashboard', 'route' => 'admin.email-marketing.index'],
+                    ['title' => 'Campaigns', 'route' => 'admin.email-marketing.campaigns.index'],
+                    ['title' => 'Templates', 'route' => 'admin.email-marketing.templates.index'],
+                    ['title' => 'Workflows', 'route' => 'admin.email-marketing.workflows.index'],
+                    ['title' => 'Analytics', 'route' => 'admin.email-marketing.analytics'],
                 ]
             ]
         ];

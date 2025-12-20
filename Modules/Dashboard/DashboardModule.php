@@ -34,7 +34,7 @@ class DashboardModule extends AbstractModule
                 'type' => 'submenu',
                 'title' => 'Dashboard',
                 'icon' => 'home',
-                'url' => '/admin/dashboard',
+                'route' => 'admin.dashboard.index',
                 'class' => 'link-nav',
                 'permission' => 'access.dashboard',
                 'children' => [
@@ -42,7 +42,7 @@ class DashboardModule extends AbstractModule
                         'type' => 'link',
                         'title' => 'Gérer les widgets',
                         'icon' => 'sliders',
-                        'url' => '/admin/dashboard/widgets',
+                        'route' => 'admin.dashboard.widgets.index',
                         'class' => 'link-nav',
                         'permission' => 'manage.widgets'
                     ]

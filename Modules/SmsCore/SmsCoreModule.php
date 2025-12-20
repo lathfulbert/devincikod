@@ -39,62 +39,62 @@ class SmsCoreModule extends AbstractModule
                 'children' => [
                     [
                         'title' => 'Dashboard',
-                        'url' => '/admin/sms',
+                        'route' => 'admin.sms.index',
                         'permission' => 'access.sms_core'
                     ],
                     [
                         'title' => 'Statistiques',
-                        'url' => '/admin/sms/statistics',
+                        'route' => 'admin.sms.statistics',
                         'permission' => 'access.sms_core'
                     ],
                     [
                         'title' => 'Envoyer SMS',
-                        'url' => '/admin/sms/send',
+                        'route' => 'admin.sms.send',
                         'permission' => 'access.sms_core'
                     ],
                     [
                         'title' => 'Envoi en Masse',
-                        'url' => '/admin/sms/bulk',
+                        'route' => 'admin.sms.bulk',
                         'permission' => 'access.sms_core'
                     ],
                     [
                         'title' => 'Sender Names',
-                        'url' => '/admin/sms/sender-names',
+                        'route' => 'admin.sms.sender_names',
                         'permission' => 'sms.sender_names.view'
                     ],
                     [
                         'title' => 'Historique',
-                        'url' => '/admin/sms/history',
+                        'route' => 'admin.sms.history',
                         'permission' => 'access.sms_core'
                     ],
                     [
                         'title' => 'Contrats',
-                        'url' => '/admin/sms/contracts',
+                        'route' => 'admin.sms.contracts',
                         'permission' => 'sms.contracts.view'
                     ],
                     [
                         'title' => 'Campagnes',
-                        'url' => '/admin/sms/campaigns',
+                        'route' => 'admin.sms.campaigns.index',
                         'permission' => 'sms.campaigns.view'
                     ],
                     [
                         'title' => 'Fournisseurs',
-                        'url' => '/admin/sms/providers',
+                        'route' => 'admin.sms.providers',
                         'permission' => 'sms.providers.view'
                     ],
                     [
                         'title' => 'Tarification',
-                        'url' => '/admin/sms/pricing',
+                        'route' => 'admin.sms.pricing',
                         'permission' => 'sms.pricing.view'
                     ],
                     [
                         'title' => 'Facturation',
-                        'url' => '/admin/sms/billing',
+                        'route' => 'admin.sms.billing',
                         'permission' => 'sms.billing.view'
                     ],
                     [
                         'title' => 'API Documentation',
-                        'url' => '/admin/sms/api/docs',
+                        'route' => 'admin.sms.api.docs',
                         'permission' => 'access.sms_core'
                     ]
                 ]

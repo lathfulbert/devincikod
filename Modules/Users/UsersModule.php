@@ -104,12 +104,12 @@ class UsersModule implements ModuleContract
                 'children' => [
                     [
                         'title' => __('users.list'),
-                        'url' => '/admin/users',
+                        'route' => 'admin.users.index',
                         'permission' => 'admin.users.view'
                     ],
                     [
                         'title' => __('users.create_user'),
-                        'url' => '/admin/users/create',
+                        'route' => 'admin.users.create',
                         'permission' => 'admin.users.create'
                     ]
                 ]

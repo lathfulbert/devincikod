@@ -141,7 +141,13 @@ class SidebarService
         }
 
         if ($type === 'link') {
-            $url = isset($item['url']) ? url($item['url']) : 'javascript:void(0)';
+            if (isset($item['route'])) {
+                $url = isset($item['route_params']) ? route($item['route'], $item['route_params']) : route($item['route']);
+            } elseif (isset($item['url'])) {
+                $url = url($item['url']);
+            } else {
+                $url = 'javascript:void(0)';
+            }
             $activeClass = (current_url() == $url) ? 'active' : '';
             $extraClass = $item['class'] ?? '';
 
@@ -178,7 +184,13 @@ class SidebarService
                         <ul class="sidebar-submenu">';
 
                 foreach ($filteredChildren as $child) {
-                    $childUrl = isset($child['url']) ? url($child['url']) : '#';
+                    if (isset($child['route'])) {
+                        $childUrl = isset($child['route_params']) ? route($child['route'], $child['route_params']) : route($child['route']);
+                    } elseif (isset($child['url'])) {
+                        $childUrl = url($child['url']);
+                    } else {
+                        $childUrl = '#';
+                    }
                     echo '<li><a href="' . $childUrl . '">' . htmlspecialchars($child['title']) . '</a></li>';
                 }
 
