@@ -47,12 +47,15 @@ class UserApiKeyController
      */
     public function generate()
     {
-        if (!isset($_SESSION['user_id'])) {
+
+        // Vérification stricte de l'identité utilisateur
+        if (empty($_SESSION['user_id']) || !is_numeric($_SESSION['user_id'])) {
+            $_SESSION['flash_error'] = "Impossible de générer une clé API : utilisateur non authentifié.";
             redirect('/auth/login');
             return;
         }
 
-        $userId = $_SESSION['user_id'];
+        $userId = (int)$_SESSION['user_id'];
 
         // Check if user already has a key (including soft-deleted)
         $apiKey = ApiKey::query()
@@ -63,12 +66,16 @@ class UserApiKeyController
         $key = 'sk_' . bin2hex(random_bytes(32));
         $hashedKey = hash('sha256', $key);
 
+        // Suppression de l'affichage direct du user_id
         if ($apiKey) {
             // UPDATE existing key
+            $apiKey->user_id = $userId; // Toujours réaffecter user_id
+            $apiKey->name = 'Personal API Key'; // Toujours réaffecter name
             $apiKey->key = $hashedKey;
             $apiKey->is_active = 1;
             $apiKey->deleted_at = null; // Un-delete if was soft-deleted
             $apiKey->updated_at = date('Y-m-d H:i:s');
+            error_log('[APIKEY] UPDATE user_id utilisé : ' . var_export($userId, true));
             $apiKey->save();
         } else {
             // INSERT new key
@@ -78,6 +85,7 @@ class UserApiKeyController
             $apiKey->key = $hashedKey;
             $apiKey->is_active = 1;
             $apiKey->created_at = date('Y-m-d H:i:s');
+            error_log('[APIKEY] INSERT user_id utilisé : ' . var_export($userId, true));
             $apiKey->save();
         }
 

@@ -31,6 +31,7 @@ class ApiKeyMiddleware
     public function handle(?string $requiredPermission = null): bool
     {
         $apiKey = $this->extractApiKey();
+        error_log('[APIKEY] Clé reçue : ' . var_export($apiKey, true));
 
         if (!$apiKey) {
             $this->statusCode = 401;
@@ -38,8 +39,10 @@ class ApiKeyMiddleware
             return false;
         }
 
-        // Find the API key in database
-        $this->keyModel = ApiKey::where('key', $apiKey)->first();
+        // Les clés sont stockées en SHA256, il faut donc hasher la clé reçue
+        $hashedKey = hash('sha256', $apiKey);
+        error_log('[APIKEY] Hash recherché : ' . $hashedKey);
+        $this->keyModel = ApiKey::where('key', $hashedKey)->first();
 
         if (!$this->keyModel) {
             $this->statusCode = 401;
@@ -78,6 +81,21 @@ class ApiKeyMiddleware
 
         // Log the successful request
         $this->logRequest();
+
+        // Facturation automatique de l'appel API (exemple)
+        try {
+            $endpoint = $_SERVER['REQUEST_URI'] ?? '';
+            $billingService = app(\Modules\Wallet\Services\BillingService::class);
+            $billingService->chargeApiUsage(
+                $this->keyModel->user_id,
+                $this->keyModel->id,
+                $endpoint,
+                [] // Ajoutez ici des critères si besoin (volume, type, etc.)
+            );
+        } catch (\Throwable $e) {
+            error_log('[APIKEY] Facturation API échouée : ' . $e->getMessage());
+            // Optionnel : return false ou laisser passer la requête même si la facturation échoue
+        }
 
         return true;
     }

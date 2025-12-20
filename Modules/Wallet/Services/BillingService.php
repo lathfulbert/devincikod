@@ -1,3 +1,38 @@
+    /**
+     * Débite le wallet pour un appel API (facturation automatique par clé API)
+     * @param int $userId
+     * @param int $apiKeyId
+     * @param string $endpoint
+     * @param array $criteria (ex: volume, type d'appel, etc.)
+     * @return array
+     */
+    public function chargeApiUsage(int $userId, int $apiKeyId, string $endpoint, array $criteria = []): array
+    {
+        // Exemple : tarif forfaitaire par appel, surcharge possible selon endpoint ou volume
+        $baseCost = $this->pricingService->getApiCost($endpoint, $criteria);
+
+        if (!$this->walletService->hasBalance($userId, $baseCost)) {
+            throw new \RuntimeException('Solde insuffisant pour appel API');
+        }
+
+        $transaction = $this->transactionService->createTransaction(
+            $userId,
+            'debit',
+            $baseCost,
+            "API charge: $endpoint",
+            [
+                'api_key_id' => $apiKeyId,
+                'endpoint' => $endpoint,
+                'criteria' => $criteria
+            ]
+        );
+
+        return [
+            'charged' => $baseCost,
+            'transaction_id' => $transaction['id'],
+            'remaining_balance' => $this->walletService->getBalance($userId)
+        ];
+    }
 <?php
 
 namespace Modules\Wallet\Services;

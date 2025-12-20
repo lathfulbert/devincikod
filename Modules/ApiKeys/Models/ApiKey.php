@@ -9,6 +9,47 @@ use Modules\Users\Models\User;
 
 class ApiKey extends Model
 {
+    /**
+     * Synchronise les attributs internes vers les propriétés publiques
+     */
+    public function syncPublicFromAttributes(): void
+    {
+        foreach ($this->fillable as $key) {
+            if (property_exists($this, $key) && isset($this->attributes[$key])) {
+                $this->$key = $this->attributes[$key];
+            }
+        }
+    }
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->syncPublicFromAttributes();
+    }
+    /**
+     * Synchronise les propriétés publiques avec attributes pour l'ORM
+     */
+    public function syncAttributesFromPublic(): void
+    {
+        foreach ($this->fillable as $key) {
+            if (property_exists($this, $key)) {
+                $this->attributes[$key] = $this->$key;
+            }
+        }
+    }
+
+    public function save(): void
+    {
+        $this->syncAttributesFromPublic();
+        // Vérification : une clé existante ne peut pas changer de propriétaire
+        if (!empty($this->key)) {
+            $existing = self::query()->where('key', $this->key)->first();
+            if ($existing && $existing->user_id != $this->user_id) {
+                throw new \Exception("Impossible d'associer une clé API existante à un autre utilisateur.");
+            }
+        }
+        parent::save();
+    }
     // Propriétés publiques pour accès direct dans les vues
     public $key;
     public $name;
