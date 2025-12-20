@@ -57,7 +57,10 @@ class AuthModule implements ModuleContract
 
     public function getMigrations(): array
     {
-        return [];
+        return [
+            __DIR__ . '/Database/Migrations/CreateAuthSettingsTable.php',
+            // autres migrations si besoin
+        ];
     }
 
     public function getPermissions(): array
@@ -118,6 +121,11 @@ class AuthModule implements ModuleContract
                         'title' => 'Paramètres SMS OTP',
                         'url' => '/admin/auth/sms-config',
                         'permission' => 'admin.auth.settings'
+                    ],
+                    [
+                        'title' => 'Paramètres Auth',
+                        'url' => '/admin/auth/settings',
+                        'permission' => 'admin.auth.settings.view'
                     ]
                 ]
             ]

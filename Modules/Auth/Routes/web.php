@@ -40,3 +40,14 @@ $router->get('/admin/auth/logs/user', [\Modules\Auth\Controllers\AuthLogsControl
 // SMS OTP Config (admin)
 $router->get('/admin/auth/sms-config', [MfaController::class, 'showSmsConfig']);
 $router->post('/admin/auth/sms-config', [MfaController::class, 'saveSmsConfig']);
+
+// Auth settings (admin)
+$router->get('/admin/auth/settings', [
+	\Modules\Auth\Controllers\Admin\AuthSettingsController::class, 'index'
+]);
+$router->post('/admin/auth/settings/update', [
+	\Modules\Auth\Controllers\Admin\AuthSettingsController::class, 'update'
+]);
+$router->post('/admin/auth/settings/add', [
+	\Modules\Auth\Controllers\Admin\AuthSettingsController::class, 'add'
+]);

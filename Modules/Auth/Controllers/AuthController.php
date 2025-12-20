@@ -8,6 +8,8 @@ use Modules\Auth\Services\AuditLogger;
 use Modules\Auth\Services\TrustedDeviceManager;
 use Modules\Auth\Providers\PasswordProvider;
 use Modules\Users\Models\User;
+use Modules\Auth\Models\AuthSetting;
+use Modules\Auth\Models\AuthLog;
 
 /**
  * Authentication Controller
@@ -56,9 +58,63 @@ class AuthController
             return;
         }
 
-        // Check rate limiting
-        if ($this->auditLogger->shouldRateLimit(null, null, 5)) {
-            $_SESSION['flash_error'] = 'Trop de tentatives. Réessayez plus tard.';
+
+        // Vérification blacklist IP/user
+        $blacklist = AuthSetting::getValue('blacklist', null);
+        $currentIp = $_SERVER['REMOTE_ADDR'] ?? '';
+        $currentUser = $identifier;
+        $isBlacklisted = false;
+        if ($blacklist) {
+            $data = is_string($blacklist) ? json_decode($blacklist, true) : $blacklist;
+            if (is_array($data)) {
+                // Vérif IP exacte
+                if (!empty($data['ips']) && in_array($currentIp, $data['ips'])) {
+                    $isBlacklisted = true;
+                }
+                // Vérif user
+                if (!empty($data['users']) && in_array($currentUser, $data['users'])) {
+                    $isBlacklisted = true;
+                }
+                // Vérif range IP simple (CIDR non supporté ici)
+                if (!$isBlacklisted && !empty($data['ips'])) {
+                    foreach ($data['ips'] as $ip) {
+                        if (strpos($ip, '/') !== false) {
+                            // Range CIDR: à améliorer si besoin
+                            list($range, $mask) = explode('/', $ip);
+                            if (substr($currentIp, 0, strlen($range)) === $range) {
+                                $isBlacklisted = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if ($isBlacklisted) {
+            $_SESSION['flash_error'] = 'Accès refusé (IP ou utilisateur blacklisté)';
+            redirect('/auth/login');
+            return;
+        }
+
+        // Paramètres dynamiques depuis la base
+        $maxRetries = AuthSetting::getValue('max_login_retries', 5);
+        $lockoutPeriod = AuthSetting::getValue('lockout_period', 15); // minutes
+
+        // Gestion du nombre maximal de lockouts
+        $maxLockouts = AuthSetting::getValue('max_lockouts', 3);
+        $userLockouts = AuthLog::query()
+            ->where('user_id', null)
+            ->where('event_type', 'account_locked')
+            ->count();
+        if ($userLockouts >= $maxLockouts) {
+            $_SESSION['flash_error'] = 'Compte temporairement bloqué (trop de blocages).';
+            redirect('/auth/login');
+            return;
+        }
+
+        // Check rate limiting avec paramètres dynamiques
+        if ($this->auditLogger->shouldRateLimit(null, null, $maxRetries)) {
+            $_SESSION['flash_error'] = 'Trop de tentatives. Réessayez dans ' . $lockoutPeriod . ' minutes.';
             redirect('/auth/login');
             return;
         }
