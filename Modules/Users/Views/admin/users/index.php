@@ -24,7 +24,7 @@
     <!-- Section: Actions rapides -->
     <div class="row mb-3">
         <div class="col-12 text-end">
-            <a href="<?= url('/admin/users/create') ?>" class="btn btn-primary">
+            <a href="<?= route('users.create') ?>" class="btn btn-primary">
                 <i data-feather="plus"></i> Nouvel utilisateur
             </a>
         </div>
@@ -75,12 +75,12 @@
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-end">
-                                    <a href="<?= url('/admin/users/' . $user->id . '/edit') ?>"
+                                    <a href="<?= route('users.edit', ['id' => $user->id]) ?>"
                                         class="btn btn-sm btn-warning"
                                         title="Éditer">
                                         <i data-feather="edit" style="width: 14px; height: 14px;"></i>
                                     </a>
-                                    <form action="<?= url('/admin/users/' . $user->id . '/delete') ?>"
+                                    <form action="<?= route('users.delete', ['id' => $user->id]) ?>"
                                         method="POST"
                                         style="display:inline;"
                                         onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">

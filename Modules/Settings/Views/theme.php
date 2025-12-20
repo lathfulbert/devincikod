@@ -28,7 +28,7 @@
             component('card-start', ['card_title' => "Thème & Apparence"]);
             ?>
 
-            <form action="<?= url('/admin/settings/theme/update') ?>" method="POST">
+            <form action="<?= route('admin.settings.theme.update') ?>" method="POST">
                 <?= csrf_field() ?>
 
                 <div class="row">
@@ -69,7 +69,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i data-feather="save"></i> Enregistrer
                     </button>
-                    <a href="<?= url('/admin/settings') ?>" class="btn btn-secondary">
+                    <a href="<?= route('admin.settings.index') ?>" class="btn btn-secondary">
                         <i data-feather="x"></i> Annuler
                     </a>
                     <button type="button" class="btn btn-warning" onclick="if(confirm('Réinitialiser le thème ?')) { document.getElementById('reset-form').submit(); }">
@@ -79,7 +79,7 @@
             </form>
 
             <!-- Hidden reset form -->
-            <form id="reset-form" action="<?= url('/admin/settings/theme/reset') ?>" method="POST" style="display: none;">
+            <form id="reset-form" action="<?= route('admin.settings.theme.reset') ?>" method="POST" style="display: none;">
                 <?= csrf_field() ?>
             </form>
 

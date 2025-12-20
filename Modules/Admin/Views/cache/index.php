@@ -36,10 +36,10 @@
     <!-- Section: Actions rapides -->
     <div class="row mb-3">
         <div class="col-12 text-end">
-            <a href="<?= url('/admin/cache/stats') ?>" class="btn btn-info">
+            <a href="<?= route('admin.cache.stats') ?>" class="btn btn-info">
                 <i data-feather="bar-chart-2"></i> Statistiques
             </a>
-            <form method="POST" action="<?= url('/admin/cache/clear') ?>" style="display: inline;" onsubmit="return confirm('Vider tout le cache ?')">
+            <form method="POST" action="<?= route('admin.cache.clear') ?>" style="display: inline;" onsubmit="return confirm('Vider tout le cache ?')">
                 <?= csrf_field() ?>
                 <button type="submit" class="btn btn-warning">
                     <i data-feather="trash-2"></i> Vider tout
@@ -55,7 +55,7 @@
             component('card-start', ['card_title' => "Configuration du Cache", 'card_actions' => '']);
             ?>
 
-            <form method="POST" action="<?= url('/admin/cache/update') ?>" id="cacheConfigForm">
+            <form method="POST" action="<?= route('admin.cache.update') ?>" id="cacheConfigForm">
                 <input type="hidden" name="_csrf_token" value="<?= csrf_token() ?>">
 
                 <div class="row">

@@ -122,7 +122,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="<?= url('/admin/system-api-keys/monitoring/details?api_key_id=' . $key->id) ?>"
+                                    <a href="<?= route('admin.system-api-keys.monitoring.details', ['api_key_id' => $key->id]) ?>"
                                         class="btn btn-sm btn-outline-primary">
                                         <i data-feather="eye"></i> Details
                                     </a>
@@ -132,7 +132,7 @@
                     <?php else: ?>
                         <tr>
                             <td colspan="6" class="text-center text-muted">
-                                No API keys found. <a href="<?= url('/admin/system-api-keys') ?>">Create one</a> to start monitoring.
+                                No API keys found. <a href="<?= route('admin.system-api-keys.index') ?>">Create one</a> to start monitoring.
                             </td>
                         </tr>
                     <?php endif; ?>

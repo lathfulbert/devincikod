@@ -12,8 +12,8 @@
             </div>
             <div class="col-6">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/dashboard') ?>"><i data-feather="home"></i></a></li>
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/settings') ?>">Settings</a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('admin.dashboard.index') ?>"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('admin.settings.index') ?>">Settings</a></li>
                     <li class="breadcrumb-item active">Wallet</li>
                 </ol>
             </div>
@@ -26,7 +26,7 @@
 </div>
 
 <div class="container-fluid">
-    <form method="POST" action="<?= url('/admin/settings/wallet/update') ?>">
+    <form method="POST" action="<?= route('admin.settings.wallet.update') ?>">
         <?= csrf_field() ?>
 
         <div class="row">

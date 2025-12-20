@@ -24,7 +24,7 @@
     <!-- Filters -->
     <div class="row mb-3">
         <div class="col-md-10">
-            <form method="GET" action="<?= url('/admin/permissions') ?>" class="row g-2">
+            <form method="GET" action="<?= route('admin.permissions.index') ?>" class="row g-2">
                 <div class="col-md-4">
                     <select name="module_slug" class="form-select" onchange="this.form.submit()">
                         <option value="">Tous les modules</option>
@@ -47,7 +47,7 @@
                 </div>
                 <div class="col-md-2">
                     <?php if ($selectedModuleSlug || $selectedRoleId): ?>
-                        <a href="<?= url('/admin/permissions') ?>" class="btn btn-secondary w-100">
+                        <a href="<?= route('admin.permissions.index') ?>" class="btn btn-secondary w-100">
                             <i data-feather="x"></i> Réinitialiser
                         </a>
                     <?php endif; ?>
@@ -55,7 +55,7 @@
             </form>
         </div>
         <div class="col-md-2 text-end">
-            <a href="<?= url('/admin/permissions/create') ?>" class="btn btn-primary w-100">
+            <a href="<?= route('admin.permissions.create') ?>" class="btn btn-primary w-100">
                 <i data-feather="plus"></i> Nouvelle permission
             </a>
         </div>
@@ -92,11 +92,11 @@
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-end">
-                                    <a href="<?= url('/admin/permissions/' . $permission->id . '/edit') ?>"
+                                    <a href="<?= route('admin.permissions.edit', ['id' => $permission->id]) ?>"
                                         class="btn btn-sm btn-warning" title="Éditer">
                                         <i data-feather="edit" style="width: 14px; height: 14px;"></i>
                                     </a>
-                                    <form action="<?= url('/admin/permissions/' . $permission->id . '/delete') ?>"
+                                    <form action="<?= route('admin.permissions.delete', ['id' => $permission->id]) ?>"
                                         method="POST" style="display:inline;"
                                         onsubmit="return confirm('Supprimer cette permission ?');">
                                         <input type="hidden" name="_csrf_token" value="<?= csrf_token() ?>">

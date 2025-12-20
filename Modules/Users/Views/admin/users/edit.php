@@ -28,7 +28,7 @@
             component('card-start', ['card_title' => "Éditer l'utilisateur : " . htmlspecialchars($user->username)]);
             ?>
 
-            <form action="<?= url('/admin/users/' . $user->id . '/update') ?>" method="POST">
+            <form action="<?= route('users.update', ['id' => $user->id]) ?>" method="POST">
                 <?= csrf_field() ?>
 
                 <div class="mb-3">
@@ -79,10 +79,10 @@
                     <button type="submit" class="btn btn-primary">
                         <i data-feather="save"></i> Mettre à jour
                     </button>
-                    <a href="<?= url('/admin/users') ?>" class="btn btn-secondary">
+                    <a href="<?= route('users.index') ?>" class="btn btn-secondary">
                         <i data-feather="x"></i> Annuler
                     </a>
-                    <form action="<?= url('/admin/users/' . $user->id . '/delete') ?>" method="POST" style="display:inline;" class="float-end" onsubmit="return confirm('Supprimer définitivement cet utilisateur ?');">
+                    <form action="<?= route('users.delete', ['id' => $user->id]) ?>" method="POST" style="display:inline;" class="float-end" onsubmit="return confirm('Supprimer définitivement cet utilisateur ?');">
                         <?= csrf_field() ?>
                         <button type="submit" class="btn btn-danger">
                             <i data-feather="trash-2"></i> Supprimer

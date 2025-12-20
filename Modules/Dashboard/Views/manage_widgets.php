@@ -30,7 +30,7 @@
                     @endif
                 </td>
                 <td>
-                    <form method="POST" action="<?= url('/admin/dashboard/widgets/toggle') ?>" style="display:inline">
+                    <form method="POST" action="<?= route('admin.dashboard.widgets.toggle') ?>" style="display:inline">
                            <?= csrf_field() ?>
                         <input type="hidden" name="widget" value="{{ $widget['name'] }}">
                         <button type="submit" class="btn btn-sm btn-outline-{{ $widget['enabled'] ? 'danger' : 'success' }}">

@@ -11,7 +11,7 @@
             </div>
             <div class="col-6">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/dashboard') ?>"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('dashboard') ?>"><i data-feather="home"></i></a></li>
                     <li class="breadcrumb-item active">Wallets</li>
                 </ol>
             </div>
@@ -75,7 +75,7 @@
                                             </td>
                                             <td><?= !empty($wallet['created_at']) ? date('d/m/Y H:i', strtotime($wallet['created_at'])) : '-' ?></td>
                                             <td>
-                                                <form method="POST" action="<?= url('/admin/wallet/topup') ?>" class="d-inline">
+                                                <form method="POST" action="<?= route('wallet.topup') ?>" class="d-inline">
                                                     <?= csrf_field() ?>
                                                     <input type="hidden" name="user_id" value="<?= $wallet['user_id'] ?>">
                                                     <input type="number" name="amount" placeholder="Montant" class="form-control form-control-sm d-inline" style="width: 100px;" min="1" required>
@@ -85,7 +85,7 @@
                                                     </button>
                                                 </form>
 
-                                                <form method="POST" action="<?= url('/admin/wallet/debit') ?>" class="d-inline mt-2">
+                                                <form method="POST" action="<?= route('wallet.debit') ?>" class="d-inline mt-2">
                                                     <?= csrf_field() ?>
                                                     <input type="hidden" name="user_id" value="<?= $wallet['user_id'] ?>">
                                                     <input type="number" name="amount" placeholder="Montant" class="form-control form-control-sm d-inline" style="width: 100px;" min="1" required>

@@ -12,8 +12,8 @@
             </div>
             <div class="col-6">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?= url('/') ?>"><i data-feather="home"></i></a></li>
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/sms') ?>">SMS</a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('home') ?>"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('sms.index') ?>">SMS</a></li>
                     <li class="breadcrumb-item active">Campaigns</li>
                 </ol>
             </div>
@@ -42,7 +42,7 @@
                             </span>
                         <?php endif; ?>
                     </div>
-                    <a href="<?= url('/admin/sms/bulk') ?>" class="btn btn-primary">
+                    <a href="<?= route('sms.bulk') ?>" class="btn btn-primary">
                         <i data-feather="plus"></i> Nouvelle Campagne
                     </a>
                 </div>

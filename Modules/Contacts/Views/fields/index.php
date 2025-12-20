@@ -22,10 +22,10 @@
 <div class="container-fluid">
     <div class="row mb-3">
         <div class="col-md-12 text-end">
-            <a href="<?= url('/admin/contacts/fields/create') ?>" class="btn btn-primary">
+            <a href="<?= route('contacts.fields.create') ?>" class="btn btn-primary">
                 <i data-feather="plus"></i> Nouveau Champ
             </a>
-            <a href="<?= url('/admin/contacts') ?>" class="btn btn-outline-secondary">
+            <a href="<?= route('contacts.index') ?>" class="btn btn-outline-secondary">
                 <i data-feather="arrow-left"></i> Retour aux Contacts
             </a>
         </div>
@@ -88,11 +88,11 @@
                                     </td>
                                     <td><?= $field->sort_order ?? 0 ?></td>
                                     <td class="text-end">
-                                        <a href="<?= url('/admin/contacts/fields/' . $field->id . '/edit') ?>"
+                                        <a href="<?= route('contacts.fields.edit', ['id' => $field->id]) ?>"
                                             class="btn btn-sm btn-warning" title="Modifier">
                                             <i data-feather="edit" style="width: 14px; height: 14px;"></i>
                                         </a>
-                                        <a href="<?= url('/admin/contacts/fields/' . $field->id . '/delete') ?>"
+                                        <a href="<?= route('contacts.fields.delete', ['id' => $field->id]) ?>"
                                             class="btn btn-sm btn-danger" title="Supprimer"
                                             onclick="return confirm('Supprimer ce champ ? Les données existantes seront conservées.')">
                                             <i data-feather="trash-2" style="width: 14px; height: 14px;"></i>

@@ -105,22 +105,22 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3">
-                            <a href="<?= url('/admin/email-marketing/campaigns/create') ?>" class="btn btn-primary btn-block">
+                            <a href="<?= route('admin.email-marketing.campaigns.create') ?>" class="btn btn-primary btn-block">
                                 <i data-feather="plus-circle"></i> New Campaign
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a href="<?= url('/admin/email-marketing/templates/create') ?>" class="btn btn-success btn-block">
+                            <a href="<?= route('admin.email-marketing.templates.create') ?>" class="btn btn-success btn-block">
                                 <i data-feather="file-text"></i> New Template
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a href="<?= url('/admin/email-marketing/workflows/create') ?>" class="btn btn-warning btn-block">
+                            <a href="<?= route('admin.email-marketing.workflows.create') ?>" class="btn btn-warning btn-block">
                                 <i data-feather="git-branch"></i> New Workflow
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a href="<?= url('/admin/email-marketing/analytics') ?>" class="btn btn-info btn-block">
+                            <a href="<?= route('admin.email-marketing.analytics') ?>" class="btn btn-info btn-block">
                                 <i data-feather="bar-chart-2"></i> View Analytics
                             </a>
                         </div>
@@ -136,7 +136,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5>Recent Campaigns</h5>
-                    <a href="<?= url('/admin/email-marketing/campaigns') ?>" class="btn btn-sm btn-primary">View All</a>
+                    <a href="<?= route('admin.email-marketing.campaigns.index') ?>" class="btn btn-sm btn-primary">View All</a>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -178,7 +178,7 @@
                                             <td><?= $campaign->getOpenRate() ?>%</td>
                                             <td><?= $campaign->getClickRate() ?>%</td>
                                             <td>
-                                                <a href="<?= url('/admin/email-marketing/campaigns/' . $campaign->id) ?>" class="btn btn-sm btn-info" title="View details">
+                                                <a href="<?= route('admin.email-marketing.campaigns.show', ['id' => $campaign->id]) ?>" class="btn btn-sm btn-info" title="View details">
                                                     <i data-feather="eye"></i>
                                                 </a>
                                             </td>

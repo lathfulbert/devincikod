@@ -73,10 +73,10 @@
                     <button type="submit" class="btn btn-primary">
                         <i data-feather="save"></i> Mettre à jour
                     </button>
-                    <a href="<?= url('/admin/roles') ?>" class="btn btn-secondary">
+                    <a href="<?= route('admin.roles.index') ?>" class="btn btn-secondary">
                         <i data-feather="x"></i> Annuler
                     </a>
-                    <a href="<?= url('/admin/roles/' . $role->id . '/delete') ?>"
+                    <a href="<?= route('admin.roles.delete', ['id' => $role->id]) ?>"
                         class="btn btn-danger float-end"
                         onclick="return confirm('Supprimer définitivement ce rôle ?')">
                         <i data-feather="trash-2"></i> Supprimer

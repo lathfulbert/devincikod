@@ -31,7 +31,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5>Automated Workflows</h5>
-                    <a href="<?= url('/admin/email-marketing/workflows/create') ?>" class="btn btn-primary">
+                    <a href="<?= route('admin.email-marketing.workflows.create') ?>" class="btn btn-primary">
                         <i data-feather="plus"></i> New Workflow
                     </a>
                 </div>
@@ -107,13 +107,13 @@
                                             </td>
                                             <td>
                                                 <div class="btn-group" role="group">
-                                                    <a href="<?= url('/admin/email-marketing/workflows/' . $workflow->id) ?>"
+                                                    <a href="<?= route('admin.email-marketing.workflows.show', ['id' => $workflow->id]) ?>"
                                                        class="btn btn-sm btn-info" title="View">
                                                         <i data-feather="eye"></i>
                                                     </a>
 
                                                     <?php if ($workflow->status !== 'archived'): ?>
-                                                        <a href="<?= url('/admin/email-marketing/workflows/' . $workflow->id . '/edit') ?>"
+                                                        <a href="<?= route('admin.email-marketing.workflows.edit', ['id' => $workflow->id]) ?>"
                                                            class="btn btn-sm btn-warning" title="Edit">
                                                             <i data-feather="edit"></i>
                                                         </a>
@@ -121,7 +121,7 @@
 
                                                     <?php if ($workflow->status === 'draft' || $workflow->status === 'paused'): ?>
                                                         <form method="POST"
-                                                              action="<?= url('/admin/email-marketing/workflows/' . $workflow->id . '/activate') ?>"
+                                                              action="<?= route('admin.email-marketing.workflows.activate', ['id' => $workflow->id]) ?>"
                                                               style="display: inline;">
                                                             <button type="submit" class="btn btn-sm btn-success" title="Activate">
                                                                 <i data-feather="play"></i>
@@ -131,7 +131,7 @@
 
                                                     <?php if ($workflow->status === 'active'): ?>
                                                         <form method="POST"
-                                                              action="<?= url('/admin/email-marketing/workflows/' . $workflow->id . '/pause') ?>"
+                                                              action="<?= route('admin.email-marketing.workflows.pause', ['id' => $workflow->id]) ?>"
                                                               style="display: inline;">
                                                             <button type="submit" class="btn btn-sm btn-warning" title="Pause">
                                                                 <i data-feather="pause"></i>
@@ -147,7 +147,7 @@
 
                                                     <?php if ($workflow->status === 'draft'): ?>
                                                         <form method="POST"
-                                                              action="<?= url('/admin/email-marketing/workflows/' . $workflow->id . '/delete') ?>"
+                                                              action="<?= route('admin.email-marketing.workflows.delete', ['id' => $workflow->id]) ?>"
                                                               style="display: inline;"
                                                               onsubmit="return confirm('Are you sure you want to delete this workflow?');">
                                                             <button type="submit" class="btn btn-sm btn-danger" title="Delete">
@@ -164,7 +164,7 @@
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
                                                     <form method="POST"
-                                                          action="<?= url('/admin/email-marketing/workflows/' . $workflow->id . '/execute') ?>">
+                                                          action="<?= route('admin.email-marketing.workflows.execute', ['id' => $workflow->id]) ?>">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title">Execute Workflow</h5>
                                                             <button type="button" class="close" data-dismiss="modal">

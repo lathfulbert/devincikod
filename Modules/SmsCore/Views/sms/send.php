@@ -12,8 +12,8 @@
             </div>
             <div class="col-6">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?= url('/') ?>"><i data-feather="home"></i></a></li>
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/sms') ?>">SMS</a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('home') ?>"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('sms.index') ?>">SMS</a></li>
                     <li class="breadcrumb-item active">Send</li>
                 </ol>
             </div>

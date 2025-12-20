@@ -12,8 +12,8 @@
             </div>
             <div class="col-6">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?= url('/') ?>"><i data-feather="home"></i></a></li>
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/sms') ?>">SMS</a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('home') ?>"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('sms.index') ?>">SMS</a></li>
                     <li class="breadcrumb-item active">Sender Names</li>
                 </ol>
             </div>
@@ -47,7 +47,7 @@
                             <h5><i data-feather="message-square"></i> Sender Names</h5>
                         </div>
                         <div class="col-md-6 text-end">
-                            <a href="<?= url('/admin/sms/sender-names/create') ?>" class="btn btn-sm btn-primary">
+                            <a href="<?= route('sms.sender-names.create') ?>" class="btn btn-sm btn-primary">
                                 <i data-feather="plus"></i> Add Sender Name
                             </a>
                         </div>

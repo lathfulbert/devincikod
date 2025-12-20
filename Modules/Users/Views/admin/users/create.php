@@ -29,7 +29,7 @@
             component('card-start',['card_title' => $card_title ]);
             ?>
 
-            <form action="<?= url('/admin/users/store') ?>" method="POST">
+            <form action="<?= route('users.store') ?>" method="POST">
                 <?= csrf_field() ?>
 
                 <div class="mb-3">
@@ -76,7 +76,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i data-feather="save"></i> Créer l'utilisateur
                     </button>
-                    <a href="<?= url('/admin/users') ?>" class="btn btn-secondary">
+                    <a href="<?= route('users.index') ?>" class="btn btn-secondary">
                         <i data-feather="x"></i> Annuler
                     </a>
                 </div>

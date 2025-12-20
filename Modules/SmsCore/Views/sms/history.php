@@ -12,8 +12,8 @@
             </div>
             <div class="col-6">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?= url('/') ?>"><i data-feather="home"></i></a></li>
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/sms') ?>">SMS</a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('home') ?>"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('sms.index') ?>">SMS</a></li>
                     <li class="breadcrumb-item active">History</li>
                 </ol>
             </div>
@@ -40,7 +40,7 @@
                             <?php endif; ?>
                         </div>
                         <div class="col-md-6 text-end">
-                            <a href="<?= url('/admin/sms/send') ?>" class="btn btn-sm btn-primary">
+                            <a href="<?= route('sms.send') ?>" class="btn btn-sm btn-primary">
                                 <i data-feather="send"></i> Send New SMS
                             </a>
                         </div>

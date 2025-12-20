@@ -11,7 +11,7 @@
             </div>
             <div class="col-6">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/dashboard') ?>"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('admin.dashboard') ?>"><i data-feather="home"></i></a></li>
                     <li class="breadcrumb-item active">Monitoring</li>
                 </ol>
             </div>

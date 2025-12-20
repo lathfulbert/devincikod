@@ -12,8 +12,8 @@
             </div>
             <div class="col-6">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/dashboard') ?>"><i data-feather="home"></i></a></li>
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/cache') ?>">Cache</a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('admin.dashboard') ?>"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('admin.cache.index') ?>">Cache</a></li>
                     <li class="breadcrumb-item active">Statistiques</li>
                 </ol>
             </div>
@@ -35,13 +35,13 @@
                             <h5>Statistiques du Cache</h5>
                         </div>
                         <div class="col-md-6 text-end">
-                            <form method="POST" action="<?= url('/admin/cache/clear') ?>" onsubmit="return confirm('Êtes-vous sûr de vouloir vider tout le cache ?');" style="display:inline;">
+                            <form method="POST" action="<?= route('admin.cache.clear') ?>" onsubmit="return confirm('Êtes-vous sûr de vouloir vider tout le cache ?');" style="display:inline;">
                                 <?= csrf_field() ?>
                                 <button type="submit" class="btn btn-danger btn-sm">
                                     <i data-feather="trash-2"></i> Vider le cache
                                 </button>
                             </form>
-                            <a href="<?= url('/admin/cache') ?>" class="btn btn-secondary btn-sm">
+                            <a href="<?= route('admin.cache.index') ?>" class="btn btn-secondary btn-sm">
                                 <i data-feather="settings"></i> Configuration
                             </a>
                         </div>

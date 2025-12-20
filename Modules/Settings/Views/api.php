@@ -28,7 +28,7 @@
             component('card-start', ['card_title' => "API Keys Configuration"]);
             ?>
 
-            <form action="<?= url('/admin/settings/api/update') ?>" method="POST">
+            <form action="<?= route('admin.settings.api.update') ?>" method="POST">
                 <?= csrf_field() ?>
 
                 <div class="alert alert-info">

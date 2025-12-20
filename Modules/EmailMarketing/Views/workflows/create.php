@@ -12,9 +12,9 @@
             </div>
             <div class="col-6">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?= url('/') ?>"><i data-feather="home"></i></a></li>
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/email-marketing') ?>">Email Marketing</a></li>
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/email-marketing/workflows') ?>">Workflows</a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('home') ?>"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('admin.email-marketing.index') ?>">Email Marketing</a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('admin.email-marketing.workflows.index') ?>">Workflows</a></li>
                     <li class="breadcrumb-item active">Create</li>
                 </ol>
             </div>
@@ -27,7 +27,7 @@
 </div>
 
 <div class="container-fluid">
-    <form method="POST" action="<?= url('/admin/email-marketing/workflows') ?>" id="workflowForm">
+    <form method="POST" action="<?= route('admin.email-marketing.workflows.store') ?>" id="workflowForm">
         <div class="row">
             <div class="col-md-8">
                 <div class="card">
@@ -118,7 +118,7 @@
                         <button type="submit" class="btn btn-primary btn-block">
                             <i data-feather="save"></i> Create Workflow
                         </button>
-                        <a href="<?= url('/admin/email-marketing/workflows') ?>" class="btn btn-secondary btn-block">
+                        <a href="<?= route('admin.email-marketing.workflows.index') ?>" class="btn btn-secondary btn-block">
                             <i data-feather="x"></i> Cancel
                         </a>
                     </div>

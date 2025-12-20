@@ -101,7 +101,7 @@
                                 </td>
                                 <td class="text-end">
                                     <?php if (!$apiKey->deleted_at && $apiKey->is_active): ?>
-                                        <form action="<?= url('/admin/system-api-keys/' . $apiKey->id . '/revoke') ?>"
+                                        <form action="<?= route('admin.system-api-keys.revoke', ['id' => $apiKey->id]) ?>"
                                             method="POST" style="display:inline;"
                                             onsubmit="return confirm('Revoke this API key?');">
                                             <input type="hidden" name="_csrf_token" value="<?= csrf_token() ?>">
@@ -110,7 +110,7 @@
                                             </button>
                                         </form>
                                     <?php elseif (!$apiKey->deleted_at && !$apiKey->is_active): ?>
-                                        <form action="<?= url('/admin/system-api-keys/' . $apiKey->id . '/activate') ?>"
+                                        <form action="<?= route('admin.system-api-keys.activate', ['id' => $apiKey->id]) ?>"
                                             method="POST" style="display:inline;">
                                             <input type="hidden" name="_csrf_token" value="<?= csrf_token() ?>">
                                             <button type="submit" class="btn btn-sm btn-success" title="Activate">
@@ -120,7 +120,7 @@
                                     <?php endif; ?>
 
                                     <?php if (!$apiKey->deleted_at): ?>
-                                        <form action="<?= url('/admin/system-api-keys/' . $apiKey->id . '/delete') ?>"
+                                        <form action="<?= route('admin.system-api-keys.delete', ['id' => $apiKey->id]) ?>"
                                             method="POST" style="display:inline;"
                                             onsubmit="return confirm('Delete this API key permanently?');">
                                             <input type="hidden" name="_csrf_token" value="<?= csrf_token() ?>">
@@ -154,7 +154,7 @@
 <div class="modal fade" id="createApiKeyModal" tabindex="-1" aria-labelledby="createApiKeyModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="<?= url('/admin/system-api-keys/store') ?>" method="POST">
+            <form action="<?= route('admin.system-api-keys.store') ?>" method="POST">
                 <?= csrf_field() ?>
 
                 <div class="modal-header">

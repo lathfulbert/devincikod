@@ -24,7 +24,7 @@
     <!--Actions-->
     <div class="row mb-3">
         <div class="col-12 text-end">
-            <a href="<?= url('/admin/roles/create') ?>" class="btn btn-primary">
+            <a href="<?= route('admin.roles.create') ?>" class="btn btn-primary">
                 <i data-feather="plus"></i> Nouveau rôle
             </a>
         </div>
@@ -64,11 +64,11 @@
                                     ?>
                                 </td>
                                 <td class="text-end">
-                                    <a href="<?= url('/admin/roles/' . $role->id . '/edit') ?>"
+                                    <a href="<?= route('admin.roles.edit', ['id' => $role->id]) ?>"
                                         class="btn btn-sm btn-warning" title="Éditer">
                                         <i data-feather="edit" style="width: 14px; height: 14px;"></i>
                                     </a>
-                                    <form action="<?= url('/admin/roles/' . $role->id . '/delete') ?>"
+                                    <form action="<?= route('admin.roles.delete', ['id' => $role->id]) ?>"
                                         method="POST" style="display:inline;"
                                         onsubmit="return confirm('Supprimer ce rôle ?');">
                                         <input type="hidden" name="_csrf_token" value="<?= csrf_token() ?>">

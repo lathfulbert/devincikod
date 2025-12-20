@@ -28,7 +28,7 @@
             component('card-start', ['card_title' => "Configuration Mail"]);
             ?>
 
-            <form action="<?= url('/admin/settings/mail/update') ?>" method="POST">
+            <form action="<?= route('admin.settings.mail.update') ?>" method="POST">
                 <?= csrf_field() ?>
 
                 <div class="row">

@@ -26,7 +26,7 @@
             component('card-start', ['card_title' => "Modifier le contact : " . htmlspecialchars($contact->getFullName())]);
             ?>
 
-            <form action="<?= url('/admin/contacts/' . $contact->id . '/update') ?>" method="POST">
+            <form action="<?= route('contacts.update', ['id' => $contact->id]) ?>" method="POST">
                 <?= csrf_field() ?>
 
                 <h5 class="mb-3">Informations de base</h5>
@@ -129,10 +129,10 @@
                     <button type="submit" class="btn btn-primary">
                         <i data-feather="save"></i> Mettre à jour
                     </button>
-                    <a href="<?= url('/admin/contacts') ?>" class="btn btn-secondary">
+                    <a href="<?= route('contacts.index') ?>" class="btn btn-secondary">
                         <i data-feather="x"></i> Annuler
                     </a>
-                    <a href="<?= url('/admin/contacts/' . $contact->id . '/delete') ?>"
+                    <a href="<?= route('contacts.delete', ['id' => $contact->id]) ?>"
                         class="btn btn-danger float-end"
                         onclick="return confirm('Supprimer définitivement ce contact ?')">
                         <i data-feather="trash-2"></i> Supprimer

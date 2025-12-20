@@ -12,8 +12,8 @@
             </div>
             <div class="col-6">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?= url('/') ?>"><i data-feather="home"></i></a></li>
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/wallet') ?>">Wallet</a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('home') ?>"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('wallet.index') ?>">Wallet</a></li>
                     <li class="breadcrumb-item active">Mes Demandes</li>
                 </ol>
             </div>
@@ -27,10 +27,10 @@
             <!-- Actions rapides -->
             <div class="card mb-3">
                 <div class="card-body">
-                    <a href="<?= url('/admin/wallet/topup') ?>" class="btn btn-primary">
+                    <a href="<?= route('wallet.topup') ?>" class="btn btn-primary">
                         <i data-feather="plus"></i> Nouvelle Demande de Rechargement
                     </a>
-                    <a href="<?= url('/admin/wallet') ?>" class="btn btn-secondary">
+                    <a href="<?= route('wallet.index') ?>" class="btn btn-secondary">
                         <i data-feather="arrow-left"></i> Retour au Wallet
                     </a>
                 </div>

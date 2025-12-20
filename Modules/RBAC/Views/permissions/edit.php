@@ -28,7 +28,7 @@
             component('card-start', ['card_title' => "Éditer la permission : " . htmlspecialchars($permission->name)]);
             ?>
 
-            <form action="<?= url('/admin/permissions/' . $permission->id . '/update') ?>" method="POST">
+            <form action="<?= route('admin.permissions.update', ['id' => $permission->id]) ?>" method="POST">
                 <?= csrf_field() ?>
 
                 <div class="mb-3">
@@ -64,10 +64,10 @@
                     <button type="submit" class="btn btn-primary">
                         <i data-feather="save"></i> Mettre à jour
                     </button>
-                    <a href="<?= url('/admin/permissions') ?>" class="btn btn-secondary">
+                    <a href="<?= route('admin.permissions.index') ?>" class="btn btn-secondary">
                         <i data-feather="x"></i> Annuler
                     </a>
-                    <a href="<?= url('/admin/permissions/' . $permission->id . '/delete') ?>"
+                    <a href="<?= route('admin.permissions.delete', ['id' => $permission->id]) ?>"
                         class="btn btn-danger float-end"
                         onclick="return confirm('Supprimer définitivement cette permission ?')">
                         <i data-feather="trash-2"></i> Supprimer

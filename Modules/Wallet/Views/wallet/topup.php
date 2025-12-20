@@ -12,8 +12,8 @@
             </div>
             <div class="col-6">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?= url('/') ?>"><i data-feather="home"></i></a></li>
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/wallet') ?>">Wallet</a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('home') ?>"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('wallet.index') ?>">Wallet</a></li>
                     <li class="breadcrumb-item active">Top-up</li>
                 </ol>
             </div>
@@ -29,7 +29,7 @@
                     <h5>Add Funds</h5>
                 </div>
                 <div class="card-body">
-                    <form action="<?= url('/admin/wallet/topup') ?>" method="POST">
+                    <form action="<?= route('wallet.topup') ?>" method="POST">
                         <?= csrf_field() ?>
                         <input type="hidden" name="user_id" value="<?= $userId ?>">
 
@@ -96,7 +96,7 @@
                         </button>
 
                         <div class="mt-3 text-center">
-                            <a href="<?= url('/admin/wallet/requests') ?>" class="btn btn-link">
+                            <a href="<?= route('wallet.requests') ?>" class="btn btn-link">
                                 <i data-feather="list"></i> Voir mes demandes précédentes
                             </a>
                         </div>
@@ -121,7 +121,7 @@
                             <li><i data-feather="check" class="text-success me-2"></i> Transaction History</li>
                         </ul>
                         <div class="mt-3">
-                            <a href="<?= url('/admin/sms') ?>" class="btn btn-secondary btn-sm">
+                            <a href="<?= route('sms.index') ?>" class="btn btn-secondary btn-sm">
                                 <i data-feather="arrow-left"></i> Back to Dashboard
                             </a>
                         </div>

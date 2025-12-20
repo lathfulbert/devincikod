@@ -11,8 +11,8 @@
             </div>
             <div class="col-6">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/dashboard') ?>"><i data-feather="home"></i></a></li>
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/wallet') ?>">Wallet</a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('dashboard') ?>"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('wallet.index') ?>">Wallet</a></li>
                     <li class="breadcrumb-item active">Mes Demandes</li>
                 </ol>
             </div>
@@ -26,7 +26,7 @@
     <!-- Bouton nouvelle demande -->
     <div class="row mb-3">
         <div class="col-12">
-            <a href="<?= url('/admin/wallet/topup') ?>" class="btn btn-success">
+            <a href="<?= route('wallet.topup') ?>" class="btn btn-success">
                 <i class="icon-plus"></i> Nouvelle Demande de Recharge
             </a>
         </div>
@@ -60,7 +60,7 @@
                                             <div class="text-muted">
                                                 <i class="icon-list font-24"></i>
                                                 <p class="mt-2">Aucune demande trouvée.</p>
-                                                <a href="<?= url('/admin/wallet/topup') ?>" class="btn btn-sm btn-primary">
+                                                <a href="<?= route('wallet.topup') ?>" class="btn btn-sm btn-primary">
                                                     Faire ma première demande
                                                 </a>
                                             </div>

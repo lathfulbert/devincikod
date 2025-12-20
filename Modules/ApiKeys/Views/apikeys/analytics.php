@@ -27,7 +27,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form method="GET" action="<?= url('/admin/system-api-keys/analytics') ?>" class="row g-3">
+                    <form method="GET" action="<?= route('admin.system-api-keys.analytics') ?>" class="row g-3">
                         <div class="col-md-5">
                             <label for="api_key_id" class="form-label">Select API Key</label>
                             <select name="api_key_id" id="api_key_id" class="form-select" onchange="this.form.submit()">
@@ -56,11 +56,11 @@
 
                         <div class="col-md-3">
                             <label class="form-label d-block">&nbsp;</label>
-                            <a href="<?= url('/admin/system-api-keys/analytics/export?api_key_id=' . $selectedKeyId . '&period=' . $period . '&format=csv') ?>"
+                            <a href="<?= route('admin.system-api-keys.analytics.export', ['api_key_id' => $selectedKeyId, 'period' => $period, 'format' => 'csv']) ?>"
                                 class="btn btn-outline-primary">
                                 <i data-feather="download"></i> Export CSV
                             </a>
-                            <a href="<?= url('/admin/system-api-keys/analytics/export?api_key_id=' . $selectedKeyId . '&period=' . $period . '&format=json') ?>"
+                            <a href="<?= route('admin.system-api-keys.analytics.export', ['api_key_id' => $selectedKeyId, 'period' => $period, 'format' => 'json']) ?>"
                                 class="btn btn-outline-secondary">
                                 <i data-feather="file-text"></i> JSON
                             </a>

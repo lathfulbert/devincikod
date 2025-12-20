@@ -11,7 +11,7 @@
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?= url('/admin/dashboard') ?>">Home</a></li>
+                    <li class="breadcrumb-item"><a href="<?= route('admin.dashboard') ?>">Home</a></li>
                     <li class="breadcrumb-item active">Modules</li>
                 </ol>
             </div>
@@ -28,7 +28,7 @@
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <a href="<?= url('/admin/modules/upload') ?>" class="btn btn-primary">
+                        <a href="<?= route('admin.modules.upload') ?>" class="btn btn-primary">
                             <i data-feather="upload"></i> Installer un nouveau module
                         </a>
                     </div>
