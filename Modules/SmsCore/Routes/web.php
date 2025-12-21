@@ -76,7 +76,7 @@ $router->group([
         ->name('sms.send');
 
     // Bulk SMS
-    $router->get('/bulk', [SmsController::class, 'bulkForm'])
+    $router->get('/bulk', [SmsController::class, 'bulk'])
         ->middleware('can:sms.bulk')
         ->name('sms.bulk.form');
 
@@ -88,5 +88,20 @@ $router->group([
     $router->post('/parse-file', [SmsController::class, 'parseFile'])
         ->middleware('can:sms.send')
         ->name('sms.parse_file');
+    
+        // Fournisseurs
+        $router->get('/providers', [\Modules\SmsCore\Controllers\ProviderDashboardController::class, 'index'])
+            ->middleware('sms.providers.manage')
+            ->name('admin.sms.providers');
+
+        // Contrats Orange
+        $router->get('/contracts', [\Modules\SmsCore\Controllers\ProviderDashboardController::class, 'orange'])
+            ->middleware('can:sms.contracts.view')
+            ->name('admin.sms.contracts');
+
+        // Facturation (exemple, à compléter selon logique métier)
+        $router->get('/billing', [\Modules\SmsCore\Controllers\SmsBillingController::class, 'index'])
+            ->middleware('can:sms.billing.view')
+            ->name('admin.sms.billing');
 
 });

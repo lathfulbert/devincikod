@@ -60,7 +60,7 @@
                                             <td><?= $log->ip_address ?? 'N/A' ?></td>
                                             <td>
                                                 <?php if ($log->details): ?>
-                                                    <button class="btn btn-sm btn-info" onclick="showDetails(<?= htmlspecialchars($log->details) ?>)">
+                                                    <button class="btn btn-sm btn-info" onclick="showDetails(<?= is_array($log->details) ? json_encode($log->details) : htmlspecialchars($log->details) ?>)">
                                                         Voir détails
                                                     </button>
                                                 <?php else: ?>

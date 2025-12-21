@@ -67,11 +67,21 @@
                                                 ?>
                                             </td>
                                             <td>
-                                                <?php if ($log->user): ?>
-                                                    <?= htmlspecialchars($log->user->username ?? $log->user->email) ?>
-                                                <?php else: ?>
-                                                    <span class="text-muted">Inconnu (<?= $log->user_id ?>)</span>
-                                                <?php endif; ?>
+                                                <?php
+                                                if ($log->user) {
+                                                    echo htmlspecialchars($log->user->username ?? $log->user->email);
+                                                } elseif (!empty($log->user_id)) {
+                                                    // Fallback : récupération manuelle
+                                                    $user = \Modules\Users\Models\User::find($log->user_id);
+                                                    if ($user) {
+                                                        echo htmlspecialchars($user->username ?? $user->email);
+                                                    } else {
+                                                        echo '<span class="text-muted">Inconnu (' . $log->user_id . ')</span>';
+                                                    }
+                                                } else {
+                                                    echo '<span class="text-muted">Inconnu</span>';
+                                                }
+                                                ?>
                                             </td>
                                             <td><?= htmlspecialchars($log->recipient) ?></td>
                                             <td><span class="badge badge-light text-dark"><?= strtoupper($log->sms_type) ?></span></td>

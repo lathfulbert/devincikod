@@ -22,8 +22,8 @@ class AuthSetting extends Model
     {
         $setting = static::query()->where('key', $key)->first();
         if (!$setting) return $default;
-        $value = $setting['value'];
-        switch ($setting['type']) {
+        $value = $setting->value;
+        switch ($setting->type) {
             case 'int': return (int)$value;
             case 'bool': return (bool)$value;
             case 'json': return json_decode($value, true);

@@ -1,0 +1,44 @@
+<?php
+// Migration : création de la table sms_billing_logs
+
+use App\Core\Database\Migration;
+
+class CreateSmsBillingLogsTable extends Migration
+{
+    public function up()
+    {
+        $this->execute('
+            CREATE TABLE sms_billing_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NULL,
+                sender_id INT NULL,
+                recipient VARCHAR(255) NOT NULL,
+                country_code VARCHAR(10) NOT NULL,
+                operator VARCHAR(50) NOT NULL,
+                gateway VARCHAR(50) NOT NULL,
+                sms_type VARCHAR(20) NOT NULL,
+                segments INT DEFAULT 1,
+                unit_cost FLOAT DEFAULT 0,
+                total_cost FLOAT DEFAULT 0,
+                currency VARCHAR(10) DEFAULT "XOF",
+                status VARCHAR(20) DEFAULT "pending",
+                created_by INT NULL,
+                updated_by INT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                INDEX idx_user_id (user_id),
+                INDEX idx_sender_id (sender_id),
+                INDEX idx_recipient (recipient),
+                INDEX idx_country_code (country_code),
+                INDEX idx_operator (operator),
+                INDEX idx_gateway (gateway),
+                INDEX idx_status (status)
+            );
+        ');
+    }
+
+    public function down()
+    {
+        $this->execute('DROP TABLE IF EXISTS sms_billing_logs;');
+    }
+}

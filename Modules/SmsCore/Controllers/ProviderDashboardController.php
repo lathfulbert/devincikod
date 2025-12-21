@@ -15,7 +15,7 @@ class ProviderDashboardController
     public function index()
     {
         $user = auth()->user();
-        if (!$user->can('sms.providers.manage')) {
+        if (!$user->can('sms.providers.view')) {
             $_SESSION['flash_error'] = "Vous n'avez pas la permission d'accéder à cette page.";
             redirect('/admin/dashboard');
             exit;

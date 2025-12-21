@@ -574,7 +574,34 @@ if (!function_exists('route')) {
      */
     function route(string $name, array $params = []): string
     {
-        return app()->router->route($name, $params);
+        $url = app()->router->route($name, $params);
+        // Correction pour les routes du module SmsCore qui retournent #
+        if ($url === '#' && str_starts_with($name, 'admin.sms.')) {
+            // Générer l'URL absolue en fonction du nom de la route
+            $base = '/sunuframework3/admin/sms/';
+            $map = [
+                'admin.sms.index' => '',
+                'admin.sms.statistics' => 'statistics',
+                'admin.sms.history' => 'history',
+                'admin.sms.contracts' => 'contracts',
+                'admin.sms.campaigns.index' => 'campaigns',
+                'admin.sms.providers' => 'providers',
+                'admin.sms.pricing' => 'pricing',
+                'admin.sms.billing' => 'billing',
+                'admin.sms.api.docs' => 'api/docs',
+                'admin.sms.sender_names' => 'sender-names',
+                'admin.sms.send' => 'send',
+                'admin.sms.bulk' => 'bulk',
+            ];
+            if (isset($map[$name])) {
+                $url = $base . $map[$name];
+                // Ajout des paramètres si besoin
+                if (!empty($params)) {
+                    $url .= '?' . http_build_query($params);
+                }
+            }
+        }
+        return $url;
     }
 }
 

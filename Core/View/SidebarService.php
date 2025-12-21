@@ -163,6 +163,8 @@ class SidebarService
         if ($type === 'dropdown') {
             // Filtrer les enfants selon les permissions
             $filteredChildren = [];
+            $activeDropdown = false;
+            $currentUrl = current_url();
             if (isset($item['children']) && is_array($item['children'])) {
                 foreach ($item['children'] as $child) {
                     if (isset($child['permission'])) {
@@ -170,6 +172,12 @@ class SidebarService
                             continue; // Sauter cet enfant si permission manquante
                         }
                     }
+                    // Vérifier si l'enfant est actif
+                    $childUrl = isset($child['route']) ? (isset($child['route_params']) ? route($child['route'], $child['route_params']) : route($child['route'])) : (isset($child['url']) ? url($child['url']) : '#');
+                    if ($childUrl !== '#' && $currentUrl == $childUrl) {
+                        $activeDropdown = true;
+                    }
+                    $child['_sidebar_url'] = $childUrl;
                     $filteredChildren[] = $child;
                 }
             }
@@ -177,21 +185,15 @@ class SidebarService
             // N'afficher le dropdown que s'il y a des enfants visibles
             if (!empty($filteredChildren)) {
                 echo '<li class="sidebar-list">
-                        <a class="sidebar-link sidebar-title" href="javascript:void(0)">
+                        <a class="sidebar-link sidebar-title' . ($activeDropdown ? ' active' : '') . '" href="javascript:void(0)">
                             <i data-feather="' . ($item['icon'] ?? 'circle') . '"></i>
                             <span>' . htmlspecialchars($item['title']) . '</span>
                         </a>
                         <ul class="sidebar-submenu">';
 
                 foreach ($filteredChildren as $child) {
-                    if (isset($child['route'])) {
-                        $childUrl = isset($child['route_params']) ? route($child['route'], $child['route_params']) : route($child['route']);
-                    } elseif (isset($child['url'])) {
-                        $childUrl = url($child['url']);
-                    } else {
-                        $childUrl = '#';
-                    }
-                    echo '<li><a href="' . $childUrl . '">' . htmlspecialchars($child['title']) . '</a></li>';
+                    $activeClass = ($currentUrl == $child['_sidebar_url']) ? 'active' : '';
+                    echo '<li><a class="' . $activeClass . '" href="' . $child['_sidebar_url'] . '">' . htmlspecialchars($child['title']) . '</a></li>';
                 }
 
                 echo '  </ul>
