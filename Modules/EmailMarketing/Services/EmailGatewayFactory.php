@@ -149,6 +149,14 @@ class EmailGatewayFactory
     }
 
     /**
+     * Obtenir le gateway par défaut (public)
+     */
+    public function getDefaultGatewayPublic(): string
+    {
+        return $this->getDefaultGateway();
+    }
+
+    /**
      * Obtenir tous les gateways disponibles
      *
      * @return array
@@ -209,5 +217,13 @@ class EmailGatewayFactory
     public function reset(): void
     {
         $this->instances = [];
+    }
+
+    /**
+     * Obtenir la configuration d'un gateway (public)
+     */
+    public function getGatewayConfigPublic(string $gatewayName): array
+    {
+        return $this->getGatewayConfig($gatewayName);
     }
 }

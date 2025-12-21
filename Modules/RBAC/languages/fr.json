@@ -34,6 +34,12 @@
         "created": "Permission créée avec succès",
         "updated": "Permission mise à jour avec succès",
         "deleted": "Permission supprimée avec succès"
+      },
+      "manage_email_gateways": {
+        "name": "Gérer les gateways email",
+        "slug": "manage_email_gateways",
+        "description": "Permet d'ajouter, modifier et supprimer les configurations des gateways email (SMTP, Infobip, ElasticMail, Twilio, etc.)",
+        "module": "EmailMarketing"
       }
     }
   }

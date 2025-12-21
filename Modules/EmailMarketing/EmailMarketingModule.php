@@ -13,9 +13,10 @@ class EmailMarketingModule extends AbstractModule
 
     public function getRoutes(): array
     {
-        // Charger les routes depuis le fichier routes/admin.php
+        // Charger les routes depuis le fichier routes/admin.php et gateways.php
         return [
             'admin' => __DIR__ . '/Routes/admin.php',
+            'gateways' => __DIR__ . '/Routes/gateways.php',
         ];
     }
 
@@ -32,6 +33,12 @@ class EmailMarketingModule extends AbstractModule
                     ['title' => 'Templates', 'route' => 'admin.email-marketing.templates.index'],
                     ['title' => 'Workflows', 'route' => 'admin.email-marketing.workflows.index'],
                     ['title' => 'Analytics', 'route' => 'admin.email-marketing.analytics'],
+                    [
+                        'title' => 'Gateways Email',
+                        'route' => 'admin.email-marketing.gateways.index',
+                        'icon' => 'settings',
+                        'permission' => 'manage_email_gateways'
+                    ],
                 ]
             ]
         ];

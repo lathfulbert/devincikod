@@ -28,6 +28,7 @@
 
 <div class="container-fluid">
     <form method="POST" action="<?= url('/admin/email-marketing/templates') ?>">
+        <?= csrf_field() ?>
         <div class="row">
             <div class="col-md-9">
                 <div class="card">
