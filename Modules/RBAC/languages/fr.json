@@ -1,7 +1,7 @@
 {
   "rbac": {
     "roles": {
-      "title": "Gestion des rôles",
+      "title": "Rôles",
       "list": "Liste des rôles",
       "create_role": "Créer un rôle",
       "edit_role": "Modifier le rôle",
@@ -19,7 +19,7 @@
       }
     },
     "permissions": {
-      "title": "Gestion des permissions",
+      "title": "Permissions",
       "list": "Liste des permissions",
       "create_permission": "Créer une permission",
       "edit_permission": "Modifier la permission",

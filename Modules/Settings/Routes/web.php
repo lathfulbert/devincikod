@@ -9,6 +9,10 @@ use Modules\Settings\Controllers\LogsController;
 |--------------------------------------------------------------------------
 */
 
+
+// Settings main page (nommée)
+$router->get('/admin/settings', [\Modules\Settings\Controllers\SettingsController::class, 'index'])->name('admin.settings.index');
+
 // Health Check / System Monitoring Routes
 $router->group(['prefix' => '/admin'], function ($router) {
     // Dashboard de monitoring (accessible aux admins)
