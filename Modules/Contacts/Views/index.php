@@ -22,7 +22,7 @@
     <!-- Filters & Actions -->
     <div class="row mb-3">
         <div class="col-md-8">
-            <form method="GET" action="<?= route('contacts.index') ?>" class="row g-2">
+            <form method="GET" action="<?= url('admin/contacts') ?>" class="row g-2">
                 <div class="col-md-6">
                     <input type="text" name="search" class="form-control" placeholder="Rechercher par nom, téléphone ou email..." value="<?= htmlspecialchars($filters['search'] ?? '') ?>">
                 </div>
@@ -41,10 +41,10 @@
             </form>
         </div>
         <div class="col-md-4 text-end">
-            <a href="<?= route('contacts.create') ?>" class="btn btn-primary">
+            <a href="<?= url('admin/contacts/create') ?>" class="btn btn-primary">
                 <i data-feather="plus"></i> Nouveau Contact
             </a>
-            <a href="<?= route('contacts.fields.index') ?>" class="btn btn-outline-secondary">
+            <a href="<?= url('admin/contacts/fields') ?>" class="btn btn-outline-secondary">
                 <i data-feather="settings"></i> Champs
             </a>
         </div>
@@ -91,11 +91,11 @@
                                         <?php endif; ?>
                                     </td>
                                     <td class="text-end">
-                                        <a href="<?= route('contacts.edit', ['id' => $contact->id]) ?>"
+                                        <a href="<?= url('admin/contacts/' . $contact->id . '/edit') ?>"
                                             class="btn btn-sm btn-warning" title="Modifier">
                                             <i data-feather="edit" style="width: 14px; height: 14px;"></i>
                                         </a>
-                                        <a href="<?= route('contacts.delete', ['id' => $contact->id]) ?>"
+                                        <a href="<?= url('admin/contacts/' . $contact->id . '/delete') ?>"
                                             class="btn btn-sm btn-danger" title="Supprimer"
                                             onclick="return confirm('Supprimer ce contact ?')">
                                             <i data-feather="trash-2" style="width: 14px; height: 14px;"></i>

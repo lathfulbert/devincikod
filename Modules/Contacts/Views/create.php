@@ -26,7 +26,7 @@
             component('card-start', ['card_title' => "Créer un nouveau contact"]);
             ?>
 
-            <form action="<?= route('contacts.store') ?>" method="POST">
+            <form action="<?= url('admin/contacts/store') ?>" method="POST">
                 <?= csrf_field() ?>
 
                 <h5 class="mb-3">Informations de base</h5>
@@ -127,7 +127,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i data-feather="save"></i> Créer le contact
                     </button>
-                    <a href="<?= route('contacts.index') ?>" class="btn btn-secondary">
+                    <a href="<?= url('admin/contacts') ?>" class="btn btn-secondary">
                         <i data-feather="x"></i> Annuler
                     </a>
                 </div>

@@ -21,7 +21,7 @@
 </div>
 
 <div class="container-fluid">
-    <form action="<?= route('contacts.fields.update', ['id' => $field->id]) ?>" method="POST" id="fieldForm">
+    <form action="<?= url('admin/contacts/fields/' . $field->id . '/update') ?>" method="POST" id="fieldForm">
         <?= csrf_field() ?>
 
         <div class="row">
@@ -105,7 +105,7 @@
                     <i data-feather="save"></i> Mettre à jour
                 </button>
 
-                <a href="<?= route('contacts.fields.index') ?>" class="btn btn-secondary w-100">
+                <a href="<?= url('admin/contacts/fields') ?>" class="btn btn-secondary w-100">
                     <i data-feather="x"></i> Annuler
                 </a>
 
