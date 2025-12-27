@@ -31,7 +31,14 @@ class SecurityHeaders
 
         // Content Security Policy (strict by default)
         // TODO: Customize based on application needs
-        header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;");
+        // Initializing default CSP
+        $csp = "default-src 'self'; ";
+        $csp .= "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tiny.cloud https://cdnjs.cloudflare.com; ";
+        $csp .= "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tiny.cloud https://cdnjs.cloudflare.com; ";
+        $csp .= "img-src 'self' data: https:; ";
+        $csp .= "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com;";
+
+        header("Content-Security-Policy: " . $csp);
 
         // Permissions Policy (disable sensitive features by default)
         header('Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()');

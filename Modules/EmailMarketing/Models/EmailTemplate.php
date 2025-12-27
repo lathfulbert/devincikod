@@ -22,10 +22,9 @@ class EmailTemplate extends Model
         'json_structure',
         'thumbnail',
         'is_active',
-        'is_default',
         'category',
         'tags',
-        'created_by',
+        'created_by',
         'updated_by'
     ];
 
@@ -87,24 +86,19 @@ class EmailTemplate extends Model
      */
     public function duplicate(string $newName = null): self
     {
-        $copy = $this->replicate();
-        $copy->name = $newName ?? ($this->name . ' (Copy)');
-        $copy->is_default = false;
+        // Manual replication since Model::replicate() doesn't exist
+        $attributes = $this->attributes;
+        unset($attributes['id']);
+        unset($attributes['created_at']);
+        unset($attributes['updated_at']);
+
+        // Override specific fields
+        $attributes['name'] = $newName ?? ($this->name . ' (Copy)');
+        $attributes['is_active'] = 1;
+
+        $copy = new self($attributes);
         $copy->save();
 
         return $copy;
-    }
-
-    /**
-     * Marquer comme template par défaut
-     */
-    public function setAsDefault(): void
-    {
-        // Retirer le défaut des autres templates de la même catégorie
-        static::where('category', $this->category)
-              ->where('id', '!=', $this->id)
-              ->update(['is_default' => false]);
-
-        $this->update(['is_default' => true]);
     }
 }

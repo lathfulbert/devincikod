@@ -41,7 +41,7 @@ class EmailTemplateController
 
         $categories = array_map(fn($item) => $item->category, $rawCategories);
 
-        return view('emailmarketing/templates/index', [
+        return view('EmailMarketing/templates/index', [
             'title' => 'Email Templates',
             'templates' => $templates,
             'categories' => $categories,
@@ -54,7 +54,7 @@ class EmailTemplateController
      */
     public function create()
     {
-        return view('emailmarketing/templates/create', [
+        return view('EmailMarketing/templates/create', [
             'title' => 'Create Email Template'
         ]);
     }
@@ -78,13 +78,9 @@ class EmailTemplateController
         $template = EmailTemplate::create([
             'name' => $data['name'],
             'description' => $data['description'] ?? null,
-            'subject' => $data['subject'] ?? null,
-            'type' => $data['type'] ?? 'html',
             'html_content' => $data['html_content'],
             'category' => $data['category'] ?? null,
-            'tags' => isset($data['tags']) ? json_encode(explode(',', $data['tags'])) : null,
-            'is_active' => isset($data['is_active']) ? 1 : 0,
-            'created_by' => $userId
+            'is_active' => isset($data['is_active']) ? 1 : 0
         ]);
 
         $_SESSION['flash']['success'][] = 'Template created successfully';
@@ -95,9 +91,8 @@ class EmailTemplateController
     /**
      * Afficher un template
      */
-    public function show()
+    public function show($id)
     {
-        $id = $_GET['id'] ?? null;
         $template = EmailTemplate::find($id);
 
         if (!$template) {
@@ -112,7 +107,7 @@ class EmailTemplateController
         // Compteur d'utilisation
         $usageCount = $template->campaigns()->count();
 
-        return view('emailmarketing/templates/show', [
+        return view('EmailMarketing/templates/show', [
             'title' => 'Template: ' . $template->name,
             'template' => $template,
             'variables' => $variables,
@@ -123,9 +118,8 @@ class EmailTemplateController
     /**
      * Formulaire d'édition
      */
-    public function edit()
+    public function edit($id)
     {
-        $id = $_GET['id'] ?? null;
         $template = EmailTemplate::find($id);
 
         if (!$template) {
@@ -134,7 +128,7 @@ class EmailTemplateController
             exit;
         }
 
-        return view('emailmarketing/templates/edit', [
+        return view('EmailMarketing/templates/edit', [
             'title' => 'Edit Template: ' . $template->name,
             'template' => $template
         ]);
@@ -143,9 +137,8 @@ class EmailTemplateController
     /**
      * Mettre à jour un template
      */
-    public function update()
+    public function update($id)
     {
-        $id = $_GET['id'] ?? null;
         $template = EmailTemplate::find($id);
 
         if (!$template) {
@@ -159,11 +152,8 @@ class EmailTemplateController
         $template->update([
             'name' => $data['name'] ?? $template->name,
             'description' => $data['description'] ?? $template->description,
-            'subject' => $data['subject'] ?? $template->subject,
-            'type' => $data['type'] ?? $template->type,
             'html_content' => $data['html_content'] ?? $template->html_content,
             'category' => $data['category'] ?? $template->category,
-            'tags' => isset($data['tags']) ? json_encode(explode(',', $data['tags'])) : $template->tags,
             'is_active' => isset($data['is_active']) ? 1 : 0
         ]);
 
@@ -175,9 +165,8 @@ class EmailTemplateController
     /**
      * Dupliquer un template
      */
-    public function duplicate()
+    public function duplicate($id)
     {
-        $id = $_GET['id'] ?? null;
         $template = EmailTemplate::find($id);
 
         if (!$template) {
@@ -197,9 +186,8 @@ class EmailTemplateController
     /**
      * Supprimer un template
      */
-    public function delete()
+    public function delete($id)
     {
-        $id = $_GET['id'] ?? null;
         $template = EmailTemplate::find($id);
 
         if (!$template) {
@@ -227,9 +215,8 @@ class EmailTemplateController
     /**
      * Envoyer un email de test
      */
-    public function sendTest()
+    public function sendTest($id)
     {
-        $id = $_GET['id'] ?? null;
         $template = EmailTemplate::find($id);
 
         if (!$template) {
@@ -273,9 +260,8 @@ class EmailTemplateController
     /**
      * Prévisualiser un template
      */
-    public function preview()
+    public function preview($id)
     {
-        $id = $_GET['id'] ?? null;
         $template = EmailTemplate::find($id);
 
         if (!$template) {

@@ -27,7 +27,8 @@
 </div>
 
 <div class="container-fluid">
-    <form method="POST" action="<?= url('/admin/email-marketing/templates/' . $template->id) ?>">
+    <form method="POST" action="<?= url('/admin/email-marketing/templates/' . $template->id . '/update') ?>">
+        <?= csrf_field() ?>
         <input type="hidden" name="_method" value="PUT">
 
         <div class="row">
@@ -140,6 +141,7 @@
                         <form method="POST"
                             action="<?= url('/admin/email-marketing/templates/' . $template->id . '/duplicate') ?>"
                             style="display: inline; width: 100%;">
+                            <?= csrf_field() ?>
                             <button type="submit" class="btn btn-success btn-block mb-2">
                                 <i data-feather="copy"></i> Duplicate
                             </button>
@@ -167,6 +169,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form method="POST" action="<?= url('/admin/email-marketing/templates/' . $template->id . '/test') ?>">
+                <?= csrf_field() ?>
                 <div class="modal-header">
                     <h5 class="modal-title">Send Test Email</h5>
                     <button type="button" class="close" data-dismiss="modal">
