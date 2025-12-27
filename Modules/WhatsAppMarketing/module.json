@@ -1,0 +1,13 @@
+{
+    "name": "WhatsAppMarketing",
+    "version": "1.0.0",
+    "description": "Module de marketing et support via WhatsApp",
+    "author": "SunuFramework",
+    "is_active": true,
+    "requires": ["Contacts", "Wallet", "SmsCore"],
+    "autoload": {
+        "psr-4": {
+            "Modules\\WhatsAppMarketing\\": ""
+        }
+    }
+}
