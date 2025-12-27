@@ -33,24 +33,47 @@ class TotalSmsWidget extends AbstractWidget
     {
         $db = Database::getInstance();
 
+        // Vérifier si super admin
+        $isSuperAdmin = $this->isSuperAdmin();
+        $userId = $this->getCurrentUserId();
+
+        // Construire la condition WHERE selon le type d'utilisateur
+        $whereClause = $isSuperAdmin ? '' : ' WHERE created_by = ?';
+        $params = $isSuperAdmin ? [] : [$userId];
+
         // Total SMS
-        $result = $db->query("SELECT COUNT(*) as total FROM sms_messages")->fetch();
+        $query = "SELECT COUNT(*) as total FROM sms_messages" . $whereClause;
+        $result = $db->query($query, $params)->fetch();
         $totalSms = $result['total'] ?? 0;
 
         // SMS du mois en cours
         $currentMonth = date('Y-m-01 00:00:00');
+        $whereMonth = $isSuperAdmin
+            ? "WHERE created_at >= ?"
+            : "WHERE created_at >= ? AND created_by = ?";
+        $paramsMonth = $isSuperAdmin
+            ? [$currentMonth]
+            : [$currentMonth, $userId];
+
         $stmt = $db->query(
-            "SELECT COUNT(*) as total FROM sms_messages WHERE created_at >= ?",
-            [$currentMonth]
+            "SELECT COUNT(*) as total FROM sms_messages " . $whereMonth,
+            $paramsMonth
         );
         $thisMonthSms = $stmt->fetch()['total'] ?? 0;
 
         // SMS du mois précédent
         $previousMonth = date('Y-m-01 00:00:00', strtotime('-1 month'));
         $currentMonthStart = date('Y-m-01 00:00:00');
+        $wherePrevious = $isSuperAdmin
+            ? "WHERE created_at >= ? AND created_at < ?"
+            : "WHERE created_at >= ? AND created_at < ? AND created_by = ?";
+        $paramsPrevious = $isSuperAdmin
+            ? [$previousMonth, $currentMonthStart]
+            : [$previousMonth, $currentMonthStart, $userId];
+
         $stmt = $db->query(
-            "SELECT COUNT(*) as total FROM sms_messages WHERE created_at >= ? AND created_at < ?",
-            [$previousMonth, $currentMonthStart]
+            "SELECT COUNT(*) as total FROM sms_messages " . $wherePrevious,
+            $paramsPrevious
         );
         $lastMonthSms = $stmt->fetch()['total'] ?? 0;
 

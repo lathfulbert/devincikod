@@ -38,6 +38,7 @@ class Application extends Container
         require_once __DIR__ . '/Support/authorization_helpers.php';
         require_once __DIR__ . '/Support/security_helpers.php';
         require_once __DIR__ . '/Files/Helpers/file_helpers.php';
+        require_once __DIR__ . '/Widget/helpers.php';
 
         // Load .env
         (new \App\Core\Support\DotEnv($basePath . '/.env'))->load();
@@ -135,6 +136,9 @@ class Application extends Container
 
         // Initialize I18n (Internationalization)
         \App\Core\I18n\Middleware\SetLocaleMiddleware::run();
+
+        // Initialize Widget System
+        \App\Core\Widget\WidgetServiceProvider::boot();
 
         // Check Maintenance Mode (before routing)
         if (php_sapi_name() !== 'cli') {

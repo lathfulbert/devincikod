@@ -134,7 +134,14 @@ abstract class AbstractWidget implements WidgetInterface
      */
     public function getCacheKey(): string
     {
-        return 'widget:' . $this->getName();
+        // Si super admin, cache global
+        if ($this->isSuperAdmin()) {
+            return 'widget:' . $this->getName() . ':admin';
+        }
+
+        // Sinon, cache par utilisateur
+        $userId = $this->getCurrentUserId();
+        return 'widget:' . $this->getName() . ':user:' . ($userId ?? 'guest');
     }
 
     /**
@@ -276,5 +283,58 @@ abstract class AbstractWidget implements WidgetInterface
             error_log("Widget cache clear error: " . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * Vérifie si l'utilisateur est super admin
+     *
+     * @return bool
+     */
+    protected function isSuperAdmin(): bool
+    {
+        try {
+            $app = Container::getInstance();
+            $user = $app->auth?->user();
+
+            if (!$user) {
+                return false;
+            }
+
+            // Vérifier si l'utilisateur a le rôle "Administrateur" (role_id = 1)
+            // ou la permission "admin.access"
+            $rbacService = Container::getInstance()->make(RbacService::class);
+
+            return $rbacService->userHasPermission($user, 'admin.access');
+        } catch (\Exception $e) {
+            error_log("Widget isSuperAdmin check failed: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Récupère l'utilisateur connecté
+     *
+     * @return mixed|null
+     */
+    protected function getCurrentUser()
+    {
+        try {
+            $app = Container::getInstance();
+            return $app->auth?->user();
+        } catch (\Exception $e) {
+            error_log("Widget getCurrentUser failed: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Récupère l'ID de l'utilisateur connecté
+     *
+     * @return int|null
+     */
+    protected function getCurrentUserId(): ?int
+    {
+        $user = $this->getCurrentUser();
+        return $user ? $user->id : null;
     }
 }
