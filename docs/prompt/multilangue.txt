@@ -1,0 +1,198 @@
+intégrer un SYSTÈME I18n (internationalisation multilingue) dans ton framework sunuDevinci, avec :
+
+✅ Gestion multi-langue
+✅ Fichiers JSON de traduction
+✅ Override depuis le Back-Office
+✅ Chargement dynamique
+✅ Middleware / Helper global
+✅ Architecture inspirée de Laravel & Symfony
+✅ Extensible en module autonome du Core
+
+ I18N (à intégrer dans ton projet / documentation / génération de code)
+
+
+
+Mettre en place un système d’internationalisation (I18n) complet dans mon framework PHP sunuDevinci, intégré dans le Core, conforme aux principes SOLID, modulaire, et capable de fonctionner comme un service activable/désactivable.
+
+Le système doit inclure :
+
+1. Fichiers de traduction
+
+Utilisation de JSON comme format principal :
+
+/languages/en.json
+
+/languages/fr.json
+
+/languages/ar.json
+
+/modules/Blog/languages/fr.json (surcharge module)
+
+Système de fusion entre :
+
+Langue du Core
+
+Langue du Module
+
+Langue définie dans le Backoffice (overrides)
+
+Support du fallback (si une clé est manquante → fallback sur default locale).
+
+Cache automatiques des traductions compilées.
+
+2. Configuration & Gestion de la Langue
+
+Ajouter dans config/app.php :
+
+default_locale
+
+supported_locales (ex: ["fr","en","ar"])
+
+Langue détectée par :
+
+Session
+
+URL param (?lang=fr)
+
+Header HTTP (Accept-Language)
+
+Utilisateur connecté (préférence stockée en DB)
+
+Middleware SetLocaleMiddleware pour initialiser la langue globale.
+
+3. API Helper de traduction
+
+Implémenter un helper global accessible partout :
+
+__t("dashboard.welcome")
+
+trans("auth.login_success")
+
+Lang::get("messages.saved")
+
+Support paramètres :
+
+__t("email.welcome", ["name" => $user->name])
+
+
+Support pluriels :
+
+__t("user.count", ["count" => 10])
+
+
+Support variables dynamiques :placeholders dans les fichiers JSON.
+
+4. Backoffice : Gestion dynamique
+
+Créer une interface permettant :
+
+Visualiser les clés existantes
+
+Ajouter / modifier une traduction
+
+Supprimer une clé
+
+Charger automatiquement toutes les clés depuis JSON et modules
+
+Stocker les overrides dans fichier :
+
+/storage/i18n/overrides/fr.json
+
+
+Bouton "Exporter / Importer" les traductions.
+
+Validation des clés dupliquées.
+
+Reload live du cache (optionnel Redis/file).
+
+5. Architecture SOLID / Modulaire
+
+Définir une structure claire :
+
+/core/I18n/
+     - LanguageManager.php
+     - Translator.php
+     - LanguageLoader.php
+     - Contracts/TranslatorInterface.php
+     - Middleware/SetLocaleMiddleware.php
+
+
+Exiger :
+
+Respect de l’interface TranslatorInterface
+
+Chargement automatique via le Module Loader du framework sunuDevinci
+
+Chaque module peut embarquer ses propres fichiers JSON
+
+Les fichiers sont fusionnés dans un ordre hiérarchique
+
+6. CLI
+
+Ajouter commandes :
+
+php sunu i18n:list — liste toutes les clés
+
+php sunu i18n:missing — clés non traduites
+
+php sunu i18n:sync — force la création d’un fichier regroupé
+
+php sunu i18n:export fr
+
+php sunu i18n:import fr
+
+7. Exemples de fichiers JSON
+
+Core (fr.json)
+
+{
+  "dashboard": {
+    "welcome": "Bienvenue dans votre tableau de bord"
+  },
+  "auth": {
+    "login_success": "Connexion réussie"
+  }
+}
+
+
+Module Blog (fr.json)
+
+{
+  "blog": {
+    "title": "Articles du blog"
+  }
+}
+
+
+Override Backoffice (fr.json)
+
+{
+  "dashboard": {
+    "welcome": "Bonjour ! Heureux de vous revoir."
+  }
+}
+
+
+Résultat final retourné par le moteur : fusion hiérarchique.
+
+8. Livraison demandée
+
+Le système devra produire automatiquement :
+
+Le code PHP complet
+
+Les classes du Core
+
+Les exemples d’intégration module
+
+Le middleware
+
+Le helper __t()
+
+Le système de cache
+
+La documentation I18n.md
+
+Le READ.ME détaillé
+
+Utiliser une écriture propre, professionnelle, inspirée de Laravel / Symfony.

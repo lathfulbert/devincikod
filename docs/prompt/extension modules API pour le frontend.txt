@@ -1,0 +1,3 @@
+chaque module doit pouvoir inclu son propre API et l'exposer pour le frontend
+
+La partie Frontend acces uniquement a tous les API crud pret

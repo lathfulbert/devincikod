@@ -1,0 +1,209 @@
+Events & Triggers System - Implementation Plan
+Implement a complete event-driven system in the Core, allowing modules to dispatch and listen to events for decoupled, extensible architecture.
+
+Architecture Overview
+Module Action
+Event::dispatch
+EventDispatcher
+Find Listeners
+Listener 1
+Listener 2
+Listener 3 Queue
+Execute Sync
+Execute Sync
+Queue Job
+Core Components
+1. Event Base Class
+File: Core/Events/Event.php
+
+abstract class Event
+{
+    protected array $data = [];
+    protected bool $propagationStopped = false;
+    
+    public function stopPropagation(): void
+    public function isPropagationStopped(): bool
+    public static function dispatch(...$args): void
+}
+2. EventDispatcher
+File: Core/Events/EventDispatcher.php
+
+class EventDispatcher
+{
+    public function dispatch(object $event): object
+    public function listen(string $event, $listener): void
+    public function hasListeners(string $event): bool
+    public function getListeners(string $event): array
+    protected function callListener($listener, $event): mixed
+}
+3. Listener Interface
+File: Core/Contracts/ListenerInterface.php
+
+interface ListenerInterface
+{
+    public function handle(object $event): void;
+}
+4. Queued Listener Support
+File: Core/Contracts/ShouldQueue.php
+
+interface ShouldQueue
+{
+    public function queue(): string; // Queue name
+    public function delay(): int;    // Delay in seconds
+}
+Module Integration
+events.php Configuration
+Each module can register events via Modules/{Module}/events.php:
+
+return [
+    // Event class => [Listeners]
+    \Modules\Auth\Events\UserRegistered::class => [
+        \Modules\Auth\Listeners\SendWelcomeEmail::class,
+        \Modules\Stats\Listeners\TrackNewUser::class,
+    ],
+    
+    \Modules\Blog\Events\PostCreated::class => [
+        \Modules\Blog\Listeners\NotifySubscribers::class,
+        \Modules\Search\Listeners\IndexPost::class,
+    ],
+];
+Proposed Changes
+Core Events System
+[NEW] 
+Event.php
+Abstract base class for all events. Provides 
+dispatch()
+ static method and propagation control.
+
+[NEW] 
+EventDispatcher.php
+Singleton dispatcher managing event-to-listener mappings and execution.
+
+[NEW] 
+ListenerProvider.php
+Registry for loading and caching event listeners from modules.
+
+Contracts
+[NEW] 
+ListenerInterface.php
+Contract for all event listeners requiring 
+handle(object $event)
+ method.
+
+[NEW] 
+ShouldQueue.php
+Interface for listeners that should run asynchronously via queue.
+
+Module System
+[MODIFY] 
+ModuleManager.php
+Add loadModuleEvents() method to autoload events.php from active modules during boot.
+
+Example Implementation
+[NEW] 
+UserRegistered.php
+Example event triggered when a new user registers.
+
+[NEW] 
+SendWelcomeEmail.php
+Example listener sending welcome email (implements ShouldQueue).
+
+[NEW] 
+events.php
+Example events configuration for Auth module.
+
+Usage Examples
+1. Simple Synchronous Event
+// Dispatch event
+use Modules\Blog\Events\PostCreated;
+PostCreated::dispatch($post);
+// Listener
+class NotifySubscribers implements ListenerInterface
+{
+    public function handle(object $event): void
+    {
+        $post = $event->post;
+        // Send notifications...
+    }
+}
+2. Queued Async Event
+class SendWelcomeEmail implements ListenerInterface, ShouldQueue
+{
+    public function handle(object $event): void
+    {
+        // Send email...
+    }
+    
+    public function queue(): string
+    {
+        return 'emails';
+    }
+    
+    public function delay(): int
+    {
+        return 0;
+    }
+}
+3. Stop Propagation
+class CheckUserBanned implements ListenerInterface
+{
+    public function handle(object $event): void
+    {
+        if ($event->user->isBanned()) {
+            $event->stopPropagation();
+        }
+    }
+}
+Integration with Existing Systems
+Queue Integration
+Listeners implementing 
+ShouldQueue
+ are automatically pushed to the queue system:
+
+QueueManager::push(
+    \App\Jobs\CallQueuedListener::class,
+    ['listener' => $listenerClass, 'event' => serialize($event)],
+    $listener->queue()
+);
+Cron Integration
+Events can be dispatched from cron tasks:
+
+class DailyReportTask extends CronTask
+{
+    public function handle(): void
+    {
+        DailyReportGenerated::dispatch($report);
+    }
+}
+Module Activation
+When modules are activated/deactivated, their events are registered/unregistered automatically.
+
+Verification Plan
+Unit Tests
+Test event dispatching
+Test listener registration
+Test propagation stopping
+Test queue integration
+Integration Tests
+Test module event loading
+Test multiple listeners per event
+Test priority ordering
+Test async execution
+Manual Verification
+Create test event and listener
+Dispatch event from controller
+Verify listener executes
+Test queued listener
+Verify module event config loads
+Performance Considerations
+Lazy loading: Listeners instantiated only when event fires
+Caching: Event-to-listener mapping cached in production
+Async by default: Heavy listeners should implement 
+ShouldQueue
+Singleton dispatcher: Single instance shared across app
+Future Enhancements
+Event Priority: Execute listeners in specific order
+Wildcard Listeners: Listen to multiple events with patterns
+Redis Pub/Sub: Distributed event system across servers
+Event Replay: Store events for debugging/replay
+Conditional Listeners: Only fire if conditions met

@@ -1,0 +1,234 @@
+Logging & Monitoring Core – Framework LathDevinci
+implémenter :
+
+✅ Un système de Logging avancé (multi-canaux, fichiers journaux, niveaux, rotation).
+✅ Un système de Monitoring/Profiling intégré au dashboard (comme Laravel Telescope + Debugbar).
+✅ Totalement modulaire pour s’intégrer à ton Core et être activé/désactivé via modules.
+
+Je veux ajouter dans le Core de mon framework PHP LathDevinci un système de Logging professionnel ET un système de Monitoring/Performance Dashboard, configurables comme dans Laravel.
+
+🎯 Objectif global
+
+Créer un composant Logging & Monitoring totalement modulaire, extensible, désactivable, et compatible avec le système de modules du Core.
+
+🔥 1. SYSTÈME DE LOGGING – Spécifications
+1.1. Caractéristiques principales
+
+Le système doit :
+
+gérer plusieurs canaux de log (single, daily, slack, database, syslog, stderr)
+
+suivre la structure Laravel, mais optimisé pour LathDevinci
+
+implémenter les niveaux PSR-3
+(emergency, alert, critical, error, warning, notice, info, debug)
+
+permettre la rotation automatique des fichiers (daily)
+
+utiliser une classe Logger centrale dans Core/Logging/Logger.php
+
+charger la configuration dans config/logging.php
+
+respecter PSR-3 (interface LoggerInterface)
+
+supporter un middleware automatique pour log des requêtes HTTP
+
+supporter un Handler dynamique pour ajouter de nouveaux types de logs
+
+1.2. Modules inclus
+
+Générer le code complet pour :
+
+LoggerInterface
+
+Logger (implémentation principale)
+
+LogManager (gestion des canaux)
+
+Handlers :
+
+FileHandler
+
+DailyFileHandler
+
+DatabaseHandler
+
+SlackHandler
+
+NullHandler
+
+ExceptionHandler (Gestion centralisée des erreurs)
+
+HttpRequestLoggerMiddleware
+
+Helpers log() et façade Log::
+
+1.3. Exemples requis
+
+Inclure :
+
+un exemple de log standard : Log::info('User registered')
+
+un exemple d’ajout d’un nouveau canal personnalisé
+
+un test unitaire PHPUnit
+
+un exemple CLI : php artisan log:clear
+
+🔥 2. SYSTÈME DE MONITORING – STYLE TELESCOPE / DEBUGBAR
+
+Créer un Monitoring Dashboard accessible depuis /admin/monitoring dans le backoffice.
+
+2.1. Metrics à capturer
+Performance & Profiling
+
+temps d’exécution total
+
+mémoire utilisée
+
+requêtes SQL exécutées
+
+erreurs et exceptions
+
+logs récents
+
+routes exécutées
+
+événements déclenchés
+
+temps par middleware
+
+temps par controller/action
+
+cache hits/miss
+
+utilisation de session
+
+Système & Serveur
+
+CPU
+
+RAM
+
+Load average
+
+PHP version
+
+Extensions chargées
+
+Espace disque
+
+2.2. Modules techniques
+
+Générer :
+
+Core/Monitoring/Profiler.php
+
+Core/Monitoring/Collectors/* :
+
+RequestCollector
+
+DatabaseCollector
+
+EventCollector
+
+LogCollector
+
+MemoryCollector
+
+SystemCollector
+
+Core/Monitoring/Storage (fichiers ou SQLite)
+
+Middleware : PerformanceProfilerMiddleware
+
+Hook automatique dans Router et DB
+
+Service Provider MonitoringServiceProvider
+
+2.3. Dashboard HTML
+
+Créer un template dashboard complet :
+
+tableau des requêtes SQL
+
+logs en temps réel (Websocket optionnel)
+
+timeline d'exécution
+
+statistiques CPU/mémoire
+
+vue par requête HTTP (profiling)
+
+boutons :
+
+"Clear Logs"
+
+"Clear Profile Data"
+
+"Export JSON"
+
+2.4. Config
+
+Ajouter dans config/monitoring.php :
+
+'enabled' => env('MONITORING_ENABLED', true),
+'storage' => 'sqlite',
+'keep_days' => 7,
+'ignore_routes' => ['/health', '/favicon.ico'],
+
+2.5. Exemples requis
+
+Inclure :
+
+Exemple d’intégration sur chaque requête
+
+Exemple de collecte SQL
+
+Exemple de panel complet HTML/CSS/JS
+
+Un test : MonitoringTest.php
+
+🔥 3. INTÉGRATION AU CORE
+
+Demander :
+
+Le système doit être fourni sous forme de module Core :
+
+Core/Logging
+
+Core/Monitoring
+
+Service Providers :
+
+LoggingServiceProvider
+
+MonitoringServiceProvider
+
+Auto-découverte
+
+Activation/désactivation via :
+
+.env
+
+config/ fichiers
+
+Backoffice → Modules
+
+🔥 4. DOC + README
+
+Générer :
+
+Documentation Markdown complète
+
+Arborescence des fichiers
+
+Exemple d’utilisation
+
+Commandes CLI
+
+Bonnes pratiques
+
+🔥 5. Livrable
+
+Soumettre maintenant le code complet, les fichiers, la documentation, les tests, les middlewares, les provider, le dashboard, et les exemples utilisables immédiatement dans mon framework LathDevinci.

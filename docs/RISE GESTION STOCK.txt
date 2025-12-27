@@ -1,0 +1,42 @@
+Le module de gestion des stocks est un outil qui vous permet de suivre vos marchandises tout au long de votre chaîne d'approvisionnement. 
+Il optimise l'ensemble du processus, de la passation de commande auprès de votre fournisseur à la livraison au client, 
+en cartographiant le parcours complet d'un produit. Grâce à un suivi précis des marchandises, 
+les entreprises peuvent minimiser le gaspillage, analyser les tendances et prendre de meilleures décisions d'investissement.
+
+onctionnalités du module
+
+Gestion des produits/services : Héritant des fonctionnalités de RISE CRM, cette fonction ajoute de nombreux attributs étendus tels que le code produit, la référence, le prix d’achat, le sous-groupe, les images, le taux de marge, le prix de vente, l’entrepôt, l’étiquette, le code-barres, les variantes, les styles, le modèle, les tailles, la couleur, la garantie, la description détaillée, etc.
+Produits d'importation en vrac
+Stock d'ouverture d'importation en vrac
+Imprimer les étiquettes à code-barres
+	Lecture de codes-barres
+	Gestion des bons de réception des stocks
+	Gestion des bons de livraison
+	Gestion des listes de colisage
+Journaux d'activité d'expédition
+	Gestion interne des bons de livraison
+	Gestion des sinistres et des ajustements
+	Gestion des transactions d'inventaire
+	Gestion des retours
+	Gestion d'entrepôt
+
+Rapports :
+	Rapport de synthèse des actions
+	Analyse des stocks
+	Rapport d'évaluation des stocks
+	Rapport sur la période de garantie
+Paramètres :
+	Paramètres généraux
+	Stock de sécurité min/max
+	Paramètres de prix de vente
+	Gestion des types de produits/services
+	Gestion de groupe de produits/services
+	Gestion des sous-groupes de produits/services
+	Gestion des unités de produits/services
+	Gestion des couleurs
+	Gestion des modèles
+	Gestion des tailles
+	Gestion des styles
+Champs personnalisés d'entrepôt
+Gestion des processus d'approbation
+Paramètres de préfixe

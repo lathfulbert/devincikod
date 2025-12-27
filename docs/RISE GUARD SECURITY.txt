@@ -1,0 +1,37 @@
+Découvrez RiseGuard, le module de sécurité ultime pour RISE CRM .
+Protégez votre installation RISE CRM dès aujourd'hui avec RiseGuard et profitez d'une tranquillité d'esprit grâce à un système sécurisé.
+
+RISE CRM est un système CRM robuste et fiable, conçu pour répondre aux besoins des entreprises de toutes tailles.
+ Cependant, même les systèmes les plus sécurisés peuvent être vulnérables aux cyberattaques. C'est là qu'intervient notre module RiseGuard .
+
+Développé pour sécuriser votre installation RISE CRM, ce module fournit des fonctionnalités de sécurité essentielles et 
+protège vos données contre tout accès non autorisé .
+Avec RiseGuard , vous renforcez la sécurité de votre installation RISE CRM et la protégez des attaques par force brute . 
+Conçu selon les normes de sécurité les plus récentes, RiseGuard offre un ensemble de fonctionnalités pour vous aider 
+à gérer la sécurité de votre installation RISE CRM . Nos paramètres anti-force brute vous permettent de définir 
+un nombre maximal de tentatives de connexion, la durée de verrouillage, le nombre maximal de verrouillages, la durée de verrouillage prolongée,
+ le nombre de tentatives de réinitialisation du mot de passe et le nombre maximal d'e-mails envoyés . 
+ Vous pouvez également créer des listes noires d'adresses IP, de plages d'adresses ou d'utilisateurs pour restreindre l'accès à votre installation.
+ Autre fonctionnalité importante de RiseGuard : la section Rapports . Elle fournit des rapports détaillés sur les tentatives de connexion, 
+ les verrouillages et les réinitialisations de mot de passe. 
+Cela permet aux entreprises de surveiller leurs installations et de détecter toute activité suspecte en temps réel.
+
+
+
+Caractéristiques de RiseGuard :
+
+Paramètres de force brute
+
+Nombre maximal de tentatives de connexion
+
+période de lock-out
+
+Verrouillages maximums
+
+Verrouillage prolongé
+
+Tentatives de réinitialisation du mot de passe
+
+Nombre maximal d'envois d'e-mails
+
+Listes noires d'adresses IP/plages d'adresses/utilisateurs

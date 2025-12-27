@@ -1,0 +1,79 @@
+module de comptabilité et de tenue de livres
+L'utilisation de ce module permet d'alléger la saisie manuelle des données, de prévenir les erreurs humaines courantes, d'aider les entreprises et les comptables lors de la déclaration fiscale et d'accéder à des rapports détaillés sur la santé financière de l'entreprise. Son principal avantage réside sans doute dans le gain de temps considérable qu'il procure. Grâce à ce module, tous les rapports financiers sont centralisés dans un système en ligne unique, ce qui simplifie le suivi des données. Un module de comptabilité pour entreprises permet d'automatiser de nombreux processus, ce qui représente un gain de temps non seulement important, mais aussi une garantie d'exactitude et d'efficacité pour les rapports financiers.
+
+Fonctionnalités du module
+
+Tableau de bord : Aperçu du compte de résultat, des revenus, des dépenses, des flux de trésorerie et des comptes bancaires
+Secteur bancaire :
+Registre bancaire
+Transaction bancaire enregistrée
+Rapprochement bancaire
+Transactions bancaires d'importation
+Transactions :
+Correspondance entre les relevés bancaires et la comptabilité
+Association des factures à la comptabilité
+Correspondance entre les paiements et la comptabilité
+Imputation des dépenses à la comptabilité
+Configuration du mappage des éléments
+Configuration du mappage des catégories de dépenses
+Configuration de la cartographie fiscale
+Configuration du mappage des achats
+Configuration de la cartographie des stocks
+Règles bancaires : pour catégoriser automatiquement les transactions
+Écriture comptable : pour enregistrer les transactions dans le grand livre
+Virement : transferts de montants entre comptes
+Plan comptable : il s’agit d’une liste des numéros et des noms des comptes de votre entreprise. Généralement, un plan comptable comprend quatre catégories : comptes d’actif, comptes de passif, comptes de produits et comptes de charges.
+Rapprochement : il s'agit du processus de rapprochement des transactions saisies dans le module avec vos relevés bancaires ou de carte de crédit.
+Gestion des budgets : cette fonctionnalité facilite la préparation des budgets, vous permettant ainsi de suivre et de comparer les revenus et les dépenses prévus avec les revenus et les dépenses réels. Lors de la préparation d'un budget, celui-ci est généralement établi pour un exercice fiscal donné, et vous pouvez choisir de saisir les montants prévisionnels ou d'utiliser les montants historiques.
+Rapports de synthèse d'activité :
+Comparaison des bilans : ce que vous possédez (actifs), ce que vous devez (passifs) et ce que vous avez investi (capitaux propres) par rapport à l’année dernière.
+Détail du bilan : une vue détaillée de ce que vous possédez (actifs), de ce que vous devez (passifs) et de ce que vous avez investi (capitaux propres).
+Résumé du bilan : un résumé de ce que vous possédez (actifs), de ce que vous devez (passifs) et de ce que vous avez investi (capitaux propres).
+Bilan : ce que vous possédez (actifs), ce que vous devez (passifs) et ce que vous avez investi (capitaux propres).
+Rapport de synthèse personnalisé : un rapport que vous créez de A à Z. Avec davantage d’options de personnalisation.
+Bénéfices et pertes en % du revenu total : vos dépenses en pourcentage de votre revenu total.
+Comparaison des profits et pertes : vos revenus, vos dépenses et votre résultat net (profit ou perte) par rapport à l'année dernière.
+Détail du compte de résultat : détail du compte de résultat
+Comparaison des profits et pertes depuis le début de l'année : vos revenus, vos dépenses et votre résultat net (profit ou perte) par rapport à cette année jusqu'à présent.
+Compte de résultat : vos revenus, vos dépenses et votre résultat net (bénéfice ou perte). Également appelé état des résultats.
+Tableau des flux de trésorerie : entrées et sorties de trésorerie liées aux ventes et aux dépenses (activités d'exploitation), aux investissements et au financement.
+État des variations des capitaux propres : état des variations des capitaux propres.
+Rapports comptables :
+Liste des comptes : le nom, le type et le solde de chaque compte de votre plan comptable.
+Comparaison des bilans : ce que vous possédez (actifs), ce que vous devez (passifs) et ce que vous avez investi (capitaux propres) par rapport à l’année dernière.
+Bilan : ce que vous possédez (actifs), ce que vous devez (passifs) et ce que vous avez investi (capitaux propres).
+Grand livre général : le solde d’ouverture, les transactions et le total de chaque compte de votre plan comptable.
+Journal : les débits et les crédits de chaque transaction, classés par date.
+Comparaison des profits et pertes : vos revenus, vos dépenses et votre résultat net (profit ou perte) par rapport à l'année dernière.
+Compte de résultat : vos revenus, vos dépenses et votre résultat net (bénéfice ou perte). Également appelé état des résultats.
+Historique du compte : historique du compte
+Transactions récentes : Transactions que vous avez créées ou modifiées au cours des 4 derniers jours.
+Tableau des flux de trésorerie : entrées et sorties de trésorerie liées aux ventes et aux dépenses (activités d'exploitation), aux investissements et au financement.
+Détail des transactions par compte : transactions et total pour chaque compte de votre plan comptable.
+Liste des transactions par date : Une liste de toutes vos transactions, classées par date.
+Balance de vérification : ce rapport récapitule les soldes débiteurs et créditeurs de chaque compte de votre plan comptable sur une période donnée.
+Rapports sur la taxe de vente :
+Rapport détaillé des impôts : Ce rapport répertorie les transactions figurant dans chaque case de la déclaration de revenus. Il est établi selon la comptabilité d’exercice, sauf si vous avez opté pour la comptabilité de caisse.
+Rapport sur les obligations fiscales : Montant de la taxe de vente perçue et montant dû aux agences fiscales.
+Rapport récapitulatif d'impôt : Ce rapport présente un résumé des informations pour chaque case de votre déclaration de revenus. Il est établi selon la comptabilité d'exercice, sauf si vous avez opté pour la comptabilité de caisse.
+Rapports sur les ventes et les clients :
+Détail des dépôts : vos dépôts, avec la date, le client ou le fournisseur et le montant.
+Résumé des revenus par client : vos revenus moins vos dépenses (revenu net) pour chaque client.
+Rapports sur les dépenses et les fournisseurs :
+Détail des chèques : Les chèques que vous avez émis, avec la date, le bénéficiaire et le montant.
+Rapports budgétaires :
+Aperçu budgétaire : ce rapport récapitule les soldes de vos comptes budgétés.
+Compte de résultat : budget vs réalisations. Ce rapport indique votre performance par rapport à votre budget. Pour chaque type de compte, il compare les montants budgétés aux montants réels.
+Analyse des résultats budgétaires (compte de résultat) : ce rapport compare les montants réels aux montants budgétés pour le mois, l'exercice financier en cours et le budget annuel.
+Rapports sur l'ancienneté des comptes :
+Résumé de l'ancienneté des comptes clients : soldes impayés pour chaque client, regroupés par nombre de jours de retard.
+Détail de l'ancienneté des comptes clients : factures impayées, regroupées par nombre de jours de retard.
+Récapitulatif de l'ancienneté des comptes fournisseurs : montant total de vos factures impayées, regroupées par nombre de jours de retard.
+Détail de l'ancienneté des comptes fournisseurs : vos factures impayées, regroupées par nombre de jours de retard.
+Rapports bancaires :
+Résumé du rapprochement bancaire
+Détail du rapprochement bancaire
+Paramètres :
+Général
+Gestion des types de détails du compte
+Configuration de l'API Plaid

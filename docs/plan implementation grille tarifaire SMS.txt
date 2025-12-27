@@ -1,0 +1,101 @@
+Système de Facturation SMS (SMS Billing)
+Objectif
+Intégrer un système de facturation complet par unité d'envoi dans le module SMS, basé sur une grille tarifaire configurable (JSON) et compatible avec les modes prépayé/postpayé.
+
+Architecture
+1. Base de Données
+Table sms_billing_logs
+Table dédiée pour l'historique détaillé de facturation de chaque SMS.
+
+id
+ (UUID)
+user_id (FK users)
+sender_id (String)
+recipient (String - MSISDN)
+country_code (String - ex: CI, FR)
+operator (String - ex: Orange, MTN)
+gateway (String - ex: orange_ci)
+sms_type (Enum: text, otp, marketing)
+segments (Int - nombre de parties)
+unit_cost (Decimal - coût par segment)
+total_cost (Decimal - coût total)
+currency (String - ex: XOF)
+status (Enum: pending, paid, failed, refunded)
+created_at
+2. Services (Modules/SmsCore/Services)
+SmsPricingService
+Responsable de la logique de calcul du coût.
+
+Charge la grille tarifaire depuis les Settings (sms_pricing_grid).
+Détermine le pays et l'opérateur du destinataire.
+Calcule le nombre de segments (GSM 03.38 vs Unicode).
+Applique les règles de prix (Pays > Opérateur > Gateway > Volume).
+Gère les overrides par utilisateur (si implémenté).
+SmsBillingService
+Orchestrateur de la facturation.
+
+Vérifie le solde via 
+WalletService
+.
+Débite le wallet (Mode Prépayé).
+Enregistre la transaction dans sms_billing_logs.
+Gère les remboursements en cas d'échec d'envoi.
+3. Interface Administration
+Configuration de la Grille (/admin/sms/pricing)
+Éditeur JSON pour sms_pricing_grid.
+Validation du format JSON.
+Visualisation conviviale (Optionnel).
+Logs de Facturation (/admin/sms/billing)
+Tableau des transactions SMS.
+Filtres par User, Date, Statut, Gateway.
+4. Intégration
+SmsSenderService
+Modification du flux d'envoi :
+
+Avant envoi :
+Calculer coût (SmsPricingService).
+Vérifier solde (SmsBillingService).
+Réserver fonds / Débiter (SmsBillingService).
+Envoi :
+Appel Gateway.
+Après envoi :
+Mettre à jour statut sms_billing_logs.
+Si échec : Rembourser (SmsBillingService).
+Plan d'Implémentation
+Phase 1: Base de Données
+ Créer migration create_sms_billing_logs_table.
+ Créer modèle Modules/SmsCore/Models/SmsBillingLog.
+Phase 2: Services Core
+ Créer Modules/SmsCore/Services/SmsPricingService.php.
+ Créer Modules/SmsCore/Services/SmsBillingService.php.
+ Implémenter la logique de segmentation SMS (librairie ou helper).
+Phase 3: UI & Configuration
+ Créer Modules/SmsCore/Controllers/SmsPricingController.php.
+ Créer vue templates/backend/sms/pricing/index.php.
+ Créer vue templates/backend/sms/billing/index.php.
+ Ajouter routes dans 
+SmsCoreModule.php
+.
+Phase 4: Intégration
+ Modifier 
+Modules/SmsCore/Services/SmsSenderService.php
+ pour intégrer le billing.
+ Tester le flux complet (Succès, Échec solde, Échec gateway).
+Structure JSON de la Grille (Exemple)
+{
+  "default": {
+    "price": 15,
+    "currency": "XOF"
+  },
+  "CI": {
+    "default": 10,
+    "networks": {
+      "orange": 12,
+      "mtn": 10,
+      "moov": 10
+    }
+  },
+  "FR": {
+    "default": 45
+  }
+}
