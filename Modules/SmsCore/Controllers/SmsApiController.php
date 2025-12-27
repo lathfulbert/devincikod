@@ -102,7 +102,7 @@ class SmsApiController
         // Validation
         if (empty($to) || empty($message)) {
             http_response_code(400);
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'error' => 'Bad Request',
                 'message' => 'Missing required fields: to, message'
@@ -115,7 +115,7 @@ class SmsApiController
 
         if (strlen($message) > 1600) {
             http_response_code(400);
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'error' => 'Bad Request',
                 'message' => 'Message too long (max 1600 characters)'
@@ -157,7 +157,7 @@ class SmsApiController
 
             if ($result['success']) {
                 http_response_code(200);
-                echo json_encode([
+                return json_encode([
                     'success' => true,
                     'message' => 'SMS sent successfully',
                     'data' => [
@@ -170,7 +170,7 @@ class SmsApiController
                 ]);
             } else {
                 http_response_code(500);
-                echo json_encode([
+                return json_encode([
                     'success' => false,
                     'error' => 'Send Failed',
                     'message' => $result['message'] ?? 'Failed to send SMS'
@@ -178,7 +178,7 @@ class SmsApiController
             }
         } catch (\Exception $e) {
             http_response_code(500);
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'error' => 'Server Error',
                 'message' => $e->getMessage()
@@ -262,7 +262,7 @@ class SmsApiController
             }
 
             http_response_code(200);
-            echo json_encode([
+            return json_encode([
                 'success' => true,
                 'data' => $data,
                 'pagination' => [
@@ -274,7 +274,7 @@ class SmsApiController
             ]);
         } catch (\Exception $e) {
             http_response_code(500);
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'error' => 'Server Error',
                 'message' => $e->getMessage()
@@ -320,7 +320,7 @@ class SmsApiController
             $totalCost = $costResult['total'] ?? 0;
 
             http_response_code(200);
-            echo json_encode([
+            return json_encode([
                 'success' => true,
                 'data' => [
                     'balance' => $balance,
@@ -334,7 +334,7 @@ class SmsApiController
             ]);
         } catch (\Exception $e) {
             http_response_code(500);
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'error' => 'Server Error',
                 'message' => $e->getMessage()

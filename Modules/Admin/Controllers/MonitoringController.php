@@ -72,7 +72,7 @@ class MonitoringController
         $totalLogs = count($logEntries);
         $totalPages = ceil($totalLogs / $perPage);
 
-        echo view('admin.monitoring.index', [
+        return view('admin.monitoring.index', [
             'title' => 'Monitoring Dashboard',
             'stats' => $stats,
             'logs' => $logs,

@@ -22,7 +22,7 @@ class ProfileController
 
         $user = User::find($userId);
 
-        echo view('auth/profile/edit', [
+        return view('auth/profile/edit', [
             'user' => $user
         ]);
     }
@@ -130,7 +130,7 @@ class ProfileController
             exit;
         }
 
-        echo view('auth/profile/change-password', []);
+        return view('auth/profile/change-password', []);
     }
 
     /**

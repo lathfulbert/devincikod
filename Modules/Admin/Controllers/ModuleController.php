@@ -41,7 +41,7 @@ class ModuleController
             ];
         }
 
-        echo view('admin/modules/index', [
+        return view('admin/modules/index', [
             'title' => 'Gestion des Modules',
             'modules' => $viewData
         ]);
@@ -142,7 +142,7 @@ class ModuleController
     {
         $app = Application::getInstance();
 
-        echo view('admin/modules/upload', [
+        return view('admin/modules/upload', [
             'title' => 'Installer un Module'
         ]);
     }

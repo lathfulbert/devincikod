@@ -42,7 +42,7 @@ class WalletController
         // Wallet de l'utilisateur actuel
         $userWallet = $this->walletService->getUserWallet($user->id);
 
-        echo view('Wallet/wallet/dashboard', [
+        return view('Wallet/wallet/dashboard', [
             'stats' => $stats,
             'userWallet' => $userWallet,
             'title' => 'Wallet Dashboard'
@@ -57,7 +57,7 @@ class WalletController
         $app = Application::getInstance();
         $wallets = $this->walletService->getAllWallets();
 
-        echo view('Wallet/wallet/manage', [
+        return view('Wallet/wallet/manage', [
             'wallets' => $wallets,
             'title' => 'Gestion des Wallets'
         ]);
@@ -75,7 +75,7 @@ class WalletController
             ->orderBy('created_at', 'desc')
             ->get();
 
-        echo view('Wallet/wallet/my_requests', [
+        return view('Wallet/wallet/my_requests', [
             'requests' => $requests,
             'title' => 'Mes demandes de recharge'
         ]);
@@ -104,7 +104,7 @@ class WalletController
         // Get available payment gateways
         $activeGateways = $this->gatewayManager->getActiveGateways();
 
-        echo view('Wallet/wallet/topup', [
+        return view('Wallet/wallet/topup', [
             'wallet' => $wallet,
             'userId' => $userId,
             'gateways' => $activeGateways,
@@ -308,7 +308,7 @@ class WalletController
         $transactions = $this->walletService->getTransactions($userId, 50);
         $wallet = $this->walletService->getWallet($userId);
 
-        echo view('Wallet/wallet/transactions', [
+        return view('Wallet/wallet/transactions', [
             'transactions' => $transactions,
             'wallet' => $wallet,
             'title' => 'Wallet Transactions'
@@ -344,7 +344,7 @@ class WalletController
         // Get pending count
         $pendingCount = WalletTopupRequest::where('status', 'pending')->count();
 
-        echo view('Wallet/wallet/admin-requests', [
+        return view('Wallet/wallet/admin-requests', [
             'requests' => $requests,
             'pendingCount' => $pendingCount,
             'currentStatus' => $status,
@@ -588,7 +588,7 @@ class WalletController
             if (!$result['valid']) {
                 error_log("Invalid webhook signature from {$gatewayCode}: " . ($result['error'] ?? 'Unknown error'));
                 http_response_code(400);
-                echo json_encode(['status' => 'error', 'message' => 'Invalid signature']);
+                return json_encode(['status' => 'error', 'message' => 'Invalid signature']);
                 exit;
             }
 
@@ -600,7 +600,7 @@ class WalletController
             if (!$transactionId) {
                 error_log("No transaction ID in webhook from {$gatewayCode}");
                 http_response_code(400);
-                echo json_encode(['status' => 'error', 'message' => 'Missing transaction ID']);
+                return json_encode(['status' => 'error', 'message' => 'Missing transaction ID']);
                 exit;
             }
 
@@ -610,7 +610,7 @@ class WalletController
             if (!$request) {
                 error_log("Topup request not found for transaction {$transactionId}");
                 http_response_code(404);
-                echo json_encode(['status' => 'error', 'message' => 'Request not found']);
+                return json_encode(['status' => 'error', 'message' => 'Request not found']);
                 exit;
             }
 
@@ -644,7 +644,7 @@ class WalletController
                 }
 
                 http_response_code(200);
-                echo json_encode(['status' => 'success', 'message' => 'Payment processed']);
+                return json_encode(['status' => 'success', 'message' => 'Payment processed']);
                 exit;
 
             } elseif ($status === 'failed' || $status === 'declined') {
@@ -653,21 +653,21 @@ class WalletController
 
                 error_log("Payment failed for request {$request->id}");
                 http_response_code(200);
-                echo json_encode(['status' => 'success', 'message' => 'Payment failed recorded']);
+                return json_encode(['status' => 'success', 'message' => 'Payment failed recorded']);
                 exit;
 
             } else {
                 // Unknown status - keep processing
                 error_log("Unknown payment status '{$status}' for request {$request->id}");
                 http_response_code(200);
-                echo json_encode(['status' => 'success', 'message' => 'Status recorded']);
+                return json_encode(['status' => 'success', 'message' => 'Status recorded']);
                 exit;
             }
 
         } catch (\Exception $e) {
             error_log("Error processing webhook from {$gatewayCode}: " . $e->getMessage());
             http_response_code(500);
-            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+            return json_encode(['status' => 'error', 'message' => $e->getMessage()]);
             exit;
         }
     }

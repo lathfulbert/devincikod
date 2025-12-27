@@ -20,7 +20,7 @@ class TranslationController
         $languages = ['fr' => 'Français', 'en' => 'English', 'ar' => 'العربية'];
         $modules = ['general', 'admin', 'auth', 'blog'];
 
-        echo view('settings/translations/index', [
+        return view('settings/translations/index', [
             'title' => 'Gestion des Traductions',
             'translations' => $translations,
             'languages' => $languages,
@@ -36,7 +36,7 @@ class TranslationController
         $languages = ['fr' => 'Français', 'en' => 'English', 'ar' => 'العربية'];
         $modules = ['general', 'admin', 'auth', 'blog'];
 
-        echo view('settings/translations/create', [
+        return view('settings/translations/create', [
             'title' => 'Nouvelle Traduction',
             'languages' => $languages,
             'modules' => $modules,
@@ -78,7 +78,7 @@ class TranslationController
         $languages = ['fr' => 'Français', 'en' => 'English', 'ar' => 'العربية'];
         $modules = ['general', 'admin', 'auth', 'blog'];
 
-        echo view('settings/translations/edit', [
+        return view('settings/translations/edit', [
             'title' => 'Modifier la Traduction',
             'translation' => $translation,
             'languages' => $languages,
@@ -174,7 +174,7 @@ class TranslationController
         header('Content-Type: application/json');
         header('Content-Disposition: attachment; filename="translations-' . $language . '-' . date('Y-m-d') . '.json"');
 
-        echo json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        return json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         exit;
     }
 
@@ -186,7 +186,7 @@ class TranslationController
             ->limit(100)
             ->get();
 
-        echo view('settings/translations/history', [
+        return view('settings/translations/history', [
             'title' => 'Historique des Traductions',
             'history' => $history,
         ]);

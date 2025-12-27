@@ -14,7 +14,7 @@ class HealthCheckController
     {
         $healthCheck = HealthCheckService::checkAllServices();
 
-        echo view('Settings/health/index', [
+        return view('Settings/health/index', [
             'healthCheck' => $healthCheck,
             'title' => 'System Health Monitor'
         ]);
@@ -39,7 +39,7 @@ class HealthCheckController
         };
 
         http_response_code($httpCode);
-        echo json_encode($summary, JSON_PRETTY_PRINT);
+        return json_encode($summary, JSON_PRETTY_PRINT);
         exit;
     }
 

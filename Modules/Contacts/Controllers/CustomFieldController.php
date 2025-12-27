@@ -12,7 +12,7 @@ class CustomFieldController
         $app = Application::getInstance();
         $fields = ContactFieldDefinition::query()->orderBy('sort_order')->get();
 
-        echo view('contacts/fields/index', [
+        return view('contacts/fields/index', [
             'title' => 'Champs Personnalisés',
             'fields' => $fields
         ]);
@@ -22,7 +22,7 @@ class CustomFieldController
     {
         $app = Application::getInstance();
 
-        echo view('contacts/fields/create', [
+        return view('contacts/fields/create', [
             'title' => 'Nouveau Champ Personnalisé'
         ]);
     }
@@ -80,7 +80,7 @@ class CustomFieldController
             return;
         }
 
-        echo view('contacts/fields/edit', [
+        return view('contacts/fields/edit', [
             'title' => 'Modifier Champ Personnalisé',
             'field' => $field
         ]);

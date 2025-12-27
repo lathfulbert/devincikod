@@ -38,7 +38,7 @@ class EmailCampaignController
 
         $campaigns = $query->get();
 
-        echo view('emailmarketing/campaigns/index', [
+        return view('emailmarketing/campaigns/index', [
             'title' => 'Email Campaigns',
             'campaigns' => $campaigns,
             'currentStatus' => $status
@@ -52,7 +52,7 @@ class EmailCampaignController
     {
         $templates = EmailTemplate::where('is_active', true)->get();
 
-        echo view('emailmarketing/campaigns/create', [
+        return view('emailmarketing/campaigns/create', [
             'title' => 'Create Email Campaign',
             'templates' => $templates
         ]);
@@ -109,7 +109,7 @@ class EmailCampaignController
         // Statistiques de la campagne
         $stats = $this->analyticsService->getEmailCampaignStats($campaign->id);
 
-        echo view('emailmarketing/campaigns/show', [
+        return view('emailmarketing/campaigns/show', [
             'title' => 'Campaign: ' . $campaign->name,
             'campaign' => $campaign,
             'stats' => $stats
@@ -132,7 +132,7 @@ class EmailCampaignController
 
         $templates = EmailTemplate::where('is_active', true)->get();
 
-        echo view('emailmarketing/campaigns/edit', [
+        return view('emailmarketing/campaigns/edit', [
             'title' => 'Edit Campaign: ' . $campaign->name,
             'campaign' => $campaign,
             'templates' => $templates
@@ -328,7 +328,7 @@ class EmailCampaignController
         $stats = $this->analyticsService->getEmailCampaignStats($campaign->id);
         $timeSeriesData = $this->analyticsService->getTimeSeriesData($campaign->id, 'hour');
 
-        echo view('emailmarketing/campaigns/analytics', [
+        return view('emailmarketing/campaigns/analytics', [
             'title' => 'Campaign Analytics: ' . $campaign->name,
             'campaign' => $campaign,
             'stats' => $stats,

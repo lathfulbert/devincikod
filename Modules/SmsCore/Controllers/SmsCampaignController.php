@@ -36,7 +36,7 @@ class SmsCampaignController
         $query = $this->scopeByOwnership($query, 'created_by');
         $campaigns = $query->get();
 
-        echo view('SmsCore/sms/campaigns/index', [
+        return view('SmsCore/sms/campaigns/index', [
             'campaigns' => $campaigns,
             'title' => 'SMS Campaigns',
             'isAdmin' => $this->isAdmin()
@@ -57,7 +57,7 @@ class SmsCampaignController
         $userId = $_SESSION['user']['id'] ?? null;
         $senderNames = $userId ? SenderName::getForUser($userId) : [];
 
-        echo view('SmsCore/sms/campaigns/create', [
+        return view('SmsCore/sms/campaigns/create', [
             'title' => 'Nouvelle Campagne SMS',
             'contacts' => $contacts,
             'placeholders' => $placeholders,
@@ -194,7 +194,7 @@ class SmsCampaignController
         $userId = $_SESSION['user']['id'] ?? null;
         $senderNames = $userId ? SenderName::getForUser($userId) : [];
 
-        echo view('SmsCore/sms/campaigns/edit', [
+        return view('SmsCore/sms/campaigns/edit', [
             'title' => 'Modifier Campagne: ' . $campaign->name,
             'campaign' => $campaign,
             'contacts' => $contacts,
@@ -265,19 +265,19 @@ class SmsCampaignController
         $contactId = $_POST['contact_id'] ?? null;
 
         if (!$message || !$contactId) {
-            echo json_encode(['error' => 'Message et contact requis']);
+            return json_encode(['error' => 'Message et contact requis']);
             exit;
         }
 
         $contact = Contact::find($contactId);
         if (!$contact) {
-            echo json_encode(['error' => 'Contact introuvable']);
+            return json_encode(['error' => 'Contact introuvable']);
             exit;
         }
 
         $personalizedMessage = $this->personalizationService->personalize($message, $contact);
 
-        echo json_encode([
+        return json_encode([
             'success' => true,
             'preview' => $personalizedMessage,
             'contact_name' => $contact->getFullName()
@@ -308,7 +308,7 @@ class SmsCampaignController
             ->orderBy('created_at', 'desc')
             ->get();
 
-        echo view('SmsCore/sms/campaigns/show', [
+        return view('SmsCore/sms/campaigns/show', [
             'campaign' => $campaign,
             'queueItems' => $queueItems,
             'title' => 'Campaign: ' . $campaign->name,

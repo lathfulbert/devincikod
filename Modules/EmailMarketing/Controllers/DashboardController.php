@@ -62,7 +62,7 @@ class DashboardController
             'click_rate' => $globalStats['rates']['click_rate'] ?? 0
         ];
 
-        echo view('emailmarketing/dashboard', [
+        return view('emailmarketing/dashboard', [
             'title' => 'Email Marketing Dashboard',
             'stats' => $stats,
             'globalStats' => $globalStats,
@@ -111,7 +111,7 @@ class DashboardController
         // Évolution mensuelle
         $monthlyData = $this->getMonthlyEvolution();
 
-        echo view('emailmarketing/dashboard/statistics', [
+        return view('emailmarketing/dashboard/statistics', [
             'title' => 'Email Marketing Statistics',
             'periods' => $periods,
             'byStatus' => $byStatus,

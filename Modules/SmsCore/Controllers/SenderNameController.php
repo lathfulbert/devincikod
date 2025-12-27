@@ -22,7 +22,7 @@ class SenderNameController
     {
         $senderNames = SenderName::orderBy('created_at', 'desc')->get();
 
-        echo view('SmsCore/sms/sender-names/index', [
+        return view('SmsCore/sms/sender-names/index', [
             'title' => 'Sender Names Management',
             'senderNames' => $senderNames
         ]);
@@ -33,7 +33,7 @@ class SenderNameController
      */
     public function create()
     {
-        echo view('SmsCore/sms/sender-names/create', [
+        return view('SmsCore/sms/sender-names/create', [
             'title' => 'Add New Sender Name'
         ]);
     }
@@ -102,7 +102,7 @@ class SenderNameController
               exit;
         }
 
-        echo view('SmsCore/sms/sender-names/edit', [
+        return view('SmsCore/sms/sender-names/edit', [
             'title' => 'Edit Sender Name',
             'senderName' => $senderName
         ]);
@@ -184,7 +184,7 @@ class SenderNameController
         $assignedUsers = $senderName->getAssignedUsers();
         $assignedUserIds = array_column($assignedUsers, 'id');
 
-        echo view('SmsCore/sms/sender-names/assign', [
+        return view('SmsCore/sms/sender-names/assign', [
             'title' => 'Assign Users - ' . $senderName->name,
             'senderName' => $senderName,
             'users' => $users,
@@ -275,13 +275,13 @@ class SenderNameController
         $userId = $user ? $user->id : ($_SESSION['user_id'] ?? 0);
 
         if (!$userId) {
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return json_encode(['success' => false, 'message' => 'Unauthorized']);
             exit;
         }
 
         $senderNames = SenderName::getForUser($userId);
 
-        echo json_encode([
+        return json_encode([
             'success' => true,
             'data' => array_map(function($sn) {
                 return [

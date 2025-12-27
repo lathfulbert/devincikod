@@ -17,7 +17,7 @@ class AkpaController
             ['id' => 3, 'title' => 'Troisième article', 'author' => 'Admin', 'created_at' => '2024-01-17'],
         ];
 
-        echo view('akpa/index', [
+        return view('akpa/index', [
             'title' => 'Liste des Articles',
             'posts' => $posts
         ]);
@@ -27,7 +27,7 @@ class AkpaController
     {
         $app = Application::getInstance();
 
-        echo view('akpa/create', [
+        return view('akpa/create', [
             'title' => 'Nouvel Article'
         ]);
     }
@@ -43,7 +43,7 @@ class AkpaController
         $app = Application::getInstance();
         $id = $params['id'] ?? null;
 
-        echo view('akpa/edit', [
+        return view('akpa/edit', [
             'title' => 'Modifier l\'article #' . $id,
             'id' => $id
         ]);

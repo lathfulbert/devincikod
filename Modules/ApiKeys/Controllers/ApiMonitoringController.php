@@ -47,7 +47,7 @@ class ApiMonitoringController
             $healthStatuses[$key->id] = $this->monitoringService->getHealthStatus($key->id, '1h');
         }
 
-        echo view('ApiKeys/apikeys/monitoring', [
+        return view('ApiKeys/apikeys/monitoring', [
             'title' => 'API Monitoring',
             'apiKeys' => $apiKeys,
             'allAlerts' => $allAlerts,
@@ -92,7 +92,7 @@ class ApiMonitoringController
         $anomalies = $this->monitoringService->detectAnomalies($apiKeyId);
         $alerts = $this->monitoringService->needsAttention($apiKeyId);
 
-        echo view('ApiKeys/apikeys/monitoring-details', [
+        return view('ApiKeys/apikeys/monitoring-details', [
             'title' => 'API Monitoring - ' . $apiKey->name,
             'apiKey' => $apiKey,
             'usageSummary' => $usageSummary,
@@ -109,14 +109,14 @@ class ApiMonitoringController
         $userId = $_SESSION['user_id'] ?? null;
 
         if (!$userId) {
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return json_encode(['success' => false, 'message' => 'Unauthorized']);
             exit;
         }
 
         $apiKeyId = $_GET['api_key_id'] ?? null;
 
         if (!$apiKeyId) {
-            echo json_encode(['success' => false, 'message' => 'API key ID required']);
+            return json_encode(['success' => false, 'message' => 'API key ID required']);
             exit;
         }
 
@@ -126,7 +126,7 @@ class ApiMonitoringController
             ->first();
 
         if (!$apiKey) {
-            echo json_encode(['success' => false, 'message' => 'API key not found']);
+            return json_encode(['success' => false, 'message' => 'API key not found']);
             exit;
         }
 
@@ -134,7 +134,7 @@ class ApiMonitoringController
         $health = $this->monitoringService->getHealthStatus($apiKeyId, $period);
 
         header('Content-Type: application/json');
-        echo json_encode(['success' => true, 'data' => $health]);
+        return json_encode(['success' => true, 'data' => $health]);
         exit;
     }
 
@@ -146,14 +146,14 @@ class ApiMonitoringController
         $userId = $_SESSION['user_id'] ?? null;
 
         if (!$userId) {
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return json_encode(['success' => false, 'message' => 'Unauthorized']);
             exit;
         }
 
         $apiKeyId = $_GET['api_key_id'] ?? null;
 
         if (!$apiKeyId) {
-            echo json_encode(['success' => false, 'message' => 'API key ID required']);
+            return json_encode(['success' => false, 'message' => 'API key ID required']);
             exit;
         }
 
@@ -163,14 +163,14 @@ class ApiMonitoringController
             ->first();
 
         if (!$apiKey) {
-            echo json_encode(['success' => false, 'message' => 'API key not found']);
+            return json_encode(['success' => false, 'message' => 'API key not found']);
             exit;
         }
 
         $anomalies = $this->monitoringService->detectAnomalies($apiKeyId);
 
         header('Content-Type: application/json');
-        echo json_encode(['success' => true, 'data' => $anomalies]);
+        return json_encode(['success' => true, 'data' => $anomalies]);
         exit;
     }
 }

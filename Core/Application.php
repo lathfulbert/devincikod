@@ -262,7 +262,16 @@ class Application extends Container
         // Cleanup
         $uri = '/' . ltrim($uri, '/');
 
-        $this->router->dispatch($method, $uri);
+        $response = $this->router->dispatch($method, $uri);
+
+        if (is_string($response)) {
+            echo $response;
+        } elseif (is_array($response)) {
+            header('Content-Type: application/json');
+            echo json_encode($response);
+        } elseif (is_numeric($response)) {
+            echo (string) $response;
+        }
     }
 
     /**

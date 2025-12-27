@@ -42,7 +42,7 @@ class WorkflowController
 
         $workflows = $query->get();
 
-        echo view('emailmarketing/workflows/index', [
+        return view('emailmarketing/workflows/index', [
             'title' => 'Workflows',
             'workflows' => $workflows,
             'currentStatus' => $status
@@ -56,7 +56,7 @@ class WorkflowController
     {
         $templates = EmailTemplate::where('is_active', true)->get();
 
-        echo view('emailmarketing/workflows/create', [
+        return view('emailmarketing/workflows/create', [
             'title' => 'Create Workflow',
             'templates' => $templates
         ]);
@@ -122,7 +122,7 @@ class WorkflowController
             ->limit(20)
             ->get();
 
-        echo view('emailmarketing/workflows/show', [
+        return view('emailmarketing/workflows/show', [
             'title' => 'Workflow: ' . $workflow->name,
             'workflow' => $workflow,
             'executions' => $executions
@@ -145,7 +145,7 @@ class WorkflowController
 
         $templates = EmailTemplate::where('is_active', true)->get();
 
-        echo view('emailmarketing/workflows/edit', [
+        return view('emailmarketing/workflows/edit', [
             'title' => 'Edit Workflow: ' . $workflow->name,
             'workflow' => $workflow,
             'templates' => $templates

@@ -30,7 +30,7 @@ class MonitoringController
         $health = $this->monitoringService->getSystemHealth();
 
         header('Content-Type: application/json');
-        echo json_encode($health);
+        return json_encode($health);
         exit;
     }
 }

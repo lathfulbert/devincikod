@@ -18,7 +18,7 @@ class SmsSettingsController
         $gateways = SmsGateway::all();
         $settings = Setting::getByGroup('sms');
 
-        echo view('settings/sms/index', [
+        return view('settings/sms/index', [
             'title' => 'Configuration SMS',
             'gateways' => $gateways,
             'settings' => $settings
@@ -32,7 +32,7 @@ class SmsSettingsController
     {
         $app = Application::getInstance();
 
-        echo view('settings/sms/create', [
+        return view('settings/sms/create', [
             'title' => 'Ajouter un Gateway SMS'
         ]);
     }
@@ -81,7 +81,7 @@ class SmsSettingsController
             redirect('/admin/settings/sms');
         }
 
-        echo view('settings/sms/edit', [
+        return view('settings/sms/edit', [
             'title' => 'Éditer Gateway SMS',
             'gateway' => $gateway
         ]);
@@ -165,12 +165,12 @@ class SmsSettingsController
         $gateway = SmsGateway::find($id);
 
         if (!$gateway) {
-            echo json_encode(['success' => false, 'message' => 'Gateway introuvable']);
+            return json_encode(['success' => false, 'message' => 'Gateway introuvable']);
             exit;
         }
 
         $result = $gateway->testConnection();
-        echo json_encode($result);
+        return json_encode($result);
         exit;
     }
 
@@ -236,7 +236,7 @@ class SmsSettingsController
         $gateway = SmsGateway::find($id);
 
         if (!$gateway) {
-            echo json_encode(['success' => false, 'message' => 'Gateway introuvable']);
+            return json_encode(['success' => false, 'message' => 'Gateway introuvable']);
             exit;
         }
 
@@ -250,7 +250,7 @@ class SmsSettingsController
             $hasCredentials = !empty($gateway->api_key) && !empty($gateway->api_secret);
 
             if (!$hasCredentials) {
-                echo json_encode([
+                return json_encode([
                     'success' => false,
                     'message' => 'Impossible de passer en mode PRODUCTION: Aucune credential configurée. Veuillez d\'abord éditer le gateway et entrer vos API Key et API Secret.'
                 ]);
@@ -258,7 +258,7 @@ class SmsSettingsController
             }
 
             // Les credentials existent, le système basculera automatiquement en PROD
-            echo json_encode([
+            return json_encode([
                 'success' => true,
                 'message' => 'Mode PRODUCTION activé. Les SMS seront réellement envoyés et facturés.'
             ]);
@@ -268,7 +268,7 @@ class SmsSettingsController
             $stmt = $pdo->prepare("UPDATE sms_gateways SET api_key = NULL, api_secret = NULL WHERE id = ?");
             $stmt->execute([$id]);
 
-            echo json_encode([
+            return json_encode([
                 'success' => true,
                 'message' => 'Mode MOCK (simulation) activé. Les SMS ne seront pas réellement envoyés.'
             ]);

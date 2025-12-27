@@ -13,7 +13,7 @@ class SmsHistoryController
     {
         $app = Application::getInstance();
         // TODO: Récupérer l'historique des SMS
-        echo view('SmsCore/sms/history', [
+        return view('SmsCore/sms/history', [
             'title' => 'Historique des SMS'
         ]);
     }

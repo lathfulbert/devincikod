@@ -13,14 +13,14 @@ class AdminUserController
     {
         $app = Application::getInstance();
         $users = User::query()->with('roles')->orderBy('id', 'DESC')->paginate(10);
-        echo view('users/admin/users/index', ['title' => 'Users', 'users' => $users]);
+        return view('users/admin/users/index', ['title' => 'Users', 'users' => $users]);
     }
 
     public function create()
     {
         $app = Application::getInstance();
         $roles = Role::all();
-        echo view('users/admin/users/create', ['title' => 'Create User', 'roles' => $roles]);
+        return view('users/admin/users/create', ['title' => 'Create User', 'roles' => $roles]);
     }
 
     public function store()
@@ -76,7 +76,7 @@ class AdminUserController
         $userRoles = $user->roles()->getResults();
         $userRoleIds = array_map(fn($r) => $r->id, $userRoles);
 
-        echo view('users/admin/users/edit', [
+        return view('users/admin/users/edit', [
             'title' => 'Edit User',
             'user' => $user,
             'roles' => $roles,

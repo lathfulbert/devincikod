@@ -32,7 +32,7 @@ class SmsBillingController
         $logs = $query->with('user')->limit($limit)->offset($offset)->get();
         $totalPages = ceil($total / $limit);
 
-        echo view('SmsCore/sms/billing/index', [
+        return view('SmsCore/sms/billing/index', [
             'logs' => $logs,
             'currentPage' => $page,
             'totalPages' => $totalPages,

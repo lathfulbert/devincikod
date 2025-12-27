@@ -13,7 +13,7 @@ class PasswordResetController
      */
     public function forgotPassword()
     {
-        echo view('auth/forgot-password', []);
+        return view('auth/forgot-password', []);
     }
 
     /**
@@ -93,7 +93,7 @@ class PasswordResetController
             exit;
         }
 
-        echo view('auth/reset-password', [
+        return view('auth/reset-password', [
             'token' => $token,
             'email' => $email
         ]);

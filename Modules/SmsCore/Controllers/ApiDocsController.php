@@ -28,7 +28,7 @@ class ApiDocsController
             $htmlContent = $parsedown->text($markdown);
         }
 
-        echo view('SmsCore/api/docs', [
+        return view('SmsCore/api/docs', [
             'title' => 'Documentation API SMS',
             'markdown' => $markdown,
             'html' => $htmlContent,

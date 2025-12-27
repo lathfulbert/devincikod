@@ -41,7 +41,7 @@ class EmailTemplateController
 
         $categories = array_map(fn($item) => $item->category, $rawCategories);
 
-        echo view('emailmarketing/templates/index', [
+        return view('emailmarketing/templates/index', [
             'title' => 'Email Templates',
             'templates' => $templates,
             'categories' => $categories,
@@ -54,7 +54,7 @@ class EmailTemplateController
      */
     public function create()
     {
-        echo view('emailmarketing/templates/create', [
+        return view('emailmarketing/templates/create', [
             'title' => 'Create Email Template'
         ]);
     }
@@ -112,7 +112,7 @@ class EmailTemplateController
         // Compteur d'utilisation
         $usageCount = $template->campaigns()->count();
 
-        echo view('emailmarketing/templates/show', [
+        return view('emailmarketing/templates/show', [
             'title' => 'Template: ' . $template->name,
             'template' => $template,
             'variables' => $variables,
@@ -134,7 +134,7 @@ class EmailTemplateController
             exit;
         }
 
-        echo view('emailmarketing/templates/edit', [
+        return view('emailmarketing/templates/edit', [
             'title' => 'Edit Template: ' . $template->name,
             'template' => $template
         ]);

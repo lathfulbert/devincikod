@@ -19,7 +19,7 @@ class ApiSettingsController
         $app = Application::getInstance();
         $settings = $this->settingsService->getApiSettings();
 
-        echo view('settings/api', [
+        return view('settings/api', [
             'title' => 'Paramètres API',
             'settings' => $settings,
         ]);
@@ -55,7 +55,7 @@ class ApiSettingsController
         $result = $this->testApiConnection($service, $apiKey);
 
         header('Content-Type: application/json');
-        echo json_encode($result);
+        return json_encode($result);
         exit;
     }
 
@@ -105,7 +105,7 @@ class ApiSettingsController
         $key = bin2hex(random_bytes(32));
 
         header('Content-Type: application/json');
-        echo json_encode(['success' => true, 'key' => $key]);
+        return json_encode(['success' => true, 'key' => $key]);
         exit;
     }
 }

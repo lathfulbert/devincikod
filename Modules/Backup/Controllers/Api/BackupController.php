@@ -23,7 +23,7 @@ class BackupController
         $backups = Backup::query()->orderBy('created_at', 'DESC')->get();
 
         header('Content-Type: application/json');
-        echo json_encode(['status' => 'success', 'data' => $backups]);
+        return json_encode(['status' => 'success', 'data' => $backups]);
         exit;
     }
 
@@ -34,11 +34,11 @@ class BackupController
         try {
             $backup = $this->backupService->runBackup($type, 'api_user:1');
             header('Content-Type: application/json');
-            echo json_encode(['status' => 'success', 'message' => 'Backup completed', 'data' => $backup]);
+            return json_encode(['status' => 'success', 'message' => 'Backup completed', 'data' => $backup]);
         } catch (\Exception $e) {
             http_response_code(500);
             header('Content-Type: application/json');
-            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+            return json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
         exit;
     }
@@ -51,12 +51,12 @@ class BackupController
         if (!$backup) {
             http_response_code(404);
             header('Content-Type: application/json');
-            echo json_encode(['status' => 'error', 'message' => 'Backup not found']);
+            return json_encode(['status' => 'error', 'message' => 'Backup not found']);
             exit;
         }
 
         header('Content-Type: application/json');
-        echo json_encode(['status' => 'success', 'data' => $backup]);
+        return json_encode(['status' => 'success', 'data' => $backup]);
         exit;
     }
 
@@ -68,7 +68,7 @@ class BackupController
         if (!$backup) {
             http_response_code(404);
             header('Content-Type: application/json');
-            echo json_encode(['status' => 'error', 'message' => 'Backup not found']);
+            return json_encode(['status' => 'error', 'message' => 'Backup not found']);
             exit;
         }
 
@@ -78,7 +78,7 @@ class BackupController
         $backup->delete();
 
         header('Content-Type: application/json');
-        echo json_encode(['status' => 'success', 'message' => 'Backup deleted']);
+        return json_encode(['status' => 'success', 'message' => 'Backup deleted']);
         exit;
     }
 }

@@ -41,7 +41,7 @@ class EmailApiController
         // Validation
         if (empty($data['to']) || empty($data['subject']) || empty($data['html'])) {
             http_response_code(400);
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'error' => 'Missing required fields: to, subject, html'
             ]);
@@ -63,10 +63,10 @@ class EmailApiController
             );
 
             http_response_code($result['success'] ? 200 : 400);
-            echo json_encode($result);
+            return json_encode($result);
         } catch (\Exception $e) {
             http_response_code(500);
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'error' => $e->getMessage()
             ]);
@@ -88,7 +88,7 @@ class EmailApiController
         // Validation
         if (empty($data['recipients']) || empty($data['template_id'])) {
             http_response_code(400);
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'error' => 'Missing required fields: recipients, template_id'
             ]);
@@ -103,10 +103,10 @@ class EmailApiController
             );
 
             http_response_code($result['success'] ? 200 : 207); // 207 = Multi-Status
-            echo json_encode($result);
+            return json_encode($result);
         } catch (\Exception $e) {
             http_response_code(500);
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'error' => $e->getMessage()
             ]);
@@ -135,7 +135,7 @@ class EmailApiController
         $total = $query->count();
         $campaigns = $query->limit($limit)->offset($offset)->get();
 
-        echo json_encode([
+        return json_encode([
             'success' => true,
             'total' => $total,
             'limit' => $limit,
@@ -158,7 +158,7 @@ class EmailApiController
 
         if (!$campaign) {
             http_response_code(404);
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'error' => 'Campaign not found'
             ]);
@@ -167,7 +167,7 @@ class EmailApiController
 
         $stats = $this->analyticsService->getEmailCampaignStats($campaign->id);
 
-        echo json_encode([
+        return json_encode([
             'success' => true,
             'data' => [
                 'campaign' => $campaign->toArray(),
@@ -207,7 +207,7 @@ class EmailApiController
 
         $stats = $this->analyticsService->getGlobalEmailStats($filters);
 
-        echo json_encode([
+        return json_encode([
             'success' => true,
             'period' => $period,
             'data' => $stats
@@ -229,7 +229,7 @@ class EmailApiController
         // Validation
         if (empty($data['workflow_id']) || empty($data['contact_id'])) {
             http_response_code(400);
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'error' => 'Missing required fields: workflow_id, contact_id'
             ]);
@@ -240,7 +240,7 @@ class EmailApiController
 
         if (!$workflow) {
             http_response_code(404);
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'error' => 'Workflow not found'
             ]);
@@ -256,7 +256,7 @@ class EmailApiController
 
         if (!$contact) {
             http_response_code(404);
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'error' => 'Contact not found'
             ]);
@@ -267,10 +267,10 @@ class EmailApiController
             $result = $this->multiChannelService->executeWorkflow($workflow, $contact);
 
             http_response_code($result['success'] ? 200 : 400);
-            echo json_encode($result);
+            return json_encode($result);
         } catch (\Exception $e) {
             http_response_code(500);
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'error' => $e->getMessage()
             ]);

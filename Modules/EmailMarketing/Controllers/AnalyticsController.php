@@ -47,7 +47,7 @@ class AnalyticsController
             ->limit(50)
             ->get();
 
-        echo view('emailmarketing/analytics/index', [
+        return view('emailmarketing/analytics/index', [
             'title' => 'Email Marketing Analytics',
             'stats' => $stats,
             'chartData' => $chartData,
@@ -74,7 +74,7 @@ class AnalyticsController
         $stats = $this->analyticsService->getEmailCampaignStats($campaign->id);
         $timeSeriesData = $this->analyticsService->getTimeSeriesData($campaign->id, 'hour');
 
-        echo view('emailmarketing/analytics/campaign', [
+        return view('emailmarketing/analytics/campaign', [
             'title' => 'Campaign Analytics: ' . $campaign->name,
             'campaign' => $campaign,
             'stats' => $stats,
@@ -110,7 +110,7 @@ class AnalyticsController
             }
         }
 
-        echo view('emailmarketing/analytics/compare', [
+        return view('emailmarketing/analytics/compare', [
             'title' => 'Compare Campaigns',
             'campaigns' => $campaigns,
             'comparisons' => $comparisons
@@ -127,7 +127,7 @@ class AnalyticsController
         // Récupérer les stats multicanal depuis campaign_logs
         $stats = $this->analyticsService->getMultiChannelCampaignStats($id, 'multichannel');
 
-        echo view('emailmarketing/analytics/multichannel', [
+        return view('emailmarketing/analytics/multichannel', [
             'title' => 'Multichannel Campaign Analytics',
             'campaignId' => $id,
             'stats' => $stats

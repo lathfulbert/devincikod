@@ -41,7 +41,7 @@ class AuthController
             return;
         }
 
-        echo view('auth/auth/login');
+        return view('auth/auth/login');
     }
 
     /**
@@ -196,7 +196,7 @@ class AuthController
             return;
         }
 
-        echo view('auth/register');
+        return view('auth/register');
     }
 
     /**

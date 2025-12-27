@@ -35,7 +35,7 @@ class WidgetManagerController
             ];
         }
 
-        echo view('dashboard/manage_widgets', ['widgets' => $widgetList]);
+        return view('dashboard/manage_widgets', ['widgets' => $widgetList]);
     }
 
     public function toggle()

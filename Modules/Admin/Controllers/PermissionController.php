@@ -48,7 +48,7 @@ class PermissionController
         $modules = \Modules\RBAC\Models\Module::all();
         $roles = \Modules\RBAC\Models\Role::all();
 
-        echo view('admin/permissions/index', [
+        return view('admin/permissions/index', [
             'title' => 'Permissions',
             'permissions' => $permissions,
             'modules' => $modules,
@@ -62,7 +62,7 @@ class PermissionController
     {
         $app = Application::getInstance();
         $modules = Module::all();
-        echo view('admin/permissions/create', [
+        return view('admin/permissions/create', [
             'title' => 'Créer une Permission',
             'modules' => $modules
         ]);
@@ -105,7 +105,7 @@ class PermissionController
         $permission = Permission::find($id);
         $modules = Module::all();
 
-        echo view('admin/permissions/edit', [
+        return view('admin/permissions/edit', [
             'title' => 'Modifier la Permission',
             'permission' => $permission,
             'modules' => $modules

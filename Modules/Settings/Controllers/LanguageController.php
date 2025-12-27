@@ -51,7 +51,7 @@ class LanguageController
             ]);
         }
 
-        echo view('settings/languages/index', [
+        return view('settings/languages/index', [
             'title' => 'Gestion des Langues',
             'languages' => $languages,
             'default_locale' => $defaultLocale,

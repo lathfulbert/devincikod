@@ -54,7 +54,7 @@ class MfaController
             }
         }
 
-        echo view('auth/mfa/challenge', [
+        return view('auth/mfa/challenge', [
             'methods' => $methods
         ]);
     }
@@ -111,7 +111,7 @@ class MfaController
         header('Content-Type: application/json');
 
         if (!isset($_SESSION['mfa_required'])) {
-            echo json_encode(['success' => false, 'message' => 'Non autorisé. Session MFA invalide.']);
+            return json_encode(['success' => false, 'message' => 'Non autorisé. Session MFA invalide.']);
             return;
         }
 
@@ -119,7 +119,7 @@ class MfaController
         $methodType = $_POST['method'] ?? null;
 
         if (!$methodType) {
-            echo json_encode(['success' => false, 'message' => 'Méthode requise']);
+            return json_encode(['success' => false, 'message' => 'Méthode requise']);
             return;
         }
 
@@ -130,7 +130,7 @@ class MfaController
             ->first();
 
         if (!$setup) {
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'message' => "Méthode '{$methodType}' non configurée pour cet utilisateur"
             ]);
@@ -142,14 +142,14 @@ class MfaController
 
             if ($success) {
                 $value = $setup->getSecret();
-                echo json_encode([
+                return json_encode([
                     'success' => true,
                     'message' => $methodType === 'sms'
                         ? 'SMS envoyé avec succès à ***' . substr($value ?? '', -4)
                         : 'Code envoyé avec succès à ' . ($value ?? 'votre adresse')
                 ]);
             } else {
-                echo json_encode([
+                return json_encode([
                     'success' => false,
                     'message' => "Impossible d'envoyer le code. Vérifiez la configuration du service {$methodType}."
                 ]);
@@ -168,7 +168,7 @@ class MfaController
                 error_log('Failed to send OTP: ' . $e->getMessage());
             }
 
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'message' => 'Erreur lors de l\'envoi du code: ' . $e->getMessage()
             ]);
@@ -188,7 +188,7 @@ class MfaController
         $userId = $_SESSION['user_id'];
         $methods = $this->mfaManager->getAllUserMethods($userId);
 
-        echo view('auth/mfa/settings', [
+        return view('auth/mfa/settings', [
             'methods' => $methods
         ]);
     }
@@ -203,7 +203,7 @@ class MfaController
             return;
         }
 
-        echo view('auth/mfa/sms_setup', [
+        return view('auth/mfa/sms_setup', [
             'title' => 'Activer SMS OTP'
         ]);
     }
@@ -285,7 +285,7 @@ class MfaController
 
         $setupData = $_SESSION['totp_setup'];
 
-        echo view('auth/mfa/totp_setup', [
+        return view('auth/mfa/totp_setup', [
             'qr_code_url' => $setupData['qr_code_url'],
             'secret' => $setupData['secret'],
             'backup_codes' => $setupData['backup_codes']
@@ -336,7 +336,7 @@ class MfaController
             return;
         }
 
-        echo view('auth/mfa/sms_verify', [
+        return view('auth/mfa/sms_verify', [
             'phone' => $_SESSION['sms_setup_phone'] ?? 'votre numéro'
         ]);
     }
@@ -396,7 +396,7 @@ class MfaController
         header('Content-Type: application/json');
 
         if (!isset($_SESSION['user_id'])) {
-            echo json_encode(['success' => false, 'message' => 'Non autorisé']);
+            return json_encode(['success' => false, 'message' => 'Non autorisé']);
             return;
         }
 
@@ -409,7 +409,7 @@ class MfaController
             ->first();
 
         if (!$setup) {
-            echo json_encode(['success' => false, 'message' => 'Configuration SMS non trouvée']);
+            return json_encode(['success' => false, 'message' => 'Configuration SMS non trouvée']);
             return;
         }
 
@@ -419,18 +419,18 @@ class MfaController
             $result = $provider->sendOtp($userId, $phone);
 
             if ($result) {
-                echo json_encode([
+                return json_encode([
                     'success' => true,
                     'message' => 'Code renvoyé avec succès à ***' . substr($phone, -4)
                 ]);
             } else {
-                echo json_encode([
+                return json_encode([
                     'success' => false,
                     'message' => 'Impossible d\'envoyer le code'
                 ]);
             }
         } catch (\Exception $e) {
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'message' => 'Erreur: ' . $e->getMessage()
             ]);
@@ -492,7 +492,7 @@ class MfaController
         // Get available sender names (all system sender names)
         $senderNames = \Modules\SmsCore\Models\SenderName::where('status', 'approved')->get();
 
-        echo view('auth/admin/sms_config', [
+        return view('auth/admin/sms_config', [
             'currentSenderId' => $currentSenderId,
             'currentGateway' => $currentGateway,
             'gateways' => $gateways,

@@ -25,7 +25,7 @@ class ProfileController
             return;
         }
 
-        echo view('users/profile', [
+        return view('users/profile', [
             'title' => 'Mon Profil',
             'user' => $user
         ]);
@@ -91,7 +91,7 @@ class ProfileController
             return;
         }
 
-        echo view('users/change-password', [
+        return view('users/change-password', [
             'title' => 'Changer le mot de passe'
         ]);
     }

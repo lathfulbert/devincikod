@@ -32,7 +32,7 @@ class SiteSettingsController
             'de' => 'Deutsch'
         ];
 
-        echo view('settings/site', [
+        return view('settings/site', [
             'title' => 'Paramètres du Site',
             'settings' => $settings,
             'timezones' => $timezones,

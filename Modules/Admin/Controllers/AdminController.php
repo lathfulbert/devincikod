@@ -21,7 +21,7 @@ class AdminController
         // Récupérer les utilisateurs récents (5 derniers)
         $recent_users = \Modules\Users\Models\User::orderBy('created_at', 'DESC')->limit(5)->get();
 
-        echo view('backend.dashboard', [
+        return view('backend.dashboard', [
             'title' => 'Dashboard',
             'stats' => $stats,
             'recent_users' => $recent_users

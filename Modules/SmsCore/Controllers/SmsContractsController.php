@@ -13,7 +13,7 @@ class SmsContractsController
     {
         $app = Application::getInstance();
         // TODO: Récupérer les contrats SMS
-        echo view('SmsCore/sms/contracts', [
+        return view('SmsCore/sms/contracts', [
             'title' => 'Contrats SMS'
         ]);
     }

@@ -13,7 +13,7 @@ class SmsProvidersController
     {
         $app = Application::getInstance();
         // TODO: Récupérer la liste des fournisseurs
-        echo view('SmsCore/sms/providers', [
+        return view('SmsCore/sms/providers', [
             'title' => 'Fournisseurs SMS'
         ]);
     }

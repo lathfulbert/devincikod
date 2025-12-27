@@ -52,7 +52,7 @@ class ApiAnalyticsController
             $recentLogs = ApiRequestLog::getLogsForApiKey($selectedKeyId, 50);
         }
 
-        echo view('ApiKeys/apikeys/analytics', [
+        return view('ApiKeys/apikeys/analytics', [
             'title' => 'API Analytics',
             'apiKeys' => $apiKeys,
             'selectedKeyId' => $selectedKeyId,
@@ -73,7 +73,7 @@ class ApiAnalyticsController
         $userId = $_SESSION['user_id'] ?? null;
 
         if (!$userId) {
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return json_encode(['success' => false, 'message' => 'Unauthorized']);
             exit;
         }
 
@@ -82,7 +82,7 @@ class ApiAnalyticsController
         $chartType = $_GET['chart_type'] ?? 'timeseries';
 
         if (!$apiKeyId) {
-            echo json_encode(['success' => false, 'message' => 'API key ID required']);
+            return json_encode(['success' => false, 'message' => 'API key ID required']);
             exit;
         }
 
@@ -92,7 +92,7 @@ class ApiAnalyticsController
             ->first();
 
         if (!$apiKey) {
-            echo json_encode(['success' => false, 'message' => 'API key not found']);
+            return json_encode(['success' => false, 'message' => 'API key not found']);
             exit;
         }
 
@@ -113,12 +113,12 @@ class ApiAnalyticsController
                 break;
 
             default:
-                echo json_encode(['success' => false, 'message' => 'Invalid chart type']);
+                return json_encode(['success' => false, 'message' => 'Invalid chart type']);
                 exit;
         }
 
         header('Content-Type: application/json');
-        echo json_encode(['success' => true, 'data' => $data]);
+        return json_encode(['success' => true, 'data' => $data]);
         exit;
     }
 

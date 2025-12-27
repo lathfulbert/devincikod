@@ -31,7 +31,7 @@ class ApiKeyController
         $newKey = $_SESSION['new_api_key'] ?? null;
         unset($_SESSION['new_api_key']);
 
-        echo view('apikeys/apikeys/index', [
+        return view('apikeys/apikeys/index', [
             'title' => 'API Keys Management',
             'apiKeys' => $apiKeys,
             'newKey' => $newKey

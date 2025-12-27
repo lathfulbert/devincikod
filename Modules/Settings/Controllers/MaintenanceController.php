@@ -20,7 +20,7 @@ class MaintenanceController
         $roles = Role::all();
         $users = User::all();
 
-        echo view('settings/maintenance/index', [
+        return view('settings/maintenance/index', [
             'title' => 'Mode Maintenance',
             'config' => $config,
             'roles' => $roles,

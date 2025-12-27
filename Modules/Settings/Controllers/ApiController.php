@@ -18,7 +18,7 @@ class ApiController
         $settings = $this->settingsService->all();
 
         header('Content-Type: application/json');
-        echo json_encode(['success' => true, 'data' => $settings]);
+        return json_encode(['success' => true, 'data' => $settings]);
         exit;
     }
 
@@ -29,7 +29,7 @@ class ApiController
         $value = $this->settingsService->get($key);
 
         header('Content-Type: application/json');
-        echo json_encode(['success' => true, 'key' => $key, 'value' => $value]);
+        return json_encode(['success' => true, 'key' => $key, 'value' => $value]);
         exit;
     }
 
@@ -43,7 +43,7 @@ class ApiController
         $result = $this->settingsService->set($key, $value, $type, $group);
 
         header('Content-Type: application/json');
-        echo json_encode(['success' => $result, 'message' => $result ? 'Setting updated' : 'Failed to update']);
+        return json_encode(['success' => $result, 'message' => $result ? 'Setting updated' : 'Failed to update']);
         exit;
     }
 }

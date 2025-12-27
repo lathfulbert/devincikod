@@ -45,7 +45,7 @@ class CacheController
             'apcu' => extension_loaded('apcu') && ini_get('apc.enabled')
         ];
 
-        echo view('admin/cache/index', [
+        return view('admin/cache/index', [
             'title' => 'Configuration du Cache',
             'config' => $config,
             'extensions' => $extensions
@@ -132,7 +132,7 @@ class CacheController
         header('Content-Type: application/json');
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            echo json_encode(['success' => false, 'message' => 'Méthode non autorisée']);
+            return json_encode(['success' => false, 'message' => 'Méthode non autorisée']);
             return;
         }
 
@@ -142,16 +142,16 @@ class CacheController
             $config = CacheConfig::getConfig();
 
             if (!$config) {
-                echo json_encode(['success' => false, 'message' => 'Configuration non trouvée']);
+                return json_encode(['success' => false, 'message' => 'Configuration non trouvée']);
                 return;
             }
 
             $configArray = (array)$config;
             $testResult = $this->performDriverTest($driver, $configArray);
 
-            echo json_encode($testResult);
+            return json_encode($testResult);
         } catch (\Exception $e) {
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'message' => 'Erreur: ' . $e->getMessage()
             ]);
@@ -230,7 +230,7 @@ class CacheController
 
         $stats = $cache->getStats();
 
-        echo view('admin/cache/stats', [
+        return view('admin/cache/stats', [
             'title' => 'Statistiques du Cache',
             'stats' => $stats
         ]);

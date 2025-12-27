@@ -12,7 +12,7 @@ class DashboardController
         // Vérification d'accès
         if (!auth()->check()) {
             http_response_code(403);
-            echo view('errors.403', [
+            return view('errors.403', [
                 'message' => "Vous devez être connecté pour accéder au dashboard.",
                 'required_permission' => 'auth'
             ]);
@@ -29,7 +29,7 @@ class DashboardController
 
         if (!$isAdmin && (!is_object($user) || !method_exists($user, 'can') || !$user->can('access.dashboard'))) {
             http_response_code(403);
-            echo view('errors.403', [
+            return view('errors.403', [
                 'message' => "Vous n'avez pas l'autorisation d'accéder au dashboard.",
                 'required_permission' => 'access.dashboard'
             ]);
@@ -115,6 +115,6 @@ class DashboardController
 
         // Debug ultime : afficher le contenu réel transmis à la vue
         // Forcer la vue du module Dashboard (notation relative comme dans les autres modules)
-        echo view('dashboard/index', $data);
+        return view('dashboard/index', $data);
     }
 }

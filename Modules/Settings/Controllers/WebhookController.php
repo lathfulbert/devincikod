@@ -12,7 +12,7 @@ class WebhookController
         $app = Application::getInstance();
         $webhooks = Webhook::orderBy('created_at', 'DESC')->get();
 
-        echo view('settings/webhooks/index', [
+        return view('settings/webhooks/index', [
             'title' => 'Gestion des Webhooks',
             'webhooks' => $webhooks,
         ]);
@@ -31,7 +31,7 @@ class WebhookController
             'payment.success' => 'Paiement réussi',
         ];
 
-        echo view('settings/webhooks/create', [
+        return view('settings/webhooks/create', [
             'title' => 'Nouveau Webhook',
             'events' => $events,
         ]);
@@ -81,7 +81,7 @@ class WebhookController
             'payment.success' => 'Paiement réussi',
         ];
 
-        echo view('settings/webhooks/edit', [
+        return view('settings/webhooks/edit', [
             'title' => 'Modifier le Webhook',
             'webhook' => $webhook,
             'events' => $events,
@@ -130,14 +130,14 @@ class WebhookController
 
         if (!$webhook) {
             header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Webhook introuvable']);
+            return json_encode(['success' => false, 'message' => 'Webhook introuvable']);
             exit;
         }
 
         $result = $webhook->test();
 
         header('Content-Type: application/json');
-        echo json_encode($result);
+        return json_encode($result);
         exit;
     }
 
@@ -155,7 +155,7 @@ class WebhookController
 
         $logs = $webhook->logs();
 
-        echo view('settings/webhooks/logs', [
+        return view('settings/webhooks/logs', [
             'title' => 'Logs du Webhook',
             'webhook' => $webhook,
             'logs' => $logs,

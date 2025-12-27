@@ -19,7 +19,7 @@ class ThemeSettingsController
         $app = Application::getInstance();
         $settings = $this->settingsService->getThemeSettings();
 
-        echo view('settings/theme', [
+        return view('settings/theme', [
             'title' => 'Paramètres du Thème',
             'settings' => $settings,
         ]);
@@ -53,7 +53,7 @@ class ThemeSettingsController
     {
         // Return JSON for AJAX preview
         header('Content-Type: application/json');
-        echo json_encode(['success' => true, 'message' => 'Preview applied']);
+        return json_encode(['success' => true, 'message' => 'Preview applied']);
         exit;
     }
 

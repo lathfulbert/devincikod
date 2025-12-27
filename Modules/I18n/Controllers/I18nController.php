@@ -22,7 +22,7 @@ class I18nController
     /**
      * Index: List all translations.
      */
-    public function index(): void
+    public function index()
     {
         $app = Application::getInstance();
         $locale = $_GET['locale'] ?? $this->manager->getLocale();
@@ -35,7 +35,7 @@ class I18nController
         $translations = $this->manager->all($locale);
         $flatTranslations = $this->flattenTranslations($translations);
 
-        echo view('i18n/index', [
+        return view('i18n/index', [
             'title' => 'Gestion des Traductions',
             'translations' => $flatTranslations,
             'current_locale' => $locale,
@@ -47,7 +47,7 @@ class I18nController
     /**
      * Edit a translation key.
      */
-    public function edit(): void
+    public function edit()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->update();
@@ -68,7 +68,7 @@ class I18nController
             ? $this->manager->trans($key, [], $locale)
             : '';
 
-        echo view('i18n/edit', [
+        return view('i18n/edit', [
             'title' => 'Modifier la Traduction',
             'key' => $key,
             'value' => $value,
@@ -123,7 +123,7 @@ class I18nController
     /**
      * Create a new translation.
      */
-    public function create(): void
+    public function create()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->store();
@@ -133,7 +133,7 @@ class I18nController
         $app = Application::getInstance();
         $locale = $_GET['locale'] ?? $this->manager->getLocale();
 
-        echo view('i18n/create', [
+        return view('i18n/create', [
             'title' => 'Nouvelle Traduction',
             'locale' => $locale
         ]);

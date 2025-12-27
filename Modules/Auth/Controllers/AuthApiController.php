@@ -27,7 +27,11 @@ class AuthApiController
      * 
      * @return void
      */
-    public function getPermissions(): void
+    /**
+     * Get current user permissions
+     * GET /api/auth/me/permissions
+     */
+    public function getPermissions()
     {
         // Utiliser la fonction helper auth() ou charger depuis la session
         $user = null;
@@ -41,12 +45,11 @@ class AuthApiController
         }
 
         if (!$user) {
-            $this->jsonResponse([
+            return $this->jsonResponse([
                 'success' => false,
                 'error' => 'Unauthorized',
                 'message' => 'User not authenticated'
             ], 401);
-            return;
         }
 
         // Get all user permissions
@@ -56,7 +59,7 @@ class AuthApiController
         $moduleAccessMiddleware = new \App\Core\Module\Middleware\ModuleAccessMiddleware();
         $accessibleModules = $moduleAccessMiddleware->getAccessibleModules();
 
-        $this->jsonResponse([
+        return $this->jsonResponse([
             'success' => true,
             'data' => [
                 'permissions' => $permissions,
@@ -73,10 +76,8 @@ class AuthApiController
     /**
      * Get current user info
      * GET /api/auth/me
-     * 
-     * @return void
      */
-    public function getMe(): void
+    public function getMe()
     {
         // Utiliser la fonction helper auth() ou charger depuis la session
         $user = null;
@@ -90,15 +91,14 @@ class AuthApiController
         }
 
         if (!$user) {
-            $this->jsonResponse([
+            return $this->jsonResponse([
                 'success' => false,
                 'error' => 'Unauthorized',
                 'message' => 'User not authenticated'
             ], 401);
-            return;
         }
 
-        $this->jsonResponse([
+        return $this->jsonResponse([
             'success' => true,
             'data' => [
                 'id' => $user->id,
@@ -120,10 +120,10 @@ class AuthApiController
     protected function getUserPermissions(User $user): array
     {
         $db = \App\Core\Database\Database::getInstance();
-        
+
         // Get user roles
         $userRoles = \Modules\RBAC\Models\UserRole::where('user_id', $user->id)->get();
-        
+
         if (empty($userRoles)) {
             return [];
         }
@@ -136,7 +136,7 @@ class AuthApiController
                 INNER JOIN role_permissions rp ON p.id = rp.permission_id
                 WHERE rp.role_id IN (" . implode(',', array_fill(0, count($roleIds), '?')) . ")
                 ORDER BY p.module_slug, p.slug";
-        
+
         $stmt = $db->query($sql, $roleIds);
         $permissions = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
@@ -149,15 +149,12 @@ class AuthApiController
      * 
      * @param array $data
      * @param int $statusCode
-     * @return void
+     * @return string|false
      */
-    protected function jsonResponse(array $data, int $statusCode = 200): void
+    protected function jsonResponse(array $data, int $statusCode = 200)
     {
         http_response_code($statusCode);
         header('Content-Type: application/json');
-        echo json_encode($data, JSON_PRETTY_PRINT);
-        exit;
+        return json_encode($data, JSON_PRETTY_PRINT);
     }
 }
-
-

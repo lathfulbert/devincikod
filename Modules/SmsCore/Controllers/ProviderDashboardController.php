@@ -22,7 +22,7 @@ class ProviderDashboardController
         }
         $gateways = SmsGateway::where('is_active', true)->get();
 
-        echo view('SmsCore/providers/index', [
+        return view('SmsCore/providers/index', [
             'title' => 'Tableau de bord Fournisseurs',
             'gateways' => $gateways
         ]);
@@ -59,7 +59,7 @@ class ProviderDashboardController
         $orders = $ordersResult['success'] ? ($ordersResult['data'] ?? []) : [];
         $ordersError = $ordersResult['success'] ? null : $ordersResult['message'];
 
-        echo view('SmsCore/providers/orange', [
+        return view('SmsCore/providers/orange', [
             'title' => 'Statistiques Orange SMS',
             'gateway' => $gatewayConfig,
             'contracts' => $contracts,

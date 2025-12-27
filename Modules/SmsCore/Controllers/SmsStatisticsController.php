@@ -13,7 +13,7 @@ class SmsStatisticsController
     {
         $app = Application::getInstance();
         // TODO: Récupérer les statistiques SMS
-        echo view('SmsCore/sms/statistics', [
+        return view('SmsCore/sms/statistics', [
             'title' => 'Statistiques SMS'
         ]);
     }

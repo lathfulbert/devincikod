@@ -57,7 +57,7 @@ class DashboardController
             'wallet_balance' => $walletBalance
         ];
 
-        echo view('SmsCore/sms/dashboard', [
+        return view('SmsCore/sms/dashboard', [
             'stats' => $stats,
             'recentMessages' => $recentMessages,
             'title' => 'SMS Dashboard'
@@ -144,7 +144,7 @@ class DashboardController
             $currentDate = strtotime('+1 day', $currentDate);
         }
 
-        echo view('SmsCore/sms/statistics', [
+        return view('SmsCore/sms/statistics', [
             'from' => $from,
             'to' => $to,
             'totalSent' => $totalSent,

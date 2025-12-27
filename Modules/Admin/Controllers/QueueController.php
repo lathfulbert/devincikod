@@ -140,7 +140,7 @@ class QueueController
         header('Content-Type: application/json');
 
         $stats = $this->service->getDashboardStats();
-        echo json_encode($stats);
+        return json_encode($stats);
         exit;
     }
 }

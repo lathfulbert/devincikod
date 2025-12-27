@@ -22,7 +22,7 @@ class ApiKeyController
 
         $user = User::find($userId);
 
-        echo view('auth/api/index', [
+        return view('auth/api/index', [
             'user' => $user,
             'hasApiKey' => !empty($user->api_key)
         ]);
@@ -146,6 +146,6 @@ class ApiKeyController
      */
     public function docs()
     {
-        echo view('auth/api/docs', []);
+        return view('auth/api/docs', []);
     }
 }

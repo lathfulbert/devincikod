@@ -46,7 +46,7 @@ class SmsCampaignControllerWithOwnership
         // Exécuter la requête
         $campaigns = $query->get();
 
-        echo view('SmsCore/sms/campaigns/index', [
+        return view('SmsCore/sms/campaigns/index', [
             'campaigns' => $campaigns,
             'title' => 'SMS Campaigns',
             'isAdmin' => $this->isAdmin()
@@ -67,7 +67,7 @@ class SmsCampaignControllerWithOwnership
         $userId = $_SESSION['user']['id'] ?? null;
         $senderNames = $userId ? SenderName::getForUser($userId) : [];
 
-        echo view('SmsCore/sms/campaigns/create', [
+        return view('SmsCore/sms/campaigns/create', [
             'title' => 'Nouvelle Campagne SMS',
             'contacts' => $contacts,
             'placeholders' => $placeholders,
@@ -176,7 +176,7 @@ class SmsCampaignControllerWithOwnership
         // Get campaign messages
         $messages = SmsQueue::where('campaign_id', $id)->orderBy('created_at', 'desc')->get();
 
-        echo view('SmsCore/sms/campaigns/show', [
+        return view('SmsCore/sms/campaigns/show', [
             'title' => 'Détails de la campagne',
             'campaign' => $campaign,
             'messages' => $messages,
@@ -209,7 +209,7 @@ class SmsCampaignControllerWithOwnership
         $userId = $_SESSION['user']['id'] ?? null;
         $senderNames = $userId ? SenderName::getForUser($userId) : [];
 
-        echo view('SmsCore/sms/campaigns/edit', [
+        return view('SmsCore/sms/campaigns/edit', [
             'title' => 'Modifier la campagne',
             'campaign' => $campaign,
             'contacts' => $contacts,

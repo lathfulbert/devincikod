@@ -35,7 +35,7 @@ class UserApiKeyController
 
         // Debug avancé : log de la tentative de rendu de la vue
         $viewName = 'ApiKeys/apikeys/user';
-        echo view($viewName, [
+        return view($viewName, [
             'title' => 'Ma Clé API',
             'user' => $user,
             'apiKey' => $apiKey

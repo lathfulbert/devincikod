@@ -26,7 +26,7 @@ class AuthSettingsController
     {
         $this->checkPermission('admin.auth.settings.view');
         $settings = AuthSetting::all();
-        echo view('auth/admin/auth_settings', [
+        return view('auth/admin/auth_settings', [
             'settings' => $settings
         ]);
     }
@@ -50,7 +50,7 @@ class AuthSettingsController
                     if (json_last_error() !== JSON_ERROR_NONE) {
                         $_SESSION['flash_error'] = "Format JSON invalide pour la blacklist.";
                         $settings = AuthSetting::all();
-                        echo view('auth/admin/auth_settings', [
+                        return view('auth/admin/auth_settings', [
                             'settings' => $settings
                         ]);
                         return;

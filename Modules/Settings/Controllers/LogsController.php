@@ -21,7 +21,7 @@ class LogsController
             $logs = array_slice($allLines, -$lines);
         }
 
-        echo view('Settings/logs/cron', [
+        return view('Settings/logs/cron', [
             'title' => 'Logs Cron',
             'logs' => $logs,
             'logPath' => $logPath,
@@ -46,7 +46,7 @@ class LogsController
             $logs = array_slice($allLines, -$lines);
         }
 
-        echo view('Settings/logs/health', [
+        return view('Settings/logs/health', [
             'title' => 'Logs Health Check',
             'logs' => $logs,
             'logPath' => $logPath,
@@ -71,7 +71,7 @@ class LogsController
             $logs = array_slice($allLines, -$lines);
         }
 
-        echo view('Settings/logs/sms_queue', [
+        return view('Settings/logs/sms_queue', [
             'title' => 'Logs SMS Queue',
             'logs' => $logs,
             'logPath' => $logPath,
@@ -84,7 +84,7 @@ class LogsController
         // Vérifier l'authentification
         if (!isset($_SESSION['user'])) {
             http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Non authentifié']);
+            return json_encode(['success' => false, 'message' => 'Non authentifié']);
             exit;
         }
 
@@ -97,7 +97,7 @@ class LogsController
 
         if (!isset($logPaths[$logType])) {
             http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Type de log invalide']);
+            return json_encode(['success' => false, 'message' => 'Type de log invalide']);
             exit;
         }
 
@@ -105,9 +105,9 @@ class LogsController
 
         if (file_exists($logPath)) {
             file_put_contents($logPath, '');
-            echo json_encode(['success' => true, 'message' => 'Log vidé avec succès']);
+            return json_encode(['success' => true, 'message' => 'Log vidé avec succès']);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Fichier log introuvable']);
+            return json_encode(['success' => false, 'message' => 'Fichier log introuvable']);
         }
     }
 }

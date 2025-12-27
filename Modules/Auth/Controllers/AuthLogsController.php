@@ -30,7 +30,7 @@ class AuthLogsController
         $total = AuthLog::query()->count();
         $totalPages = ceil($total / $perPage);
 
-        echo view('auth/logs/index', [
+        return view('auth/logs/index', [
             'title' => 'Journal d\'authentification',
             'logs' => $logs,
             'page' => $page,
@@ -57,7 +57,7 @@ class AuthLogsController
             ->limit(100)
             ->get();
 
-        echo view('auth/logs/index', [
+        return view('auth/logs/index', [
             'title' => 'Journal d\'authentification - Utilisateur #' . $userId,
             'logs' => $logs,
             'page' => 1,

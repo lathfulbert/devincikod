@@ -18,7 +18,7 @@ class WalletSettingsController
         $gateways = WalletGateway::all();
         $settings = Setting::getByGroup('wallet');
 
-        echo view('settings/wallet/index', [
+        return view('settings/wallet/index', [
             'title' => 'Configuration Wallet',
             'gateways' => $gateways,
             'settings' => $settings
@@ -71,7 +71,7 @@ class WalletSettingsController
     {
         $app = Application::getInstance();
 
-        echo view('settings/wallet/create', [
+        return view('settings/wallet/create', [
             'title' => 'Ajouter un Gateway Wallet'
         ]);
     }
@@ -128,7 +128,7 @@ class WalletSettingsController
             redirect('/admin/settings/wallet');
         }
 
-        echo view('settings/wallet/edit', [
+        return view('settings/wallet/edit', [
             'title' => 'Éditer Gateway Wallet',
             'gateway' => $gateway
         ]);
@@ -229,13 +229,13 @@ class WalletSettingsController
         $gateway = WalletGateway::find($id);
 
         if (!$gateway) {
-            echo json_encode(['success' => false, 'message' => 'Gateway introuvable']);
+            return json_encode(['success' => false, 'message' => 'Gateway introuvable']);
             return;
         }
 
         // Test connection based on provider
         $result = $this->testConnectionByProvider($gateway);
-        echo json_encode($result);
+        return json_encode($result);
     }
 
     /**

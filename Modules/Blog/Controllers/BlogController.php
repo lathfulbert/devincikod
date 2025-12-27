@@ -13,6 +13,6 @@ class BlogController
             ['id' => 2, 'title' => 'Modular PHP', 'content' => 'Building a modular framework is fun.']
         ];
 
-        echo view('blog/index', ['title' => 'Blog Module', 'posts' => $posts]);
+        return view('blog/index', ['title' => 'Blog Module', 'posts' => $posts]);
     }
 }

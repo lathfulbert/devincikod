@@ -137,7 +137,7 @@ public function send()
         $userId = $_SESSION['user']['id'] ?? null;
         $senderNames = $userId ? SenderName::getForUser($userId) : [];
 
-        echo view('SmsCore/sms/send', [
+        return view('SmsCore/sms/send', [
             'title' => 'Send SMS',
             'gateways' => $gateways,
             'senderNames' => $senderNames
@@ -153,7 +153,7 @@ public function send()
         $query = $this->scopeByOwnership($query, 'user_id');
         $messages = $query->get();
 
-        echo view('SmsCore/sms/history', [
+        return view('SmsCore/sms/history', [
             'messages' => $messages,
             'title' => 'SMS History',
             'isAdmin' => $this->isAdmin()
@@ -175,7 +175,7 @@ public function send()
         // Vérifier l'autorisation
         $this->authorizeView($sms, 'user_id', '/admin/sms/history');
 
-        echo view('SmsCore/sms/details', [
+        return view('SmsCore/sms/details', [
             'sms' => $sms,
             'title' => 'SMS Details'
         ]);
@@ -551,7 +551,7 @@ public function send()
 
         try {
             if (!isset($_FILES['file'])) {
-                echo json_encode([
+                return json_encode([
                     'success' => false,
                     'message' => 'Aucun fichier fourni'
                 ]);
@@ -602,7 +602,7 @@ public function send()
             // Preview data (first 3 rows)
             $previewData = array_slice($result['data'], 0, 3);
 
-            echo json_encode([
+            return json_encode([
                 'success' => true,
                 'data' => [
                     'headers' => $headers,
@@ -614,7 +614,7 @@ public function send()
                 ]
             ]);
         } catch (\Exception $e) {
-            echo json_encode([
+            return json_encode([
                 'success' => false,
                 'message' => $e->getMessage()
             ]);
@@ -660,7 +660,7 @@ public function send()
             $error = $result['message'] . (isset($result['error']) ? ': ' . $result['error'] : '');
         }
 
-        echo view('SmsCore/sms/contracts', [
+        return view('SmsCore/sms/contracts', [
             'title' => 'Contrats Orange SMS',
             'contracts' => $contracts,
             'error' => $error,

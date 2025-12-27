@@ -25,12 +25,12 @@ class GatewayController
                 'active' => ($name === $defaultGateway),
             ];
         }
-        echo view('EmailMarketing/gateways/index', ['gateways' => $gateways]);
+        return view('EmailMarketing/gateways/index', ['gateways' => $gateways]);
     }
 
     public function create()
     {
-        echo view('EmailMarketing/gateways/form', ['edit' => false, 'gateway' => []]);
+        return view('EmailMarketing/gateways/form', ['edit' => false, 'gateway' => []]);
     }
 
     public function store()
@@ -57,7 +57,7 @@ class GatewayController
     public function edit($name)
     {
         $config = $this->factory->getGatewayConfigPublic($name);
-        echo view('EmailMarketing/gateways/form', ['edit' => true, 'gateway' => array_merge(['name' => $name], $config)]);
+        return view('EmailMarketing/gateways/form', ['edit' => true, 'gateway' => array_merge(['name' => $name], $config)]);
     }
 
     public function update($name)
